@@ -1,0 +1,1237 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>PISTONWAVE — A Daily Drive</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&family=Rajdhani:wght@400;500;600;700&family=VT323&display=swap" rel="stylesheet">
+<style>
+:root {
+  --bg-deep: #07000f;
+  --bg-mid: #150035;
+  --magenta: #ff2bd6;
+  --cyan: #00f0ff;
+  --yellow: #ffe600;
+  --red: #ff3a3a;
+  --green: #00ff88;
+  --white: #f4f4ff;
+  --grid-line: rgba(255, 43, 214, 0.5);
+}
+* { box-sizing: border-box; margin: 0; padding: 0; }
+html, body {
+  background: var(--bg-deep);
+  color: var(--white);
+  font-family: 'Rajdhani', sans-serif;
+  font-weight: 500;
+  overflow-x: hidden;
+  min-height: 100vh;
+}
+.scene {
+  position: fixed; inset: 0; z-index: -1;
+  background:
+    radial-gradient(ellipse at center 30%, rgba(255, 43, 214, 0.18), transparent 60%),
+    linear-gradient(180deg, #07000f 0%, #150035 30%, #2a005e 55%, #150035 56%, #07000f 100%);
+  overflow: hidden;
+}
+.sun {
+  position: absolute; top: 14%; left: 50%;
+  transform: translateX(-50%);
+  width: 420px; height: 420px;
+  background: linear-gradient(180deg, #fff200 0%, #ff8800 50%, #ff2bd6 100%);
+  border-radius: 50%;
+  box-shadow: 0 0 140px rgba(255, 43, 214, 0.5);
+  -webkit-mask: linear-gradient(180deg, #000 50%, transparent 100%),
+                repeating-linear-gradient(0deg, #000 0 14px, transparent 14px 22px);
+  -webkit-mask-composite: source-in; mask-composite: intersect;
+  opacity: 0.85;
+}
+.grid-floor {
+  position: absolute; bottom: 0; left: 50%;
+  transform: translateX(-50%) perspective(380px) rotateX(60deg);
+  width: 220vw; height: 60vh;
+  background-image:
+    linear-gradient(0deg, var(--grid-line) 1px, transparent 1px),
+    linear-gradient(90deg, var(--grid-line) 1px, transparent 1px);
+  background-size: 60px 60px;
+  animation: grid-scroll 4s linear infinite;
+}
+@keyframes grid-scroll { from { background-position: 0 0; } to { background-position: 0 60px; } }
+
+nav {
+  position: sticky; top: 0; z-index: 100;
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 16px 36px;
+  background: rgba(7, 0, 15, 0.78);
+  backdrop-filter: blur(8px);
+  border-bottom: 1px solid rgba(255, 43, 214, 0.3);
+}
+.logo {
+  font-family: 'Press Start 2P', monospace;
+  font-size: 18px; letter-spacing: 2px;
+  color: var(--cyan);
+  text-shadow: -2px 0 var(--magenta), 2px 0 var(--cyan), 0 0 18px rgba(0, 240, 255, 0.6);
+  cursor: pointer; user-select: none;
+}
+.nav-links { display: flex; gap: 28px; }
+.nav-links a {
+  color: var(--white); text-decoration: none;
+  font-weight: 600; letter-spacing: 1.4px;
+  text-transform: uppercase; font-size: 13px;
+  transition: color 0.2s; position: relative;
+  cursor: pointer;
+}
+.nav-links a:hover { color: var(--magenta); }
+.nav-links a.active { color: var(--magenta); }
+.nav-links a.active::after {
+  content: ''; position: absolute;
+  bottom: -22px; left: 0; right: 0; height: 2px;
+  background: var(--magenta); box-shadow: 0 0 8px var(--magenta);
+}
+.nav-links a.disabled { opacity: 0.35; cursor: not-allowed; }
+.nav-cta {
+  background: var(--magenta); color: var(--bg-deep); border: 0;
+  padding: 9px 22px; font-family: 'Rajdhani', sans-serif;
+  font-weight: 700; letter-spacing: 2px; text-transform: uppercase;
+  font-size: 14px; cursor: pointer;
+  box-shadow: 0 0 20px rgba(255, 43, 214, 0.5);
+  transition: all 0.15s;
+}
+.nav-cta:hover { background: var(--cyan); box-shadow: 0 0 20px rgba(0, 240, 255, 0.7); }
+.user-chip {
+  font-family: 'VT323', monospace; font-size: 18px;
+  color: var(--cyan); letter-spacing: 2px;
+  padding: 8px 14px; border: 1px solid rgba(0, 240, 255, 0.4);
+  background: transparent; cursor: pointer;
+}
+
+main { padding: 36px 36px 100px; max-width: 1600px; margin: 0 auto; }
+
+.proto-banner {
+  text-align: center;
+  font-family: 'VT323', monospace; font-size: 18px;
+  letter-spacing: 3px; color: var(--yellow);
+  background: rgba(255, 230, 0, 0.07);
+  border: 1px dashed rgba(255, 230, 0, 0.4);
+  padding: 8px; margin-bottom: 24px;
+}
+
+.hero {
+  border: 2px solid var(--cyan);
+  background: rgba(7, 0, 15, 0.55);
+  padding: 36px; margin-bottom: 32px;
+  position: relative;
+  box-shadow: 0 0 40px rgba(0, 240, 255, 0.18), inset 0 0 30px rgba(0, 240, 255, 0.08);
+}
+.hero::before {
+  content: ''; position: absolute;
+  top: -2px; left: -2px; right: -2px; height: 4px;
+  background: linear-gradient(90deg, transparent, var(--cyan), var(--magenta), var(--cyan), transparent);
+}
+.hero-tag {
+  font-family: 'VT323', monospace; color: var(--magenta);
+  font-size: 22px; letter-spacing: 4px; margin-bottom: 4px;
+}
+.hero-title {
+  font-family: 'Press Start 2P', monospace;
+  font-size: 44px; margin: 8px 0 22px;
+  color: var(--yellow);
+  text-shadow: 0 0 24px rgba(255, 230, 0, 0.45), 4px 4px 0 var(--magenta);
+  letter-spacing: 4px; line-height: 1.05;
+}
+.hero-body { font-size: 22px; line-height: 1.45; max-width: 920px; }
+.hero-body strong { color: var(--cyan); }
+.constraints { display: flex; gap: 12px; margin-top: 22px; flex-wrap: wrap; }
+.chip {
+  display: inline-block; padding: 7px 16px;
+  border: 1px solid var(--magenta);
+  background: rgba(255, 43, 214, 0.12);
+  color: var(--magenta);
+  font-family: 'VT323', monospace; font-size: 22px; letter-spacing: 2px;
+}
+.chip.warn { border-color: var(--red); background: rgba(255, 58, 58, 0.1); color: var(--red); }
+.chip.time { border-color: var(--cyan); background: rgba(0, 240, 255, 0.1); color: var(--cyan); }
+
+.picker-grid {
+  display: grid; grid-template-columns: 1fr 380px;
+  gap: 28px; align-items: start;
+}
+@media (max-width: 1100px) {
+  .picker-grid { grid-template-columns: 1fr; }
+  .selected-panel { position: relative !important; top: 0 !important; }
+}
+
+.filters { display: flex; gap: 12px; margin-bottom: 14px; flex-wrap: wrap; }
+.filters input, .filters select {
+  background: rgba(7, 0, 15, 0.7);
+  border: 1px solid rgba(0, 240, 255, 0.3);
+  color: var(--white); font-family: 'Rajdhani', sans-serif;
+  font-weight: 500; padding: 10px 14px;
+  font-size: 15px; letter-spacing: 1px;
+}
+.filters input { flex: 1; min-width: 220px; }
+.filters input:focus, .filters select:focus {
+  outline: none; border-color: var(--cyan);
+  box-shadow: 0 0 10px rgba(0, 240, 255, 0.4);
+}
+.filters label.toggle {
+  display: inline-flex; align-items: center; gap: 8px;
+  color: rgba(255, 255, 255, 0.7); font-size: 14px;
+  cursor: pointer; letter-spacing: 1px; text-transform: uppercase;
+}
+.results-count {
+  font-family: 'VT323', monospace; font-size: 18px;
+  color: rgba(255, 255, 255, 0.55); letter-spacing: 2px;
+  margin-bottom: 10px;
+}
+.cars-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap: 16px; }
+.car-card {
+  background: rgba(7, 0, 15, 0.6);
+  border: 1px solid rgba(0, 240, 255, 0.3);
+  padding: 18px; cursor: pointer;
+  transition: transform 0.15s, border-color 0.15s, box-shadow 0.2s;
+  position: relative;
+}
+.car-card:hover {
+  transform: translateY(-4px);
+  border-color: var(--cyan);
+  box-shadow: 0 0 24px rgba(0, 240, 255, 0.35);
+}
+.car-card.ineligible { opacity: 0.45; }
+.car-card.ineligible::after {
+  content: 'INELIGIBLE'; position: absolute;
+  top: 10px; right: 10px;
+  background: var(--red); color: var(--bg-deep);
+  font-family: 'Press Start 2P', monospace;
+  font-size: 9px; padding: 4px 6px; letter-spacing: 1px;
+}
+.car-card.selected {
+  border-color: var(--magenta);
+  box-shadow: 0 0 30px rgba(255, 43, 214, 0.55);
+}
+.car-silhouette { width: 100%; height: 78px; display: block; margin-bottom: 12px; }
+.car-year { font-family: 'VT323', monospace; color: var(--cyan); font-size: 18px; letter-spacing: 2px; }
+.car-name { font-weight: 700; font-size: 17px; margin: 4px 0 10px; letter-spacing: 1px; text-transform: uppercase; line-height: 1.2; }
+.car-meta { display: flex; justify-content: space-between; font-family: 'VT323', monospace; font-size: 18px; letter-spacing: 1px; }
+.car-meta .price { color: var(--yellow); font-weight: bold; }
+
+.show-more-btn {
+  display: block; margin: 28px auto;
+  padding: 12px 36px; background: transparent;
+  border: 1px solid var(--cyan); color: var(--cyan);
+  font-family: 'VT323', monospace; font-size: 22px;
+  letter-spacing: 3px; cursor: pointer;
+  transition: all 0.15s;
+}
+.show-more-btn:hover { background: rgba(0, 240, 255, 0.1); box-shadow: 0 0 20px rgba(0, 240, 255, 0.4); }
+
+.selected-panel {
+  position: sticky; top: 86px;
+  background: rgba(7, 0, 15, 0.85);
+  border: 2px solid var(--magenta);
+  padding: 24px;
+  box-shadow: 0 0 30px rgba(255, 43, 214, 0.25);
+}
+.selected-panel.empty {
+  text-align: center; border-style: dashed;
+  border-color: rgba(255, 43, 214, 0.4);
+  color: rgba(255, 255, 255, 0.6);
+  padding: 60px 24px;
+}
+.selected-empty-icon { font-family: 'VT323', monospace; font-size: 70px; color: rgba(255, 43, 214, 0.6); letter-spacing: 8px; }
+.sel-silhouette { width: 100%; height: 110px; margin-bottom: 14px; }
+.sel-name { font-family: 'Press Start 2P', monospace; font-size: 13px; color: var(--yellow); letter-spacing: 2px; margin-bottom: 6px; line-height: 1.5; }
+.sel-variant { font-family: 'VT323', monospace; font-size: 22px; color: var(--cyan); letter-spacing: 2px; margin-bottom: 18px; }
+.specs { display: grid; grid-template-columns: 1fr 1fr; gap: 8px 18px; margin-bottom: 18px; }
+.spec { padding: 8px 0; border-top: 1px solid rgba(255, 43, 214, 0.25); }
+.spec-label { font-family: 'VT323', monospace; font-size: 14px; color: rgba(255, 255, 255, 0.5); letter-spacing: 2px; text-transform: uppercase; }
+.spec-value { font-family: 'Rajdhani', sans-serif; font-weight: 700; font-size: 16px; color: var(--white); letter-spacing: 1px; }
+.eligibility { background: rgba(0, 240, 255, 0.1); border-left: 3px solid var(--cyan); padding: 10px 14px; margin-bottom: 18px; font-family: 'VT323', monospace; font-size: 18px; letter-spacing: 1.5px; color: var(--cyan); }
+.eligibility.fail { background: rgba(255, 58, 58, 0.12); border-left-color: var(--red); color: var(--red); }
+.btn-submit {
+  width: 100%; padding: 16px;
+  background: var(--magenta); color: var(--bg-deep); border: 0;
+  font-family: 'Press Start 2P', monospace;
+  font-size: 12px; letter-spacing: 3px; cursor: pointer;
+  box-shadow: 0 0 25px rgba(255, 43, 214, 0.5);
+  transition: all 0.15s;
+}
+.btn-submit:hover:not(:disabled) { background: var(--cyan); box-shadow: 0 0 25px rgba(0, 240, 255, 0.7); }
+.btn-submit:disabled { background: rgba(255, 255, 255, 0.08); color: rgba(255, 255, 255, 0.4); box-shadow: none; cursor: not-allowed; }
+
+/* ===== SUBMISSIONS TAB ===== */
+.submissions-header {
+  display: flex; justify-content: space-between; align-items: end;
+  margin-bottom: 20px; flex-wrap: wrap; gap: 16px;
+}
+.submissions-header h2 {
+  font-family: 'Press Start 2P', monospace;
+  font-size: 24px; color: var(--yellow);
+  letter-spacing: 3px;
+  text-shadow: 3px 3px 0 var(--magenta);
+}
+.sort-toggle { display: flex; gap: 8px; }
+.sort-toggle button {
+  padding: 8px 16px;
+  background: transparent; border: 1px solid rgba(0, 240, 255, 0.3);
+  color: var(--white); cursor: pointer;
+  font-family: 'VT323', monospace; font-size: 18px;
+  letter-spacing: 2px; text-transform: uppercase;
+  transition: all 0.15s;
+}
+.sort-toggle button.active { background: var(--cyan); color: var(--bg-deep); border-color: var(--cyan); }
+.sort-toggle button:hover:not(.active) { border-color: var(--cyan); }
+
+.submissions-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(320px, 1fr)); gap: 18px; }
+.sub-card {
+  background: rgba(7, 0, 15, 0.65);
+  border: 1px solid rgba(0, 240, 255, 0.3);
+  padding: 20px; position: relative;
+  display: flex; flex-direction: column; gap: 10px;
+  transition: border-color 0.15s, box-shadow 0.2s;
+}
+.sub-card:hover { border-color: var(--cyan); box-shadow: 0 0 22px rgba(0, 240, 255, 0.25); }
+.sub-card.your-pick { border-color: var(--magenta); box-shadow: 0 0 28px rgba(255, 43, 214, 0.4); }
+.sub-card.your-pick::before {
+  content: 'YOUR PICK'; position: absolute;
+  top: -10px; left: 14px;
+  background: var(--magenta); color: var(--bg-deep);
+  font-family: 'Press Start 2P', monospace; font-size: 9px;
+  padding: 4px 8px; letter-spacing: 1.5px;
+}
+.sub-rank { position: absolute; top: 10px; right: 10px; font-family: 'VT323', monospace; font-size: 26px; color: rgba(255,255,255,0.45); letter-spacing: 2px; }
+.sub-card.gold .sub-rank { color: #ffd700; text-shadow: 0 0 10px rgba(255, 215, 0, 0.6); }
+.sub-card.silver .sub-rank { color: #c0c0c0; text-shadow: 0 0 8px rgba(192, 192, 192, 0.5); }
+.sub-card.bronze .sub-rank { color: #cd7f32; text-shadow: 0 0 8px rgba(205, 127, 50, 0.5); }
+.sub-card.gold { border-color: #ffd700; }
+.sub-card.silver { border-color: #c0c0c0; }
+.sub-card.bronze { border-color: #cd7f32; }
+
+.sub-user {
+  font-family: 'VT323', monospace; font-size: 22px;
+  color: var(--cyan); letter-spacing: 2px;
+}
+.sub-time { font-family: 'VT323', monospace; font-size: 16px; color: rgba(255,255,255,0.4); letter-spacing: 1.5px; margin-top: -8px; }
+.sub-silhouette { width: 100%; height: 70px; margin: 4px 0; }
+.sub-car-name { font-weight: 700; font-size: 16px; letter-spacing: 1px; text-transform: uppercase; line-height: 1.25; }
+.sub-specs { font-family: 'VT323', monospace; font-size: 18px; color: rgba(255,255,255,0.75); letter-spacing: 1px; }
+.sub-specs .price { color: var(--yellow); }
+.sub-actions {
+  display: flex; align-items: center; justify-content: space-between;
+  margin-top: 8px; padding-top: 12px;
+  border-top: 1px solid rgba(255, 43, 214, 0.2);
+}
+.vote-count { font-family: 'Press Start 2P', monospace; font-size: 18px; color: var(--yellow); letter-spacing: 2px; }
+.vote-btn {
+  display: inline-flex; align-items: center; gap: 8px;
+  padding: 9px 18px; background: transparent;
+  border: 1px solid var(--magenta); color: var(--magenta);
+  font-family: 'Rajdhani', sans-serif; font-weight: 700;
+  font-size: 14px; letter-spacing: 2px; text-transform: uppercase;
+  cursor: pointer; transition: all 0.15s;
+}
+.vote-btn:hover { background: rgba(255, 43, 214, 0.15); }
+.vote-btn.voted { background: var(--magenta); color: var(--bg-deep); box-shadow: 0 0 18px rgba(255, 43, 214, 0.6); }
+.vote-btn.voted:hover { background: var(--cyan); border-color: var(--cyan); box-shadow: 0 0 18px rgba(0, 240, 255, 0.5); }
+.vote-arrow { font-size: 18px; }
+.vote-btn.own { opacity: 0.4; cursor: not-allowed; }
+
+/* ===== HALL OF FAME ===== */
+.fame-hero {
+  border: 2px solid var(--yellow);
+  background: rgba(255, 230, 0, 0.05);
+  padding: 36px; margin-bottom: 36px; position: relative;
+  box-shadow: 0 0 50px rgba(255, 230, 0, 0.18);
+}
+.fame-tag { font-family: 'VT323', monospace; color: var(--magenta); font-size: 22px; letter-spacing: 4px; }
+.fame-title { font-family: 'Press Start 2P', monospace; font-size: 36px; color: var(--yellow); text-shadow: 0 0 24px rgba(255, 230, 0, 0.5), 4px 4px 0 var(--magenta); letter-spacing: 4px; margin: 8px 0 18px; line-height: 1.05; }
+.fame-grid { display: grid; grid-template-columns: 1fr 380px; gap: 28px; align-items: start; margin-top: 24px; }
+@media (max-width: 1100px) { .fame-grid { grid-template-columns: 1fr; } }
+.fame-winner-card { background: rgba(7, 0, 15, 0.6); border: 2px solid var(--magenta); padding: 24px; }
+.fame-winner-user { font-family: 'Press Start 2P', monospace; font-size: 14px; color: var(--cyan); letter-spacing: 2px; margin-bottom: 6px; }
+.fame-trophy { font-family: 'VT323', monospace; color: var(--yellow); font-size: 18px; letter-spacing: 2px; margin-bottom: 14px; }
+.fame-curator { background: rgba(0, 240, 255, 0.06); border-left: 3px solid var(--cyan); padding: 14px 18px; font-style: italic; font-size: 17px; line-height: 1.45; color: rgba(244,244,255,0.9); }
+.fame-curator::before { content: '" '; font-size: 24px; color: var(--cyan); }
+.fame-curator::after { content: ' "'; font-size: 24px; color: var(--cyan); }
+.fame-runners { display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap: 16px; margin-top: 32px; }
+
+/* ===== Modals & Footer ===== */
+.modal-bg {
+  position: fixed; inset: 0;
+  background: rgba(7, 0, 15, 0.85);
+  backdrop-filter: blur(6px);
+  display: none; align-items: center; justify-content: center;
+  z-index: 1000;
+}
+.modal-bg.show { display: flex; }
+.modal {
+  background: var(--bg-mid);
+  border: 2px solid var(--magenta);
+  padding: 36px; width: 90%; max-width: 460px;
+  text-align: center;
+  box-shadow: 0 0 60px rgba(255, 43, 214, 0.4);
+}
+.modal h2 { font-family: 'Press Start 2P', monospace; font-size: 16px; color: var(--yellow); letter-spacing: 2px; margin-bottom: 14px; }
+.modal p { color: rgba(255, 255, 255, 0.85); font-size: 17px; margin-bottom: 18px; line-height: 1.4; }
+.modal-form input {
+  display: block; width: 100%;
+  background: rgba(7, 0, 15, 0.7);
+  border: 1px solid rgba(0, 240, 255, 0.3);
+  color: var(--white); font-family: 'Rajdhani', sans-serif;
+  font-weight: 500; padding: 12px 14px; font-size: 16px;
+  margin-bottom: 12px; letter-spacing: 1px;
+}
+.modal-form input:focus { outline: none; border-color: var(--cyan); }
+.submitted-icon { font-family: 'Press Start 2P', monospace; font-size: 48px; color: var(--cyan); margin-bottom: 12px; display: block; }
+
+.modal-sub { max-width: 560px; padding: 36px 32px; text-align: center; }
+.trophy-icon { font-family: 'Press Start 2P', monospace; font-size: 36px; color: var(--yellow); margin-bottom: 4px; text-shadow: 0 0 16px rgba(255, 230, 0, 0.5); }
+.modal-sub h2 { color: var(--yellow); font-size: 18px; margin-bottom: 20px; text-shadow: 3px 3px 0 var(--magenta); letter-spacing: 2px; }
+.locked-card { border: 1px solid var(--cyan); background: rgba(0, 240, 255, 0.06); padding: 18px; margin-bottom: 22px; position: relative; text-align: center; }
+.locked-tag { position: absolute; top: -10px; left: 14px; background: var(--cyan); color: var(--bg-deep); font-family: 'Press Start 2P', monospace; font-size: 9px; padding: 4px 8px; letter-spacing: 1.5px; }
+.locked-silhouette { width: 100%; height: 60px; margin-bottom: 8px; }
+.locked-name { font-family: 'Press Start 2P', monospace; font-size: 12px; color: var(--yellow); letter-spacing: 1.5px; line-height: 1.5; }
+.locked-meta { font-family: 'VT323', monospace; font-size: 18px; color: var(--cyan); letter-spacing: 2px; margin-top: 4px; }
+.duel { display: grid; grid-template-columns: 1fr auto 1fr; gap: 14px; align-items: center; margin-bottom: 22px; }
+.duel-side { border: 1px solid rgba(255, 43, 214, 0.4); background: rgba(255, 43, 214, 0.06); padding: 14px 12px; text-align: center; }
+.duel-out { border-color: rgba(0, 240, 255, 0.4); background: rgba(0, 240, 255, 0.06); }
+.duel-out .duel-arrow { color: var(--cyan); }
+.duel-out .duel-text { color: var(--cyan); }
+.duel-arrow { font-family: 'Press Start 2P', monospace; font-size: 18px; color: var(--magenta); margin-bottom: 6px; }
+.duel-text { font-family: 'Rajdhani', sans-serif; font-weight: 700; font-size: 13px; letter-spacing: 1.5px; text-transform: uppercase; color: var(--magenta); line-height: 1.3; }
+.duel-text strong { font-family: 'Press Start 2P', monospace; font-size: 13px; color: var(--yellow); display: inline-block; margin: 0 2px; }
+.duel-hint { font-family: 'VT323', monospace; font-size: 15px; color: rgba(255,255,255,0.6); letter-spacing: 1px; margin-top: 6px; }
+.duel-vs { font-family: 'Press Start 2P', monospace; font-size: 14px; color: var(--yellow); letter-spacing: 2px; }
+.duel-rules { font-family: 'VT323', monospace; font-size: 19px; letter-spacing: 1.5px; color: var(--white); margin-bottom: 18px; }
+
+footer { text-align: center; padding: 30px; color: rgba(255, 255, 255, 0.4); font-family: 'VT323', monospace; font-size: 18px; letter-spacing: 2px; border-top: 1px solid rgba(255, 43, 214, 0.2); margin-top: 60px; }
+
+.tab-section { display: none; }
+.tab-section.active { display: block; }
+
+.toast {
+  position: fixed; bottom: 30px; left: 50%;
+  transform: translateX(-50%) translateY(100px);
+  background: var(--bg-mid);
+  border: 1px solid var(--cyan);
+  padding: 14px 26px;
+  font-family: 'VT323', monospace; font-size: 20px;
+  letter-spacing: 2px; color: var(--cyan);
+  box-shadow: 0 0 30px rgba(0, 240, 255, 0.4);
+  z-index: 999; opacity: 0;
+  transition: transform 0.25s, opacity 0.25s;
+}
+.toast.show { transform: translateX(-50%) translateY(0); opacity: 1; }
+</style>
+</head>
+<body>
+
+<div class="scene"><div class="sun"></div><div class="grid-floor"></div></div>
+
+<nav>
+  <div class="logo" data-tab="today">PISTONWAVE</div>
+  <div class="nav-links">
+    <a data-tab="today" class="active">Today's Drive</a>
+    <a data-tab="submissions">Submissions <span id="subCountBadge" style="font-family:'VT323',monospace;color:var(--yellow);"></span></a>
+    <a data-tab="fame">Hall of Fame</a>
+    <a class="disabled" title="Coming soon">Garage</a>
+  </div>
+  <button id="loginBtn" class="nav-cta">Log in</button>
+</nav>
+
+<main>
+  <div class="proto-banner">▼ PROTOTYPE v0.3 — 201 CARS · CHEAP HEROES + ENTHUSIAST ICONS · NO REAL DATA SAVED YET ▼</div>
+
+  <!-- TAB: TODAY'S DRIVE -->
+  <section id="tab-today" class="tab-section active">
+    <div class="hero">
+      <div class="hero-tag">▶ CHALLENGE 001</div>
+      <h1 class="hero-title">GOBI CROSSING</h1>
+      <p class="hero-body">
+        You've got <strong>£5,000 (mods included)</strong> to cross the Gobi Desert.
+        1,610km of unforgiving sand, rock and wind. The catch — <strong>no 4x4s allowed</strong>.
+        Pick something with character. Sensible is allowed. Stupid is encouraged.
+      </p>
+      <div class="constraints">
+        <span class="chip">BUDGET ≤ £5,000</span>
+        <span class="chip warn">NO 4WD</span>
+        <span class="chip time" id="countdown">▣ SUBMISSIONS CLOSE IN 14:23:00</span>
+      </div>
+    </div>
+
+    <div class="picker-grid">
+      <section>
+        <div class="filters">
+          <input type="text" id="searchInput" placeholder="Search make, model, year...">
+          <select id="filterCountry">
+            <option value="">All countries</option>
+          </select>
+          <select id="filterDrivetrain">
+            <option value="">All drivetrains</option>
+            <option value="FWD">FWD</option><option value="RWD">RWD</option>
+            <option value="AWD">AWD</option><option value="4WD">4WD</option>
+          </select>
+          <select id="filterBody">
+            <option value="">All body types</option>
+            <option value="hatch">Hatchback</option><option value="coupe">Coupe</option>
+            <option value="saloon">Saloon</option><option value="estate">Estate</option>
+            <option value="roadster">Roadster</option><option value="supercar">Supercar</option>
+            <option value="4x4">4x4</option>
+          </select>
+          <select id="sortBy">
+            <option value="default">Sort: Default</option>
+            <option value="price-asc">Price ↑</option>
+            <option value="price-desc">Price ↓</option>
+            <option value="hp-desc">Power ↓</option>
+            <option value="year-desc">Newest</option>
+            <option value="year-asc">Oldest</option>
+            <option value="weight-asc">Lightest</option>
+          </select>
+          <label class="toggle">
+            <input type="checkbox" id="hideIneligible" checked>
+            Hide ineligible
+          </label>
+        </div>
+        <div class="results-count" id="resultsCount"></div>
+        <div id="carsGrid" class="cars-grid"></div>
+        <button id="showMoreBtn" class="show-more-btn" style="display:none;">SHOW MORE CARS ▼</button>
+      </section>
+
+      <aside class="selected-panel empty" id="selectedPanel"></aside>
+    </div>
+  </section>
+
+  <!-- TAB: SUBMISSIONS -->
+  <section id="tab-submissions" class="tab-section">
+    <div class="submissions-header">
+      <h2>TODAY'S SUBMISSIONS</h2>
+      <div class="sort-toggle">
+        <button data-sort="votes" class="active">Top Voted</button>
+        <button data-sort="newest">Newest</button>
+      </div>
+    </div>
+    <p style="color:rgba(255,255,255,0.6);margin-bottom:24px;font-size:17px;letter-spacing:1px;">
+      Tap a car to back the pick. One vote per submission. Fastest fingers win.
+    </p>
+    <div id="submissionsGrid" class="submissions-grid"></div>
+  </section>
+
+  <!-- TAB: HALL OF FAME -->
+  <section id="tab-fame" class="tab-section">
+    <div class="fame-hero">
+      <div class="fame-tag">▶ YESTERDAY'S WINNER · CHALLENGE 000</div>
+      <h1 class="fame-title">BANK HOLIDAY ROADSTER</h1>
+      <p style="font-size:20px;line-height:1.45;max-width:900px;color:rgba(244,244,255,0.85);">
+        £5,000 to find the best little drop-top for a sunny weekend. Bonus marks for not falling apart between Calais and Cannes.
+      </p>
+      <div class="fame-grid">
+        <div class="fame-winner-card">
+          <div class="fame-winner-user">→ NIGHTSHIFT_88</div>
+          <div class="fame-trophy">▣ 247 VOTES · CROWNED</div>
+          <div style="height:90px;margin-bottom:12px;" id="fameWinnerSilhouette"></div>
+          <div style="font-family:'Press Start 2P',monospace;font-size:13px;color:var(--yellow);letter-spacing:2px;line-height:1.5;" id="fameWinnerName"></div>
+          <div style="font-family:'VT323',monospace;font-size:20px;color:var(--cyan);letter-spacing:2px;margin:6px 0 14px;" id="fameWinnerSpecs"></div>
+          <div class="fame-curator">
+            The MX-5 is the obvious answer, the right answer, and the boring answer. Doesn't matter — under five grand it's the most reliable smile-per-mile thing on the planet. Three cans of WD40, a bottle of brake fluid, you're sorted to the south of France. Well done.
+          </div>
+        </div>
+        <div>
+          <h3 style="font-family:'VT323',monospace;color:var(--magenta);font-size:24px;letter-spacing:3px;margin-bottom:10px;">RUNNERS UP</h3>
+          <div id="fameRunners" class="fame-runners" style="grid-template-columns:1fr;"></div>
+        </div>
+      </div>
+    </div>
+    <p style="text-align:center;color:rgba(255,255,255,0.45);font-family:'VT323',monospace;font-size:18px;letter-spacing:2px;">
+      ▣ AS WE ROLL ON, THE HALL OF FAME GROWS. CHECK BACK DAILY.
+    </p>
+  </section>
+</main>
+
+<footer>PISTONWAVE :: A DAILY CAR CHALLENGE :: VOTING + GARAGES IN BETA</footer>
+
+<div class="modal-bg" id="loginModal">
+  <div class="modal">
+    <h2>BANG IT IN</h2>
+    <p>Pick a username and password. We don't need your email — we don't even want it. First time? We'll just spin up the account on the spot.</p>
+    <form class="modal-form" id="loginForm">
+      <input type="text" name="username" placeholder="Username" required maxlength="20">
+      <input type="password" name="password" placeholder="Password" required minlength="3">
+      <button type="submit" class="btn-submit">LET ME IN</button>
+    </form>
+  </div>
+</div>
+
+<div class="modal-bg" id="submitModal">
+  <div class="modal modal-sub">
+    <div class="trophy-icon">▲</div>
+    <h2>YOU'RE IN THE RING</h2>
+    <div class="locked-card">
+      <div class="locked-tag">LOCKED IN</div>
+      <div class="locked-silhouette" id="lockedSilhouette"></div>
+      <div class="locked-name" id="lockedName"></div>
+      <div class="locked-meta" id="lockedMeta"></div>
+    </div>
+    <div class="duel">
+      <div class="duel-side duel-out">
+        <div class="duel-arrow">▲</div>
+        <div class="duel-text">VOTE ON <strong id="duelOthersA">0</strong> OTHERS</div>
+        <div class="duel-hint">Back the cars you reckon can hack it.</div>
+      </div>
+      <div class="duel-vs">VS</div>
+      <div class="duel-side duel-in">
+        <div class="duel-arrow">▼</div>
+        <div class="duel-text"><strong id="duelOthersB">0</strong> WILL VOTE ON YOURS</div>
+        <div class="duel-hint">Brace yourself.</div>
+      </div>
+    </div>
+    <p class="duel-rules">Most votes by midnight wins the day. Good luck out there.</p>
+    <button class="btn-submit" id="closeSubmit">SEE THE COMPETITION →</button>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+// ============ DATA ============
+const TODAY = {
+  id: '001',
+  title: 'GOBI CROSSING',
+  constraints: { maxPrice: 5000, drivetrainBlacklist: ['4WD'] }
+};
+
+const SILHOUETTES = {
+  hatch: '<svg viewBox="0 0 200 60" xmlns="http://www.w3.org/2000/svg"><path d="M10 50 L25 30 L60 18 L130 18 L150 30 L190 32 L190 50 Z" fill="#ff2bd6" stroke="#00f0ff" stroke-width="1.5"/><circle cx="50" cy="50" r="9" fill="#0a0214" stroke="#00f0ff" stroke-width="1.5"/><circle cx="160" cy="50" r="9" fill="#0a0214" stroke="#00f0ff" stroke-width="1.5"/></svg>',
+  coupe: '<svg viewBox="0 0 200 60" xmlns="http://www.w3.org/2000/svg"><path d="M5 50 L20 36 L70 18 L140 18 L175 36 L195 38 L195 50 Z" fill="#ff2bd6" stroke="#00f0ff" stroke-width="1.5"/><circle cx="50" cy="50" r="9" fill="#0a0214" stroke="#00f0ff" stroke-width="1.5"/><circle cx="160" cy="50" r="9" fill="#0a0214" stroke="#00f0ff" stroke-width="1.5"/></svg>',
+  saloon: '<svg viewBox="0 0 200 60" xmlns="http://www.w3.org/2000/svg"><path d="M5 50 L20 32 L60 22 L130 22 L160 32 L195 34 L195 50 Z" fill="#ff2bd6" stroke="#00f0ff" stroke-width="1.5"/><circle cx="48" cy="50" r="9" fill="#0a0214" stroke="#00f0ff" stroke-width="1.5"/><circle cx="158" cy="50" r="9" fill="#0a0214" stroke="#00f0ff" stroke-width="1.5"/></svg>',
+  estate: '<svg viewBox="0 0 200 60" xmlns="http://www.w3.org/2000/svg"><path d="M5 50 L20 30 L60 22 L180 22 L195 30 L195 50 Z" fill="#ff2bd6" stroke="#00f0ff" stroke-width="1.5"/><circle cx="48" cy="50" r="9" fill="#0a0214" stroke="#00f0ff" stroke-width="1.5"/><circle cx="158" cy="50" r="9" fill="#0a0214" stroke="#00f0ff" stroke-width="1.5"/></svg>',
+  roadster: '<svg viewBox="0 0 200 60" xmlns="http://www.w3.org/2000/svg"><path d="M10 50 L40 38 L80 32 L130 32 L170 38 L190 42 L190 50 Z" fill="#ff2bd6" stroke="#00f0ff" stroke-width="1.5"/><circle cx="50" cy="50" r="9" fill="#0a0214" stroke="#00f0ff" stroke-width="1.5"/><circle cx="160" cy="50" r="9" fill="#0a0214" stroke="#00f0ff" stroke-width="1.5"/></svg>',
+  supercar: '<svg viewBox="0 0 200 60" xmlns="http://www.w3.org/2000/svg"><path d="M5 50 L25 42 L60 28 L140 28 L180 42 L195 44 L195 50 Z" fill="#ff2bd6" stroke="#00f0ff" stroke-width="1.5"/><circle cx="50" cy="50" r="9" fill="#0a0214" stroke="#00f0ff" stroke-width="1.5"/><circle cx="160" cy="50" r="9" fill="#0a0214" stroke="#00f0ff" stroke-width="1.5"/></svg>',
+  '4x4': '<svg viewBox="0 0 200 60" xmlns="http://www.w3.org/2000/svg"><path d="M10 50 L20 14 L160 14 L180 18 L195 30 L195 50 Z" fill="#ff2bd6" stroke="#00f0ff" stroke-width="1.5"/><circle cx="48" cy="50" r="11" fill="#0a0214" stroke="#00f0ff" stroke-width="1.5"/><circle cx="160" cy="50" r="11" fill="#0a0214" stroke="#00f0ff" stroke-width="1.5"/></svg>'
+};
+
+const FLAGS = { UK:'GB', DE:'DE', JP:'JP', IT:'IT', FR:'FR', SE:'SE', US:'US', KR:'KR', RU:'RU', RS:'RS', HR:'HR' };
+
+const CARS = [
+  // ===== BMW =====
+  { id:1, year:1973, make:'BMW', model:'2002 Turbo', country:'DE', hp:170, engine:'2.0L Turbo I4', weight:1080, drivetrain:'RWD', body:'coupe', price:95000, zeroToSixty:7.0 },
+  { id:2, year:1980, make:'BMW', model:'M1', country:'DE', hp:273, engine:'3.5L NA I6', weight:1300, drivetrain:'RWD', body:'supercar', price:600000, zeroToSixty:5.6 },
+  { id:3, year:1990, make:'BMW', model:'M3 E30 Sport Evolution', country:'DE', hp:238, engine:'2.5L NA I4', weight:1200, drivetrain:'RWD', body:'coupe', price:100000, zeroToSixty:6.5 },
+  { id:4, year:1995, make:'BMW', model:'M3 E36', country:'DE', hp:286, engine:'3.0L NA I6', weight:1460, drivetrain:'RWD', body:'coupe', price:22000, zeroToSixty:5.5 },
+  { id:5, year:2002, make:'BMW', model:'M3 E46', country:'DE', hp:343, engine:'3.2L NA I6', weight:1495, drivetrain:'RWD', body:'coupe', price:25000, zeroToSixty:5.2 },
+  { id:6, year:2003, make:'BMW', model:'M3 CSL E46', country:'DE', hp:360, engine:'3.2L NA I6', weight:1385, drivetrain:'RWD', body:'coupe', price:80000, zeroToSixty:4.9 },
+  { id:7, year:2001, make:'BMW', model:'M5 E39', country:'DE', hp:400, engine:'5.0L NA V8', weight:1720, drivetrain:'RWD', body:'saloon', price:28000, zeroToSixty:4.8 },
+  { id:8, year:2011, make:'BMW', model:'1M Coupe E82', country:'DE', hp:340, engine:'3.0L Twin-Turbo I6', weight:1495, drivetrain:'RWD', body:'coupe', price:45000, zeroToSixty:4.7 },
+  // ===== Mercedes-Benz =====
+  { id:9, year:1955, make:'Mercedes-Benz', model:'300SL Gullwing', country:'DE', hp:215, engine:'3.0L NA I6', weight:1295, drivetrain:'RWD', body:'coupe', price:1500000, zeroToSixty:8.8 },
+  { id:10, year:1986, make:'Mercedes-Benz', model:'AMG Hammer 6.0', country:'DE', hp:380, engine:'6.0L NA V8', weight:1620, drivetrain:'RWD', body:'saloon', price:250000, zeroToSixty:5.0 },
+  { id:11, year:1990, make:'Mercedes-Benz', model:'190E 2.5-16 Evo II', country:'DE', hp:235, engine:'2.5L NA I4', weight:1340, drivetrain:'RWD', body:'saloon', price:200000, zeroToSixty:7.1 },
+  { id:12, year:1991, make:'Mercedes-Benz', model:'500E W124', country:'DE', hp:326, engine:'5.0L NA V8', weight:1690, drivetrain:'RWD', body:'saloon', price:60000, zeroToSixty:6.1 },
+  { id:13, year:1998, make:'Mercedes-Benz', model:'CLK GTR', country:'DE', hp:612, engine:'6.9L NA V12', weight:1440, drivetrain:'RWD', body:'supercar', price:12000000, zeroToSixty:3.8 },
+  { id:14, year:2012, make:'Mercedes-Benz', model:'C63 AMG Black Series W204', country:'DE', hp:510, engine:'6.2L NA V8', weight:1635, drivetrain:'RWD', body:'coupe', price:130000, zeroToSixty:4.2 },
+  { id:15, year:2013, make:'Mercedes-Benz', model:'SLS AMG Black Series', country:'DE', hp:622, engine:'6.2L NA V8', weight:1550, drivetrain:'RWD', body:'supercar', price:350000, zeroToSixty:3.5 },
+  { id:16, year:2017, make:'Mercedes-Benz', model:'AMG GT R', country:'DE', hp:577, engine:'4.0L Twin-Turbo V8', weight:1555, drivetrain:'RWD', body:'coupe', price:130000, zeroToSixty:3.5 },
+  // ===== Audi =====
+  { id:17, year:1981, make:'Audi', model:'Quattro 10V', country:'DE', hp:200, engine:'2.1L Turbo I5', weight:1290, drivetrain:'AWD', body:'coupe', price:50000, zeroToSixty:7.1 },
+  { id:18, year:1985, make:'Audi', model:'Sport Quattro S1', country:'DE', hp:306, engine:'2.1L Turbo I5', weight:1200, drivetrain:'AWD', body:'coupe', price:750000, zeroToSixty:4.5 },
+  { id:19, year:1994, make:'Audi', model:'RS2 Avant', country:'DE', hp:311, engine:'2.2L Turbo I5', weight:1595, drivetrain:'AWD', body:'estate', price:70000, zeroToSixty:5.4 },
+  { id:20, year:2000, make:'Audi', model:'RS4 B5', country:'DE', hp:380, engine:'2.7L Twin-Turbo V6', weight:1620, drivetrain:'AWD', body:'estate', price:30000, zeroToSixty:4.9 },
+  { id:21, year:2002, make:'Audi', model:'RS6 C5', country:'DE', hp:450, engine:'4.2L Twin-Turbo V8', weight:1880, drivetrain:'AWD', body:'estate', price:25000, zeroToSixty:4.7 },
+  { id:22, year:2014, make:'Audi', model:'R8 V10 Plus', country:'DE', hp:602, engine:'5.2L NA V10', weight:1555, drivetrain:'AWD', body:'supercar', price:90000, zeroToSixty:3.2 },
+  { id:23, year:2017, make:'Audi', model:'RS3 8V Sportback', country:'DE', hp:394, engine:'2.5L Turbo I5', weight:1520, drivetrain:'AWD', body:'hatch', price:32000, zeroToSixty:4.1 },
+  // ===== Volkswagen =====
+  { id:24, year:1965, make:'Volkswagen', model:'Beetle 1300', country:'DE', hp:50, engine:'1.3L NA Flat-4', weight:820, drivetrain:'RWD', body:'hatch', price:8000, zeroToSixty:23.0 },
+  { id:25, year:1976, make:'Volkswagen', model:'Golf GTI Mk1', country:'DE', hp:110, engine:'1.6L NA I4', weight:810, drivetrain:'FWD', body:'hatch', price:18000, zeroToSixty:9.2 },
+  { id:26, year:1986, make:'Volkswagen', model:'Golf GTI Mk2 16V', country:'DE', hp:139, engine:'1.8L NA I4', weight:970, drivetrain:'FWD', body:'hatch', price:12000, zeroToSixty:8.5 },
+  { id:27, year:1992, make:'Volkswagen', model:'Corrado VR6', country:'DE', hp:190, engine:'2.9L NA V6', weight:1260, drivetrain:'FWD', body:'coupe', price:8000, zeroToSixty:7.1 },
+  { id:28, year:2002, make:'Volkswagen', model:'Golf R32 Mk4', country:'DE', hp:240, engine:'3.2L NA V6', weight:1477, drivetrain:'AWD', body:'hatch', price:10000, zeroToSixty:6.4 },
+  { id:29, year:2002, make:'Volkswagen', model:'Phaeton W12', country:'DE', hp:444, engine:'6.0L NA W12', weight:2249, drivetrain:'AWD', body:'saloon', price:18000, zeroToSixty:6.1 },
+  { id:30, year:2014, make:'Volkswagen', model:'Golf R Mk7', country:'DE', hp:296, engine:'2.0L Turbo I4', weight:1476, drivetrain:'AWD', body:'hatch', price:18000, zeroToSixty:4.9 },
+  // ===== Porsche =====
+  { id:31, year:1973, make:'Porsche', model:'911 Carrera 2.7 RS', country:'DE', hp:210, engine:'2.7L NA Flat-6', weight:1075, drivetrain:'RWD', body:'coupe', price:750000, zeroToSixty:5.8 },
+  { id:32, year:1978, make:'Porsche', model:'930 Turbo 3.3', country:'DE', hp:300, engine:'3.3L Turbo Flat-6', weight:1335, drivetrain:'RWD', body:'coupe', price:90000, zeroToSixty:5.4 },
+  { id:33, year:1987, make:'Porsche', model:'959', country:'DE', hp:444, engine:'2.8L Twin-Turbo Flat-6', weight:1450, drivetrain:'AWD', body:'supercar', price:1500000, zeroToSixty:3.7 },
+  { id:34, year:1993, make:'Porsche', model:'968 Club Sport', country:'DE', hp:240, engine:'3.0L NA I4', weight:1335, drivetrain:'RWD', body:'coupe', price:28000, zeroToSixty:6.5 },
+  { id:35, year:2003, make:'Porsche', model:'911 GT3 996', country:'DE', hp:381, engine:'3.6L NA Flat-6', weight:1380, drivetrain:'RWD', body:'coupe', price:75000, zeroToSixty:4.4 },
+  { id:36, year:2002, make:'Porsche', model:'911 GT2 996', country:'DE', hp:462, engine:'3.6L Twin-Turbo Flat-6', weight:1420, drivetrain:'RWD', body:'coupe', price:200000, zeroToSixty:4.0 },
+  { id:37, year:2004, make:'Porsche', model:'Carrera GT', country:'DE', hp:612, engine:'5.7L NA V10', weight:1380, drivetrain:'RWD', body:'supercar', price:1200000, zeroToSixty:3.5 },
+  { id:38, year:2014, make:'Porsche', model:'918 Spyder', country:'DE', hp:887, engine:'4.6L V8 Hybrid', weight:1640, drivetrain:'AWD', body:'supercar', price:1500000, zeroToSixty:2.6 },
+  { id:39, year:2018, make:'Porsche', model:'911 GT3 RS 991.2', country:'DE', hp:520, engine:'4.0L NA Flat-6', weight:1430, drivetrain:'RWD', body:'coupe', price:200000, zeroToSixty:3.2 },
+  // ===== Ferrari =====
+  { id:40, year:1962, make:'Ferrari', model:'250 GTO', country:'IT', hp:296, engine:'3.0L NA V12', weight:880, drivetrain:'RWD', body:'coupe', price:50000000, zeroToSixty:6.1 },
+  { id:41, year:1984, make:'Ferrari', model:'288 GTO', country:'IT', hp:400, engine:'2.9L Twin-Turbo V8', weight:1160, drivetrain:'RWD', body:'supercar', price:3500000, zeroToSixty:4.8 },
+  { id:42, year:1987, make:'Ferrari', model:'F40', country:'IT', hp:478, engine:'2.9L Twin-Turbo V8', weight:1100, drivetrain:'RWD', body:'supercar', price:1500000, zeroToSixty:4.1 },
+  { id:43, year:1995, make:'Ferrari', model:'F50', country:'IT', hp:513, engine:'4.7L NA V12', weight:1230, drivetrain:'RWD', body:'supercar', price:4500000, zeroToSixty:3.7 },
+  { id:44, year:2002, make:'Ferrari', model:'Enzo', country:'IT', hp:651, engine:'6.0L NA V12', weight:1365, drivetrain:'RWD', body:'supercar', price:3500000, zeroToSixty:3.4 },
+  { id:45, year:2013, make:'Ferrari', model:'458 Speciale', country:'IT', hp:597, engine:'4.5L NA V8', weight:1290, drivetrain:'RWD', body:'supercar', price:220000, zeroToSixty:3.0 },
+  { id:46, year:2013, make:'Ferrari', model:'LaFerrari', country:'IT', hp:950, engine:'6.3L V12 Hybrid', weight:1255, drivetrain:'RWD', body:'supercar', price:3000000, zeroToSixty:2.6 },
+  { id:47, year:2015, make:'Ferrari', model:'F12tdf', country:'IT', hp:769, engine:'6.3L NA V12', weight:1415, drivetrain:'RWD', body:'supercar', price:1200000, zeroToSixty:2.9 },
+  // ===== Lamborghini =====
+  { id:48, year:1971, make:'Lamborghini', model:'Miura SV', country:'IT', hp:380, engine:'4.0L NA V12', weight:1245, drivetrain:'RWD', body:'supercar', price:3500000, zeroToSixty:6.7 },
+  { id:49, year:1974, make:'Lamborghini', model:'Countach LP400', country:'IT', hp:375, engine:'4.0L NA V12', weight:1490, drivetrain:'RWD', body:'supercar', price:800000, zeroToSixty:5.4 },
+  { id:50, year:1995, make:'Lamborghini', model:'Diablo SV', country:'IT', hp:510, engine:'5.7L NA V12', weight:1530, drivetrain:'RWD', body:'supercar', price:350000, zeroToSixty:3.9 },
+  { id:51, year:2009, make:'Lamborghini', model:'Murciélago LP670-4 SV', country:'IT', hp:670, engine:'6.5L NA V12', weight:1565, drivetrain:'AWD', body:'supercar', price:400000, zeroToSixty:3.2 },
+  { id:52, year:2010, make:'Lamborghini', model:'Sesto Elemento', country:'IT', hp:562, engine:'5.2L NA V10', weight:999, drivetrain:'AWD', body:'supercar', price:2500000, zeroToSixty:2.5 },
+  { id:53, year:2018, make:'Lamborghini', model:'Aventador SVJ', country:'IT', hp:760, engine:'6.5L NA V12', weight:1525, drivetrain:'AWD', body:'supercar', price:450000, zeroToSixty:2.8 },
+  { id:54, year:2017, make:'Lamborghini', model:'Huracán Performante', country:'IT', hp:631, engine:'5.2L NA V10', weight:1382, drivetrain:'AWD', body:'supercar', price:220000, zeroToSixty:2.9 },
+  // ===== Maserati =====
+  { id:55, year:1969, make:'Maserati', model:'Ghibli SS', country:'IT', hp:335, engine:'4.9L NA V8', weight:1450, drivetrain:'RWD', body:'coupe', price:250000, zeroToSixty:6.8 },
+  { id:56, year:1971, make:'Maserati', model:'Bora', country:'IT', hp:310, engine:'4.7L NA V8', weight:1480, drivetrain:'RWD', body:'supercar', price:200000, zeroToSixty:6.5 },
+  { id:57, year:1976, make:'Maserati', model:'Merak SS', country:'IT', hp:220, engine:'3.0L NA V6', weight:1370, drivetrain:'RWD', body:'supercar', price:60000, zeroToSixty:7.4 },
+  { id:58, year:2004, make:'Maserati', model:'MC12', country:'IT', hp:624, engine:'6.0L NA V12', weight:1335, drivetrain:'RWD', body:'supercar', price:3500000, zeroToSixty:3.8 },
+  { id:59, year:2003, make:'Maserati', model:'Quattroporte V', country:'IT', hp:400, engine:'4.2L NA V8', weight:1930, drivetrain:'RWD', body:'saloon', price:18000, zeroToSixty:5.2 },
+  { id:60, year:2010, make:'Maserati', model:'GranTurismo MC Stradale', country:'IT', hp:444, engine:'4.7L NA V8', weight:1770, drivetrain:'RWD', body:'coupe', price:50000, zeroToSixty:4.6 },
+  // ===== Alfa Romeo =====
+  { id:61, year:1965, make:'Alfa Romeo', model:'Giulia Sprint GTA', country:'IT', hp:170, engine:'1.6L NA I4', weight:745, drivetrain:'RWD', body:'coupe', price:800000, zeroToSixty:8.8 },
+  { id:62, year:1967, make:'Alfa Romeo', model:'33 Stradale', country:'IT', hp:230, engine:'2.0L NA V8', weight:700, drivetrain:'RWD', body:'supercar', price:10000000, zeroToSixty:5.5 },
+  { id:63, year:1970, make:'Alfa Romeo', model:'Montreal', country:'IT', hp:200, engine:'2.6L NA V8', weight:1270, drivetrain:'RWD', body:'coupe', price:90000, zeroToSixty:7.6 },
+  { id:64, year:1985, make:'Alfa Romeo', model:'75 Twin Spark', country:'IT', hp:148, engine:'2.0L NA I4', weight:1230, drivetrain:'RWD', body:'saloon', price:8000, zeroToSixty:9.0 },
+  { id:65, year:1989, make:'Alfa Romeo', model:'SZ Zagato', country:'IT', hp:207, engine:'3.0L NA V6', weight:1260, drivetrain:'RWD', body:'coupe', price:80000, zeroToSixty:7.0 },
+  { id:66, year:2007, make:'Alfa Romeo', model:'8C Competizione', country:'IT', hp:444, engine:'4.7L NA V8', weight:1585, drivetrain:'RWD', body:'supercar', price:250000, zeroToSixty:4.5 },
+  { id:67, year:2013, make:'Alfa Romeo', model:'4C', country:'IT', hp:237, engine:'1.7L Turbo I4', weight:895, drivetrain:'RWD', body:'coupe', price:35000, zeroToSixty:4.5 },
+  { id:68, year:2016, make:'Alfa Romeo', model:'Giulia Quadrifoglio', country:'IT', hp:503, engine:'2.9L Twin-Turbo V6', weight:1580, drivetrain:'RWD', body:'saloon', price:35000, zeroToSixty:3.9 },
+  // ===== McLaren =====
+  { id:69, year:1992, make:'McLaren', model:'F1', country:'UK', hp:627, engine:'6.1L NA V12', weight:1140, drivetrain:'RWD', body:'supercar', price:18000000, zeroToSixty:3.2 },
+  { id:70, year:1995, make:'McLaren', model:'F1 LM', country:'UK', hp:680, engine:'6.1L NA V12', weight:1062, drivetrain:'RWD', body:'supercar', price:25000000, zeroToSixty:3.0 },
+  { id:71, year:2003, make:'McLaren', model:'SLR', country:'UK', hp:617, engine:'5.4L Supercharged V8', weight:1693, drivetrain:'RWD', body:'supercar', price:250000, zeroToSixty:3.7 },
+  { id:72, year:2011, make:'McLaren', model:'MP4-12C', country:'UK', hp:592, engine:'3.8L Twin-Turbo V8', weight:1336, drivetrain:'RWD', body:'supercar', price:80000, zeroToSixty:3.1 },
+  { id:73, year:2013, make:'McLaren', model:'P1', country:'UK', hp:903, engine:'3.8L V8 Hybrid', weight:1490, drivetrain:'RWD', body:'supercar', price:1500000, zeroToSixty:2.8 },
+  { id:74, year:2017, make:'McLaren', model:'720S', country:'UK', hp:710, engine:'4.0L Twin-Turbo V8', weight:1283, drivetrain:'RWD', body:'supercar', price:180000, zeroToSixty:2.8 },
+  { id:75, year:2018, make:'McLaren', model:'Senna', country:'UK', hp:789, engine:'4.0L Twin-Turbo V8', weight:1198, drivetrain:'RWD', body:'supercar', price:1000000, zeroToSixty:2.8 },
+  // ===== Aston Martin =====
+  { id:76, year:1960, make:'Aston Martin', model:'DB4 GT Zagato', country:'UK', hp:314, engine:'3.7L NA I6', weight:1225, drivetrain:'RWD', body:'coupe', price:12000000, zeroToSixty:6.1 },
+  { id:77, year:1965, make:'Aston Martin', model:'DB5', country:'UK', hp:282, engine:'4.0L NA I6', weight:1465, drivetrain:'RWD', body:'coupe', price:750000, zeroToSixty:7.1 },
+  { id:78, year:1977, make:'Aston Martin', model:'V8 Vantage', country:'UK', hp:380, engine:'5.3L NA V8', weight:1810, drivetrain:'RWD', body:'coupe', price:150000, zeroToSixty:5.8 },
+  { id:79, year:2003, make:'Aston Martin', model:'Vanquish V12', country:'UK', hp:460, engine:'5.9L NA V12', weight:1875, drivetrain:'RWD', body:'coupe', price:75000, zeroToSixty:4.7 },
+  { id:80, year:2009, make:'Aston Martin', model:'V12 Vantage', country:'UK', hp:510, engine:'5.9L NA V12', weight:1680, drivetrain:'RWD', body:'coupe', price:80000, zeroToSixty:4.2 },
+  { id:81, year:2009, make:'Aston Martin', model:'One-77', country:'UK', hp:750, engine:'7.3L NA V12', weight:1630, drivetrain:'RWD', body:'supercar', price:2500000, zeroToSixty:3.7 },
+  { id:82, year:2015, make:'Aston Martin', model:'Vulcan', country:'UK', hp:820, engine:'7.0L NA V12', weight:1350, drivetrain:'RWD', body:'supercar', price:3000000, zeroToSixty:3.0 },
+  { id:83, year:2021, make:'Aston Martin', model:'Valkyrie', country:'UK', hp:1160, engine:'6.5L V12 Hybrid', weight:1030, drivetrain:'RWD', body:'supercar', price:3000000, zeroToSixty:2.5 },
+  // ===== Jaguar =====
+  { id:84, year:1961, make:'Jaguar', model:'E-Type Series 1', country:'UK', hp:265, engine:'3.8L NA I6', weight:1296, drivetrain:'RWD', body:'coupe', price:150000, zeroToSixty:7.0 },
+  { id:85, year:1991, make:'Jaguar', model:'XJR-15', country:'UK', hp:450, engine:'6.0L NA V12', weight:1050, drivetrain:'RWD', body:'supercar', price:600000, zeroToSixty:3.9 },
+  { id:86, year:1992, make:'Jaguar', model:'XJ220', country:'UK', hp:542, engine:'3.5L Twin-Turbo V6', weight:1470, drivetrain:'RWD', body:'supercar', price:400000, zeroToSixty:3.6 },
+  { id:87, year:1997, make:'Jaguar', model:'XKR', country:'UK', hp:370, engine:'4.0L Supercharged V8', weight:1750, drivetrain:'RWD', body:'coupe', price:12000, zeroToSixty:5.2 },
+  { id:88, year:2011, make:'Jaguar', model:'XKR-S', country:'UK', hp:542, engine:'5.0L Supercharged V8', weight:1753, drivetrain:'RWD', body:'coupe', price:35000, zeroToSixty:4.2 },
+  { id:89, year:2016, make:'Jaguar', model:'F-Type SVR', country:'UK', hp:567, engine:'5.0L Supercharged V8', weight:1748, drivetrain:'AWD', body:'coupe', price:70000, zeroToSixty:3.5 },
+  // ===== Land Rover =====
+  { id:90, year:1948, make:'Land Rover', model:'Series I 80', country:'UK', hp:50, engine:'1.6L NA I4', weight:1200, drivetrain:'4WD', body:'4x4', price:25000, zeroToSixty:30.0 },
+  { id:91, year:1970, make:'Land Rover', model:'Range Rover Classic', country:'UK', hp:135, engine:'3.5L NA V8', weight:1850, drivetrain:'4WD', body:'4x4', price:18000, zeroToSixty:13.5 },
+  { id:92, year:1990, make:'Land Rover', model:'Defender 90', country:'UK', hp:111, engine:'2.5L Diesel I4', weight:1700, drivetrain:'4WD', body:'4x4', price:25000, zeroToSixty:14.5 },
+  { id:93, year:2015, make:'Land Rover', model:'Range Rover Sport SVR', country:'UK', hp:542, engine:'5.0L Supercharged V8', weight:2335, drivetrain:'4WD', body:'4x4', price:50000, zeroToSixty:4.5 },
+  { id:94, year:2021, make:'Land Rover', model:'Defender 110 V8', country:'UK', hp:518, engine:'5.0L Supercharged V8', weight:2469, drivetrain:'4WD', body:'4x4', price:100000, zeroToSixty:5.2 },
+  // ===== Lotus =====
+  { id:95, year:1968, make:'Lotus', model:'Seven S2', country:'UK', hp:84, engine:'1.6L NA I4', weight:540, drivetrain:'RWD', body:'roadster', price:35000, zeroToSixty:7.5 },
+  { id:96, year:1980, make:'Lotus', model:'Esprit Turbo', country:'UK', hp:215, engine:'2.2L Turbo I4', weight:1268, drivetrain:'RWD', body:'supercar', price:50000, zeroToSixty:5.6 },
+  { id:97, year:1996, make:'Lotus', model:'Esprit V8', country:'UK', hp:350, engine:'3.5L Twin-Turbo V8', weight:1380, drivetrain:'RWD', body:'supercar', price:35000, zeroToSixty:4.5 },
+  { id:98, year:1996, make:'Lotus', model:'Elise S1', country:'UK', hp:118, engine:'1.8L NA I4', weight:725, drivetrain:'RWD', body:'roadster', price:15000, zeroToSixty:5.9 },
+  { id:99, year:2006, make:'Lotus', model:'Exige S2', country:'UK', hp:220, engine:'1.8L Supercharged I4', weight:875, drivetrain:'RWD', body:'coupe', price:28000, zeroToSixty:4.9 },
+  { id:100, year:2015, make:'Lotus', model:'Evora 400', country:'UK', hp:400, engine:'3.5L Supercharged V6', weight:1395, drivetrain:'RWD', body:'coupe', price:45000, zeroToSixty:4.1 },
+  { id:101, year:2022, make:'Lotus', model:'Emira V6', country:'UK', hp:400, engine:'3.5L Supercharged V6', weight:1458, drivetrain:'RWD', body:'coupe', price:75000, zeroToSixty:4.3 },
+  // ===== Ford =====
+  { id:102, year:1966, make:'Ford', model:'GT40 Mk II', country:'US', hp:485, engine:'7.0L NA V8', weight:1100, drivetrain:'RWD', body:'supercar', price:12000000, zeroToSixty:4.5 },
+  { id:103, year:1973, make:'Ford', model:'Capri RS3100', country:'UK', hp:148, engine:'3.1L NA V6', weight:1200, drivetrain:'RWD', body:'coupe', price:50000, zeroToSixty:8.0 },
+  { id:104, year:1986, make:'Ford', model:'Sierra RS Cosworth', country:'UK', hp:224, engine:'2.0L Turbo I4', weight:1240, drivetrain:'RWD', body:'saloon', price:60000, zeroToSixty:6.5 },
+  { id:105, year:1969, make:'Ford', model:'Mustang Boss 302', country:'US', hp:290, engine:'5.0L NA V8', weight:1500, drivetrain:'RWD', body:'coupe', price:95000, zeroToSixty:6.5 },
+  { id:106, year:1992, make:'Ford', model:'Escort RS Cosworth', country:'UK', hp:227, engine:'2.0L Turbo I4', weight:1275, drivetrain:'AWD', body:'hatch', price:70000, zeroToSixty:5.7 },
+  { id:107, year:2002, make:'Ford', model:'Focus RS Mk1', country:'UK', hp:215, engine:'2.0L Turbo I4', weight:1278, drivetrain:'FWD', body:'hatch', price:18000, zeroToSixty:6.7 },
+  { id:108, year:2009, make:'Ford', model:'Focus RS Mk2', country:'UK', hp:305, engine:'2.5L Turbo I5', weight:1467, drivetrain:'FWD', body:'hatch', price:18000, zeroToSixty:5.9 },
+  { id:109, year:2005, make:'Ford', model:'GT', country:'US', hp:550, engine:'5.4L Supercharged V8', weight:1583, drivetrain:'RWD', body:'supercar', price:380000, zeroToSixty:3.7 },
+  { id:110, year:2017, make:'Ford', model:'GT', country:'US', hp:647, engine:'3.5L Twin-Turbo V6', weight:1385, drivetrain:'RWD', body:'supercar', price:600000, zeroToSixty:3.0 },
+  { id:111, year:2015, make:'Ford', model:'Shelby GT350R', country:'US', hp:526, engine:'5.2L NA V8', weight:1610, drivetrain:'RWD', body:'coupe', price:80000, zeroToSixty:3.9 },
+  // ===== Chevrolet =====
+  { id:112, year:1963, make:'Chevrolet', model:'Corvette C2 Sting Ray', country:'US', hp:360, engine:'5.4L NA V8', weight:1450, drivetrain:'RWD', body:'coupe', price:100000, zeroToSixty:6.0 },
+  { id:113, year:1969, make:'Chevrolet', model:'Camaro Z/28', country:'US', hp:290, engine:'5.0L NA V8', weight:1480, drivetrain:'RWD', body:'coupe', price:80000, zeroToSixty:7.4 },
+  { id:114, year:1970, make:'Chevrolet', model:'SS 396 Chevelle', country:'US', hp:450, engine:'7.4L NA V8', weight:1750, drivetrain:'RWD', body:'coupe', price:90000, zeroToSixty:6.0 },
+  { id:115, year:1990, make:'Chevrolet', model:'Corvette C4 ZR-1', country:'US', hp:375, engine:'5.7L NA V8', weight:1567, drivetrain:'RWD', body:'coupe', price:35000, zeroToSixty:4.9 },
+  { id:116, year:2001, make:'Chevrolet', model:'Corvette C5 Z06', country:'US', hp:405, engine:'5.7L NA V8', weight:1410, drivetrain:'RWD', body:'coupe', price:30000, zeroToSixty:4.0 },
+  { id:117, year:2015, make:'Chevrolet', model:'Corvette C7 Z06', country:'US', hp:650, engine:'6.2L Supercharged V8', weight:1599, drivetrain:'RWD', body:'coupe', price:60000, zeroToSixty:2.9 },
+  { id:118, year:2017, make:'Chevrolet', model:'Camaro ZL1 1LE', country:'US', hp:650, engine:'6.2L Supercharged V8', weight:1738, drivetrain:'RWD', body:'coupe', price:65000, zeroToSixty:3.5 },
+  { id:119, year:2023, make:'Chevrolet', model:'Corvette C8 Z06', country:'US', hp:670, engine:'5.5L NA V8', weight:1561, drivetrain:'RWD', body:'supercar', price:110000, zeroToSixty:2.6 },
+  // ===== Dodge =====
+  { id:120, year:1969, make:'Dodge', model:'Charger R/T 440', country:'US', hp:375, engine:'7.2L NA V8', weight:1750, drivetrain:'RWD', body:'coupe', price:100000, zeroToSixty:6.5 },
+  { id:121, year:1970, make:'Dodge', model:'Challenger R/T Hemi', country:'US', hp:425, engine:'7.0L NA V8', weight:1700, drivetrain:'RWD', body:'coupe', price:150000, zeroToSixty:5.8 },
+  { id:122, year:1992, make:'Dodge', model:'Viper RT/10', country:'US', hp:400, engine:'8.0L NA V10', weight:1488, drivetrain:'RWD', body:'roadster', price:50000, zeroToSixty:4.6 },
+  { id:123, year:1996, make:'Dodge', model:'Viper GTS', country:'US', hp:450, engine:'8.0L NA V10', weight:1535, drivetrain:'RWD', body:'coupe', price:50000, zeroToSixty:4.0 },
+  { id:124, year:2008, make:'Dodge', model:'Viper SRT-10 ACR', country:'US', hp:600, engine:'8.4L NA V10', weight:1542, drivetrain:'RWD', body:'coupe', price:100000, zeroToSixty:3.5 },
+  { id:125, year:2016, make:'Dodge', model:'Viper ACR', country:'US', hp:645, engine:'8.4L NA V10', weight:1564, drivetrain:'RWD', body:'coupe', price:130000, zeroToSixty:3.4 },
+  { id:126, year:2019, make:'Dodge', model:'Challenger Hellcat Redeye', country:'US', hp:797, engine:'6.2L Supercharged V8', weight:2042, drivetrain:'RWD', body:'coupe', price:70000, zeroToSixty:3.4 },
+  { id:127, year:2018, make:'Dodge', model:'Demon', country:'US', hp:840, engine:'6.2L Supercharged V8', weight:2034, drivetrain:'RWD', body:'coupe', price:100000, zeroToSixty:2.3 },
+  // ===== Toyota =====
+  { id:128, year:1968, make:'Toyota', model:'2000GT', country:'JP', hp:150, engine:'2.0L NA I6', weight:1120, drivetrain:'RWD', body:'coupe', price:1200000, zeroToSixty:8.6 },
+  { id:129, year:1985, make:'Toyota', model:'AE86 Corolla GT', country:'JP', hp:130, engine:'1.6L NA I4', weight:940, drivetrain:'RWD', body:'coupe', price:30000, zeroToSixty:8.3 },
+  { id:130, year:1992, make:'Toyota', model:'MR2 SW20 Turbo', country:'JP', hp:245, engine:'2.0L Turbo I4', weight:1250, drivetrain:'RWD', body:'coupe', price:14000, zeroToSixty:5.9 },
+  { id:131, year:1993, make:'Toyota', model:'Supra Mk4 RZ', country:'JP', hp:320, engine:'3.0L Twin-Turbo I6', weight:1570, drivetrain:'RWD', body:'coupe', price:80000, zeroToSixty:4.6 },
+  { id:132, year:1994, make:'Toyota', model:'Celica GT-Four ST205', country:'JP', hp:252, engine:'2.0L Turbo I4', weight:1410, drivetrain:'AWD', body:'coupe', price:30000, zeroToSixty:6.2 },
+  { id:133, year:2012, make:'Toyota', model:'GT86', country:'JP', hp:197, engine:'2.0L NA Flat-4', weight:1240, drivetrain:'RWD', body:'coupe', price:9000, zeroToSixty:7.2 },
+  { id:134, year:2019, make:'Toyota', model:'GR Supra A90', country:'JP', hp:335, engine:'3.0L Turbo I6', weight:1495, drivetrain:'RWD', body:'coupe', price:45000, zeroToSixty:4.1 },
+  { id:135, year:2020, make:'Toyota', model:'GR Yaris', country:'JP', hp:257, engine:'1.6L Turbo I3', weight:1280, drivetrain:'AWD', body:'hatch', price:32000, zeroToSixty:5.2 },
+  // ===== Nissan =====
+  { id:136, year:1969, make:'Nissan', model:'Skyline 2000GT-R Hakosuka', country:'JP', hp:160, engine:'2.0L NA I6', weight:1100, drivetrain:'RWD', body:'coupe', price:350000, zeroToSixty:8.0 },
+  { id:137, year:1969, make:'Nissan', model:'240Z', country:'JP', hp:151, engine:'2.4L NA I6', weight:1043, drivetrain:'RWD', body:'coupe', price:50000, zeroToSixty:8.0 },
+  { id:138, year:1989, make:'Nissan', model:'Skyline GT-R R32 V-Spec', country:'JP', hp:280, engine:'2.6L Twin-Turbo I6', weight:1430, drivetrain:'AWD', body:'coupe', price:80000, zeroToSixty:5.6 },
+  { id:139, year:2002, make:'Nissan', model:'Skyline GT-R R34 V-Spec II', country:'JP', hp:280, engine:'2.6L Twin-Turbo I6', weight:1560, drivetrain:'AWD', body:'coupe', price:150000, zeroToSixty:4.8 },
+  { id:140, year:1999, make:'Nissan', model:'Silvia S15 Spec-R', country:'JP', hp:250, engine:'2.0L Turbo I4', weight:1270, drivetrain:'RWD', body:'coupe', price:30000, zeroToSixty:6.0 },
+  { id:141, year:2003, make:'Nissan', model:'350Z', country:'JP', hp:287, engine:'3.5L NA V6', weight:1530, drivetrain:'RWD', body:'coupe', price:8000, zeroToSixty:5.7 },
+  { id:142, year:2014, make:'Nissan', model:'GT-R Nismo R35', country:'JP', hp:600, engine:'3.8L Twin-Turbo V6', weight:1740, drivetrain:'AWD', body:'coupe', price:130000, zeroToSixty:2.5 },
+  // ===== Subaru =====
+  { id:143, year:1991, make:'Subaru', model:'SVX', country:'JP', hp:230, engine:'3.3L NA Flat-6', weight:1660, drivetrain:'AWD', body:'coupe', price:8000, zeroToSixty:7.7 },
+  { id:144, year:1998, make:'Subaru', model:'Impreza 22B STI', country:'JP', hp:280, engine:'2.2L Turbo Flat-4', weight:1270, drivetrain:'AWD', body:'saloon', price:200000, zeroToSixty:4.8 },
+  { id:145, year:2004, make:'Subaru', model:'Impreza WRX STI Blobeye', country:'JP', hp:280, engine:'2.0L Turbo Flat-4', weight:1470, drivetrain:'AWD', body:'saloon', price:18000, zeroToSixty:4.8 },
+  { id:146, year:2010, make:'Subaru', model:'Impreza WRX STI Spec C', country:'JP', hp:308, engine:'2.0L Turbo Flat-4', weight:1480, drivetrain:'AWD', body:'saloon', price:25000, zeroToSixty:5.0 },
+  { id:147, year:2008, make:'Subaru', model:'Impreza WRX STI Hatch', country:'JP', hp:305, engine:'2.5L Turbo Flat-4', weight:1505, drivetrain:'AWD', body:'hatch', price:12000, zeroToSixty:5.4 },
+  { id:148, year:2018, make:'Subaru', model:'BRZ tS', country:'JP', hp:197, engine:'2.0L NA Flat-4', weight:1259, drivetrain:'RWD', body:'coupe', price:22000, zeroToSixty:7.4 },
+  { id:149, year:1989, make:'Subaru', model:'Legacy RS Turbo', country:'JP', hp:217, engine:'2.0L Turbo Flat-4', weight:1290, drivetrain:'AWD', body:'saloon', price:6000, zeroToSixty:7.2 },
+
+  // ===== CHEAP CAR HEROES =====
+  { id:150, year:1996, make:'Volvo', model:'850 R Wagon', country:'SE', hp:250, engine:'2.3L Turbo I5', weight:1450, drivetrain:'FWD', body:'estate', price:4500, zeroToSixty:6.7 },
+  { id:151, year:1995, make:'Subaru', model:'Impreza WRX Wagon GF8', country:'JP', hp:218, engine:'2.0L Turbo Flat-4', weight:1300, drivetrain:'AWD', body:'estate', price:4000, zeroToSixty:5.7 },
+  { id:152, year:1999, make:'BMW', model:'528i Touring E39', country:'DE', hp:193, engine:'2.8L NA I6', weight:1660, drivetrain:'RWD', body:'estate', price:3000, zeroToSixty:8.1 },
+  { id:153, year:1986, make:'Mercedes-Benz', model:'230E W124', country:'DE', hp:132, engine:'2.3L NA I4', weight:1320, drivetrain:'RWD', body:'saloon', price:4000, zeroToSixty:11.5 },
+  { id:154, year:1979, make:'Lancia', model:'Beta Coupe 2000', country:'IT', hp:119, engine:'2.0L NA I4', weight:1080, drivetrain:'FWD', body:'coupe', price:6000, zeroToSixty:9.5 },
+  { id:155, year:1988, make:'Opel', model:'Kadett GSi 16V', country:'DE', hp:150, engine:'2.0L NA I4', weight:1085, drivetrain:'FWD', body:'hatch', price:5500, zeroToSixty:8.0 },
+  { id:156, year:1989, make:'Porsche', model:'928 GT', country:'DE', hp:326, engine:'5.0L NA V8', weight:1580, drivetrain:'RWD', body:'coupe', price:30000, zeroToSixty:5.7 },
+  { id:157, year:1969, make:'Ford', model:'Mustang Mach 1', country:'US', hp:290, engine:'5.8L NA V8', weight:1500, drivetrain:'RWD', body:'coupe', price:45000, zeroToSixty:7.5 },
+  { id:158, year:1996, make:'BMW', model:'Z3 1.9', country:'DE', hp:138, engine:'1.9L NA I4', weight:1180, drivetrain:'RWD', body:'roadster', price:3500, zeroToSixty:9.0 },
+  { id:159, year:1998, make:'Mercedes-Benz', model:'SLK 230 Kompressor', country:'DE', hp:193, engine:'2.3L Supercharged I4', weight:1325, drivetrain:'RWD', body:'roadster', price:2500, zeroToSixty:7.4 },
+  { id:160, year:1998, make:'Jaguar', model:'XJ8 X308', country:'UK', hp:290, engine:'4.0L NA V8', weight:1820, drivetrain:'RWD', body:'saloon', price:3500, zeroToSixty:7.6 },
+  { id:161, year:2000, make:'Audi', model:'A6 4.2 Quattro C5', country:'DE', hp:300, engine:'4.2L NA V8', weight:1700, drivetrain:'AWD', body:'saloon', price:4500, zeroToSixty:6.5 },
+  { id:162, year:1975, make:'Austin', model:'Allegro 1500', country:'UK', hp:75, engine:'1.5L NA I4', weight:856, drivetrain:'FWD', body:'hatch', price:3000, zeroToSixty:17.0 },
+  { id:163, year:1985, make:'Rover', model:'SD1 V8 Vitesse', country:'UK', hp:190, engine:'3.5L NA V8', weight:1500, drivetrain:'RWD', body:'saloon', price:8000, zeroToSixty:7.4 },
+  { id:164, year:1978, make:'Austin', model:'Princess 2200 HLS', country:'UK', hp:110, engine:'2.2L NA I6', weight:1280, drivetrain:'FWD', body:'saloon', price:4000, zeroToSixty:12.0 },
+  { id:165, year:1974, make:'Morris', model:'Marina 1.8', country:'UK', hp:91, engine:'1.8L NA I4', weight:920, drivetrain:'RWD', body:'saloon', price:3000, zeroToSixty:13.0 },
+  { id:166, year:1989, make:'MG', model:'Maestro Turbo', country:'UK', hp:152, engine:'2.0L Turbo I4', weight:1085, drivetrain:'FWD', body:'hatch', price:4000, zeroToSixty:7.0 },
+  { id:167, year:1985, make:'Reliant', model:'Robin', country:'UK', hp:40, engine:'0.85L NA I4', weight:450, drivetrain:'FWD', body:'hatch', price:2500, zeroToSixty:18.0 },
+  { id:168, year:1994, make:'Renault', model:'Clio Williams', country:'FR', hp:150, engine:'2.0L NA I4', weight:980, drivetrain:'FWD', body:'hatch', price:18000, zeroToSixty:7.6 },
+  { id:169, year:1995, make:'Peugeot', model:'106 Rallye S2', country:'FR', hp:103, engine:'1.6L NA I4', weight:825, drivetrain:'FWD', body:'hatch', price:10000, zeroToSixty:9.0 },
+  { id:170, year:2000, make:'Citroen', model:'Saxo VTS', country:'FR', hp:120, engine:'1.6L NA I4', weight:935, drivetrain:'FWD', body:'hatch', price:4000, zeroToSixty:7.7 },
+  { id:171, year:2003, make:'Vauxhall', model:'VX220 Turbo', country:'UK', hp:200, engine:'2.0L Turbo I4', weight:875, drivetrain:'RWD', body:'roadster', price:14000, zeroToSixty:4.7 },
+  { id:172, year:1986, make:'Toyota', model:'MR2 Mk1 AW11 SC', country:'JP', hp:145, engine:'1.6L Supercharged I4', weight:1066, drivetrain:'RWD', body:'coupe', price:8000, zeroToSixty:7.7 },
+  { id:173, year:1999, make:'Mazda', model:'MX-5 NB', country:'JP', hp:140, engine:'1.8L NA I4', weight:1080, drivetrain:'RWD', body:'roadster', price:3500, zeroToSixty:7.9 },
+  { id:174, year:1986, make:'Renault', model:'5 GT Turbo', country:'FR', hp:120, engine:'1.4L Turbo I4', weight:850, drivetrain:'FWD', body:'hatch', price:15000, zeroToSixty:7.5 },
+  { id:175, year:1989, make:'Vauxhall', model:'Astra GTE 16V Mk2', country:'UK', hp:156, engine:'2.0L NA I4', weight:1060, drivetrain:'FWD', body:'hatch', price:10000, zeroToSixty:7.5 },
+  { id:176, year:1984, make:'Ford', model:'Capri 2.8i Special', country:'UK', hp:160, engine:'2.8L NA V6', weight:1180, drivetrain:'RWD', body:'coupe', price:15000, zeroToSixty:7.9 },
+  { id:177, year:1979, make:'Triumph', model:'TR7 V8', country:'UK', hp:137, engine:'3.5L NA V8', weight:1130, drivetrain:'RWD', body:'roadster', price:8000, zeroToSixty:8.5 },
+  { id:178, year:1973, make:'MG', model:'MGB GT V8', country:'UK', hp:137, engine:'3.5L NA V8', weight:1080, drivetrain:'RWD', body:'coupe', price:12000, zeroToSixty:8.5 },
+  { id:179, year:1976, make:'AMC', model:'Pacer', country:'US', hp:110, engine:'4.2L NA I6', weight:1500, drivetrain:'RWD', body:'hatch', price:8000, zeroToSixty:14.5 },
+  { id:180, year:1976, make:'Cadillac', model:'Eldorado Convertible', country:'US', hp:215, engine:'8.2L NA V8', weight:2300, drivetrain:'RWD', body:'coupe', price:18000, zeroToSixty:11.0 },
+  { id:181, year:1995, make:'Saab', model:'9000 Aero', country:'SE', hp:225, engine:'2.3L Turbo I4', weight:1450, drivetrain:'FWD', body:'hatch', price:4500, zeroToSixty:6.9 },
+  { id:182, year:1990, make:'Citroen', model:'XM V6', country:'FR', hp:200, engine:'3.0L NA V6', weight:1500, drivetrain:'FWD', body:'saloon', price:4500, zeroToSixty:7.9 },
+  { id:183, year:1989, make:'Peugeot', model:'405 Mi16', country:'FR', hp:158, engine:'1.9L NA I4', weight:1100, drivetrain:'FWD', body:'saloon', price:6000, zeroToSixty:8.5 },
+  { id:184, year:1996, make:'Bentley', model:'Continental T', country:'UK', hp:420, engine:'6.75L Turbo V8', weight:2419, drivetrain:'RWD', body:'coupe', price:35000, zeroToSixty:5.7 },
+  { id:185, year:1980, make:'Mazda', model:'RX-7 FB Series 2', country:'JP', hp:105, engine:'1.1L NA Wankel', weight:1050, drivetrain:'RWD', body:'coupe', price:12000, zeroToSixty:8.6 },
+  { id:186, year:1994, make:'Honda', model:'Prelude Mk4 VTEC', country:'JP', hp:200, engine:'2.2L NA I4', weight:1300, drivetrain:'FWD', body:'coupe', price:4000, zeroToSixty:7.5 },
+  { id:187, year:2001, make:'Honda', model:'S2000 AP1', country:'JP', hp:240, engine:'2.0L NA I4', weight:1260, drivetrain:'RWD', body:'roadster', price:8000, zeroToSixty:5.8 },
+  { id:188, year:1985, make:'Trabant', model:'601', country:'DE', hp:26, engine:'0.6L NA I2', weight:615, drivetrain:'FWD', body:'saloon', price:3000, zeroToSixty:21.0 },
+  { id:189, year:1985, make:'Yugo', model:'45', country:'RS', hp:45, engine:'0.9L NA I4', weight:730, drivetrain:'FWD', body:'hatch', price:1500, zeroToSixty:18.0 },
+  { id:190, year:1985, make:'Lada', model:'Riva 1500', country:'RU', hp:75, engine:'1.5L NA I4', weight:1010, drivetrain:'RWD', body:'saloon', price:2000, zeroToSixty:16.0 },
+  { id:191, year:1980, make:'Citroen', model:'2CV', country:'FR', hp:29, engine:'0.6L NA Flat-2', weight:590, drivetrain:'FWD', body:'hatch', price:4500, zeroToSixty:32.0 },
+  { id:192, year:1965, make:'Mini', model:'Cooper Mk1', country:'UK', hp:65, engine:'1.3L NA I4', weight:645, drivetrain:'FWD', body:'hatch', price:18000, zeroToSixty:13.0 },
+  { id:193, year:1992, make:'Lexus', model:'LS400', country:'JP', hp:256, engine:'4.0L NA V8', weight:1840, drivetrain:'RWD', body:'saloon', price:3000, zeroToSixty:7.5 },
+  { id:194, year:1992, make:'Toyota', model:'Soarer 2.5 GT', country:'JP', hp:280, engine:'2.5L Twin-Turbo I6', weight:1610, drivetrain:'RWD', body:'coupe', price:5000, zeroToSixty:5.5 },
+  { id:195, year:1991, make:'BMW', model:'M5 E34', country:'DE', hp:340, engine:'3.6L NA I6', weight:1650, drivetrain:'RWD', body:'saloon', price:12000, zeroToSixty:5.9 },
+  { id:196, year:1995, make:'Mercedes-Benz', model:'C36 AMG W202', country:'DE', hp:280, engine:'3.6L NA I6', weight:1490, drivetrain:'RWD', body:'saloon', price:8000, zeroToSixty:6.6 },
+  { id:197, year:1998, make:'Audi', model:'S4 B5', country:'DE', hp:261, engine:'2.7L Twin-Turbo V6', weight:1620, drivetrain:'AWD', body:'saloon', price:5000, zeroToSixty:5.8 },
+  { id:198, year:2003, make:'Smart', model:'Roadster', country:'DE', hp:80, engine:'0.7L Turbo I3', weight:790, drivetrain:'RWD', body:'roadster', price:3000, zeroToSixty:10.6 },
+  { id:199, year:1998, make:'Land Rover', model:'Range Rover P38 4.6 HSE', country:'UK', hp:218, engine:'4.6L NA V8', weight:2200, drivetrain:'4WD', body:'4x4', price:3500, zeroToSixty:9.7 },
+  { id:200, year:1995, make:'Land Rover', model:'Discovery 1 V8', country:'UK', hp:182, engine:'3.9L NA V8', weight:1980, drivetrain:'4WD', body:'4x4', price:3000, zeroToSixty:12.5 },
+  { id:201, year:1991, make:'Lancia', model:'Delta HF Integrale Evo', country:'IT', hp:210, engine:'2.0L Turbo I4', weight:1360, drivetrain:'AWD', body:'hatch', price:80000, zeroToSixty:5.7 },
+];
+
+// Mock submissions seed
+const SEED_SUBS = [
+  { id:'s1', user:'GRANDSILENCE', carId:150, votes:51, time: Date.now() - 1000*60*60*8 },    // Volvo 850 R Wagon (Hammond)
+  { id:'s2', user:'NIGHTSHIFT_88', carId:152, votes:47, time: Date.now() - 1000*60*60*6 },   // BMW 528i Touring (Clarkson)
+  { id:'s3', user:'RUSTY_BOI', carId:167, votes:38, time: Date.now() - 1000*60*60*5 },       // Reliant Robin
+  { id:'s4', user:'JDM_LASS', carId:151, votes:33, time: Date.now() - 1000*60*60*4 },        // Subaru WRX Wagon (May)
+  { id:'s5', user:'GTI_FOREVER', carId:153, votes:26, time: Date.now() - 1000*60*60*3 },     // Mercedes 230E W124
+  { id:'s6', user:'M_POWER_MARK', carId:160, votes:19, time: Date.now() - 1000*60*60*2 },    // Jaguar XJ8
+  { id:'s7', user:'BIGFOOT', carId:191, votes:17, time: Date.now() - 1000*60*55 },           // Citroen 2CV
+  { id:'s8', user:'KEEFTOY', carId:188, votes:12, time: Date.now() - 1000*60*40 },           // Trabant 601
+  { id:'s9', user:'MISS_FRONTAL', carId:189, votes:8, time: Date.now() - 1000*60*22 },       // Yugo 45
+  { id:'s10', user:'SHED_DWELLER', carId:162, votes:5, time: Date.now() - 1000*60*8 }        // Austin Allegro
+];
+
+// Hall of Fame mock — yesterday was a £5k roadster challenge
+const FAME_WINNER_ID = 173; // Mazda MX-5 NB
+const FAME_RUNNERS = [
+  { user:'PETROL_PETE', carId:158, votes:189 },   // BMW Z3 1.9
+  { user:'TURBO_TONY', carId:159, votes:156 },    // Mercedes SLK 230 Kompressor
+  { user:'SHIFT_SISTER', carId:198, votes:124 }   // Smart Roadster
+];
+
+// ============ STATE ============
+const fmt = n => '£' + n.toLocaleString();
+let selectedId = null;
+let currentUser = null;
+let submissions = [...SEED_SUBS];
+let userVotes = new Set();    // submission ids the current user has voted on
+let userSubmissionId = null;  // their own submission this round
+let visibleCount = 24;        // pagination
+let sortBy = 'default';
+let subsSort = 'votes';
+
+// Try restore from localStorage
+try {
+  const saved = JSON.parse(localStorage.getItem('pistonwave_v03') || '{}');
+  if (saved.user) currentUser = saved.user;
+  if (saved.votes) userVotes = new Set(saved.votes);
+  if (saved.submission) {
+    userSubmissionId = saved.submission.id;
+    submissions = [saved.submission, ...submissions];
+  }
+} catch(e) {}
+
+function persist() {
+  const ownSub = submissions.find(s => s.id === userSubmissionId);
+  localStorage.setItem('pistonwave_v03', JSON.stringify({
+    user: currentUser,
+    votes: [...userVotes],
+    submission: ownSub
+  }));
+}
+
+// ============ ELIGIBILITY ============
+function isEligible(c) {
+  if (TODAY.constraints.maxPrice && c.price > TODAY.constraints.maxPrice) return false;
+  if (TODAY.constraints.drivetrainBlacklist.includes(c.drivetrain)) return false;
+  return true;
+}
+function ineligibleReasons(c) {
+  const r = [];
+  if (TODAY.constraints.maxPrice && c.price > TODAY.constraints.maxPrice) r.push('OVER BUDGET');
+  if (TODAY.constraints.drivetrainBlacklist.includes(c.drivetrain)) r.push('4WD NOT ALLOWED');
+  return r;
+}
+
+// ============ COUNTRY DROPDOWN ============
+function populateCountries() {
+  const sel = document.getElementById('filterCountry');
+  const seen = new Set(CARS.map(c => c.country));
+  const NAMES = { UK:'United Kingdom', DE:'Germany', JP:'Japan', IT:'Italy', FR:'France', SE:'Sweden', US:'USA', KR:'South Korea', RU:'Russia', RS:'Serbia', HR:'Croatia' };
+  [...seen].sort().forEach(c => {
+    const opt = document.createElement('option');
+    opt.value = c; opt.textContent = NAMES[c] || c;
+    sel.appendChild(opt);
+  });
+}
+populateCountries();
+
+// ============ TIME FORMATTING ============
+function timeAgo(ms) {
+  const diff = Date.now() - ms;
+  const m = Math.floor(diff / 60000);
+  if (m < 1) return 'JUST NOW';
+  if (m < 60) return m + 'm AGO';
+  const h = Math.floor(m / 60);
+  if (h < 24) return h + 'h AGO';
+  return Math.floor(h / 24) + 'd AGO';
+}
+
+// ============ TABS ============
+function switchTab(tab) {
+  document.querySelectorAll('.tab-section').forEach(s => s.classList.remove('active'));
+  document.getElementById('tab-' + tab).classList.add('active');
+  document.querySelectorAll('.nav-links a').forEach(a => a.classList.toggle('active', a.dataset.tab === tab));
+  if (tab === 'submissions') renderSubmissions();
+  if (tab === 'fame') renderFame();
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+
+document.querySelectorAll('.nav-links a[data-tab]').forEach(a => {
+  a.addEventListener('click', e => { e.preventDefault(); switchTab(a.dataset.tab); });
+});
+document.querySelector('.logo').addEventListener('click', () => switchTab('today'));
+
+// ============ CARS RENDER ============
+function renderCars() {
+  const grid = document.getElementById('carsGrid');
+  const q = document.getElementById('searchInput').value.toLowerCase().trim();
+  const country = document.getElementById('filterCountry').value;
+  const drivetrain = document.getElementById('filterDrivetrain').value;
+  const body = document.getElementById('filterBody').value;
+  const hideIneligible = document.getElementById('hideIneligible').checked;
+  sortBy = document.getElementById('sortBy').value;
+
+  let list = CARS.filter(c => {
+    const text = `${c.year} ${c.make} ${c.model}`.toLowerCase();
+    if (q && !text.includes(q)) return false;
+    if (country && c.country !== country) return false;
+    if (drivetrain && c.drivetrain !== drivetrain) return false;
+    if (body && c.body !== body) return false;
+    if (hideIneligible && !isEligible(c)) return false;
+    return true;
+  });
+
+  // Sort
+  switch(sortBy) {
+    case 'price-asc': list.sort((a,b) => a.price - b.price); break;
+    case 'price-desc': list.sort((a,b) => b.price - a.price); break;
+    case 'hp-desc': list.sort((a,b) => b.hp - a.hp); break;
+    case 'year-desc': list.sort((a,b) => b.year - a.year); break;
+    case 'year-asc': list.sort((a,b) => a.year - b.year); break;
+    case 'weight-asc': list.sort((a,b) => a.weight - b.weight); break;
+  }
+
+  document.getElementById('resultsCount').textContent =
+    `${list.length} CARS · ${list.filter(isEligible).length} ELIGIBLE · SHOWING ${Math.min(list.length, visibleCount)}`;
+
+  const visible = list.slice(0, visibleCount);
+  grid.innerHTML = visible.map(c => {
+    const elig = isEligible(c);
+    return `<div class="car-card ${elig ? '' : 'ineligible'} ${selectedId === c.id ? 'selected' : ''}" data-id="${c.id}">
+      <div class="car-silhouette">${SILHOUETTES[c.body] || SILHOUETTES.coupe}</div>
+      <div class="car-year">${c.year} · ${FLAGS[c.country] || ''}</div>
+      <div class="car-name">${c.make} ${c.model}</div>
+      <div class="car-meta">
+        <span>${c.hp}hp · ${c.drivetrain}</span>
+        <span class="price">${fmt(c.price)}</span>
+      </div>
+    </div>`;
+  }).join('') || '<p style="color:rgba(255,255,255,0.5);grid-column:1/-1;text-align:center;padding:40px;font-family:VT323,monospace;font-size:22px;letter-spacing:2px;">NO CARS MATCH. CHECK YOUR FILTERS.</p>';
+
+  document.getElementById('showMoreBtn').style.display = list.length > visibleCount ? 'block' : 'none';
+
+  grid.querySelectorAll('.car-card').forEach(el => {
+    el.addEventListener('click', () => {
+      selectedId = parseInt(el.dataset.id);
+      renderCars();
+      renderSelected();
+    });
+  });
+}
+
+document.getElementById('showMoreBtn').addEventListener('click', () => {
+  visibleCount += 24;
+  renderCars();
+});
+
+// ============ SELECTED PANEL ============
+function renderSelected() {
+  const panel = document.getElementById('selectedPanel');
+  if (selectedId === null) {
+    panel.classList.add('empty');
+    panel.innerHTML = `<div class="selected-empty-icon">[ ◇ ]</div><p style="margin-top:12px;font-family:'VT323',monospace;font-size:22px;letter-spacing:2px;">NO CAR SELECTED.<br>PICK SOMETHING STUPID.</p>`;
+    return;
+  }
+  const c = CARS.find(x => x.id === selectedId);
+  const elig = isEligible(c);
+  const reasons = ineligibleReasons(c);
+  const alreadySubmitted = !!userSubmissionId;
+  panel.classList.remove('empty');
+  panel.innerHTML = `
+    <div class="sel-silhouette">${SILHOUETTES[c.body] || SILHOUETTES.coupe}</div>
+    <div class="sel-name">${c.year} ${c.make}<br>${c.model.toUpperCase()}</div>
+    <div class="sel-variant">${FLAGS[c.country] || ''} · ${c.body.toUpperCase()}</div>
+    <div class="specs">
+      <div class="spec"><div class="spec-label">Engine</div><div class="spec-value">${c.engine}</div></div>
+      <div class="spec"><div class="spec-label">Power</div><div class="spec-value">${c.hp} hp</div></div>
+      <div class="spec"><div class="spec-label">Weight</div><div class="spec-value">${c.weight} kg</div></div>
+      <div class="spec"><div class="spec-label">Drivetrain</div><div class="spec-value">${c.drivetrain}</div></div>
+      <div class="spec"><div class="spec-label">0-60 mph</div><div class="spec-value">${c.zeroToSixty}s</div></div>
+      <div class="spec"><div class="spec-label">Used Price</div><div class="spec-value">${fmt(c.price)}</div></div>
+    </div>
+    <div class="eligibility ${elig ? '' : 'fail'}">
+      ${elig ? '> ELIGIBLE FOR THIS CHALLENGE' : '> INELIGIBLE: ' + reasons.join(' · ')}
+    </div>
+    <button class="btn-submit" id="submitPick" ${(elig && !alreadySubmitted) ? '' : 'disabled'}>
+      ${alreadySubmitted ? 'ALREADY SUBMITTED' : 'SUBMIT THIS PICK'}
+    </button>
+  `;
+  const btn = document.getElementById('submitPick');
+  if (btn && !btn.disabled) btn.addEventListener('click', submitPick);
+}
+
+// ============ SUBMIT ============
+function submitPick() {
+  if (!currentUser) {
+    document.getElementById('loginModal').classList.add('show');
+    return;
+  }
+  const c = CARS.find(x => x.id === selectedId);
+  const newSub = {
+    id: 's_' + Date.now(),
+    user: currentUser.toUpperCase(),
+    carId: c.id,
+    votes: 0,
+    time: Date.now(),
+    own: true
+  };
+  submissions = [newSub, ...submissions.filter(s => !s.own)];
+  userSubmissionId = newSub.id;
+  persist();
+  const others = submissions.length - 1;
+  document.getElementById('lockedSilhouette').innerHTML = SILHOUETTES[c.body] || SILHOUETTES.coupe;
+  document.getElementById('lockedName').textContent = `${c.year} ${c.make.toUpperCase()} ${c.model.toUpperCase()}`;
+  document.getElementById('lockedMeta').textContent = `${FLAGS[c.country]} · ${c.hp}hp · ${c.drivetrain} · ${fmt(c.price)}`;
+  document.getElementById('duelOthersA').textContent = others;
+  document.getElementById('duelOthersB').textContent = others;
+  document.getElementById('submitModal').classList.add('show');
+  renderSelected();
+  updateSubBadge();
+}
+
+// ============ SUBMISSIONS RENDER ============
+function renderSubmissions() {
+  const grid = document.getElementById('submissionsGrid');
+  let list = [...submissions];
+  if (subsSort === 'votes') list.sort((a,b) => b.votes - a.votes || b.time - a.time);
+  else list.sort((a,b) => b.time - a.time);
+
+  grid.innerHTML = list.map((s, idx) => {
+    const c = CARS.find(x => x.id === s.carId);
+    if (!c) return '';
+    const isYours = s.id === userSubmissionId;
+    const hasVoted = userVotes.has(s.id);
+    let rankCls = '';
+    let rankIcon = `#${idx+1}`;
+    if (subsSort === 'votes') {
+      if (idx === 0) { rankCls = 'gold'; rankIcon = '1ST'; }
+      else if (idx === 1) { rankCls = 'silver'; rankIcon = '2ND'; }
+      else if (idx === 2) { rankCls = 'bronze'; rankIcon = '3RD'; }
+    }
+    return `<div class="sub-card ${isYours ? 'your-pick' : ''} ${rankCls}">
+      <div class="sub-rank">${rankIcon}</div>
+      <div class="sub-user">→ ${s.user}</div>
+      <div class="sub-time">${timeAgo(s.time)}</div>
+      <div class="sub-silhouette">${SILHOUETTES[c.body] || SILHOUETTES.coupe}</div>
+      <div class="sub-car-name">${c.year} ${c.make} ${c.model}</div>
+      <div class="sub-specs">${FLAGS[c.country]} · ${c.hp}hp · ${c.drivetrain} · <span class="price">${fmt(c.price)}</span></div>
+      <div class="sub-actions">
+        <div class="vote-count">▲ ${s.votes}</div>
+        <button class="vote-btn ${hasVoted ? 'voted' : ''} ${isYours ? 'own' : ''}" data-sub="${s.id}" ${isYours ? 'disabled' : ''}>
+          <span class="vote-arrow">▲</span> ${isYours ? 'YOUR PICK' : (hasVoted ? 'VOTED' : 'VOTE')}
+        </button>
+      </div>
+    </div>`;
+  }).join('');
+
+  grid.querySelectorAll('.vote-btn[data-sub]').forEach(btn => {
+    btn.addEventListener('click', () => {
+      if (!currentUser) {
+        document.getElementById('loginModal').classList.add('show');
+        return;
+      }
+      const subId = btn.dataset.sub;
+      const sub = submissions.find(x => x.id === subId);
+      if (!sub) return;
+      if (userVotes.has(subId)) {
+        userVotes.delete(subId);
+        sub.votes -= 1;
+        showToast('VOTE WITHDRAWN');
+      } else {
+        userVotes.add(subId);
+        sub.votes += 1;
+        showToast('VOTE LOCKED IN');
+      }
+      persist();
+      renderSubmissions();
+    });
+  });
+}
+
+document.querySelectorAll('.sort-toggle button').forEach(btn => {
+  btn.addEventListener('click', () => {
+    document.querySelectorAll('.sort-toggle button').forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+    subsSort = btn.dataset.sort;
+    renderSubmissions();
+  });
+});
+
+function updateSubBadge() {
+  document.getElementById('subCountBadge').textContent = `(${submissions.length})`;
+}
+
+// ============ FAME RENDER ============
+function renderFame() {
+  const winner = CARS.find(x => x.id === FAME_WINNER_ID);
+  document.getElementById('fameWinnerSilhouette').innerHTML = SILHOUETTES[winner.body] || SILHOUETTES.coupe;
+  document.getElementById('fameWinnerName').innerHTML = `${winner.year} ${winner.make.toUpperCase()}<br>${winner.model.toUpperCase()}`;
+  document.getElementById('fameWinnerSpecs').textContent = `${FLAGS[winner.country] || ''} · ${winner.hp}hp · ${winner.drivetrain} · ${fmt(winner.price)}`;
+  const runners = document.getElementById('fameRunners');
+  runners.innerHTML = FAME_RUNNERS.map((r, i) => {
+    const c = CARS.find(x => x.id === r.carId);
+    if (!c) return '';
+    const medal = ['SILVER', 'BRONZE', '4TH'][i] || `${i+2}TH`;
+    return `<div class="sub-card" style="position:relative;">
+      <div class="sub-rank" style="color:rgba(255,255,255,0.45);">${medal}</div>
+      <div class="sub-user">→ ${r.user}</div>
+      <div class="sub-silhouette">${SILHOUETTES[c.body] || SILHOUETTES.coupe}</div>
+      <div class="sub-car-name">${c.year} ${c.make} ${c.model}</div>
+      <div class="sub-specs">${FLAGS[c.country]} · ${c.hp}hp · ${c.drivetrain} · <span class="price">${fmt(c.price)}</span></div>
+      <div class="sub-actions"><div class="vote-count">▲ ${r.votes}</div></div>
+    </div>`;
+  }).join('');
+}
+
+// ============ TOAST ============
+function showToast(msg) {
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.classList.add('show');
+  clearTimeout(t._timer);
+  t._timer = setTimeout(() => t.classList.remove('show'), 1800);
+}
+
+// ============ LOGIN ============
+function applyUserChip() {
+  const btn = document.getElementById('loginBtn');
+  if (currentUser) {
+    btn.textContent = currentUser;
+    btn.classList.remove('nav-cta');
+    btn.classList.add('user-chip');
+  }
+}
+
+document.getElementById('loginBtn').addEventListener('click', () => {
+  document.getElementById('loginModal').classList.add('show');
+});
+document.getElementById('loginForm').addEventListener('submit', (e) => {
+  e.preventDefault();
+  const data = new FormData(e.target);
+  currentUser = data.get('username');
+  persist();
+  document.getElementById('loginModal').classList.remove('show');
+  applyUserChip();
+  showToast('WELCOME, ' + currentUser.toUpperCase());
+});
+document.getElementById('closeSubmit').addEventListener('click', () => {
+  document.getElementById('submitModal').classList.remove('show');
+  switchTab('submissions');
+});
+document.querySelectorAll('.modal-bg').forEach(bg => {
+  bg.addEventListener('click', e => { if (e.target === bg) bg.classList.remove('show'); });
+});
+
+// ============ FILTERS ============
+['searchInput','filterCountry','filterDrivetrain','filterBody','sortBy','hideIneligible'].forEach(id => {
+  document.getElementById(id).addEventListener('input', () => { visibleCount = 24; renderCars(); });
+  document.getElementById(id).addEventListener('change', () => { visibleCount = 24; renderCars(); });
+});
+
+// ============ COUNTDOWN ============
+function tickCountdown() {
+  const now = new Date();
+  const close = new Date();
+  close.setHours(23, 59, 0, 0);
+  if (now > close) close.setDate(close.getDate() + 1);
+  const diff = close - now;
+  const h = Math.floor(diff / 3600000);
+  const m = Math.floor((diff % 3600000) / 60000);
+  const s = Math.floor((diff % 60000) / 1000);
+  const pad = n => String(n).padStart(2, '0');
+  document.getElementById('countdown').textContent =
+    `▣ SUBMISSIONS CLOSE IN ${pad(h)}:${pad(m)}:${pad(s)}`;
+}
+tickCountdown();
+setInterval(tickCountdown, 1000);
+
+// ============ INIT ============
+applyUserChip();
+updateSubBadge();
+renderCars();
+renderSelected();
+</script>
+</body>
+</html>
