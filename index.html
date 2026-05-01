@@ -424,6 +424,7 @@ footer { text-align: center; padding: 30px; color: rgba(255, 255, 255, 0.4); fon
 }
 .toast.show { transform: translateX(-50%) translateY(0); opacity: 1; }
 </style>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 </head>
 <body>
 
@@ -441,22 +442,16 @@ footer { text-align: center; padding: 30px; color: rgba(255, 255, 255, 0.4); fon
 </nav>
 
 <main>
-  <div class="proto-banner">▼ BETA — LIVE DATA · VOTES SAVE · REAL LEADERBOARD ▼</div>
+  <div class="proto-banner">▼ PROTOTYPE v0.3 — 201 CARS · CHEAP HEROES + ENTHUSIAST ICONS · NO REAL DATA SAVED YET ▼</div>
 
   <!-- TAB: TODAY'S DRIVE -->
   <section id="tab-today" class="tab-section active">
     <div class="hero">
       <div class="hero-tag" id="challengeTag">▶ LOADING...</div>
       <h1 class="hero-title" id="heroTitle">LOADING...</h1>
-      <p class="hero-body">
-        You've got <strong>£5,000 (mods included)</strong> to cross the Gobi Desert.
-        1,610km of unforgiving sand, rock and wind. The catch — <strong>no 4x4s allowed</strong>.
-        Pick something with character. Sensible is allowed. Stupid is encouraged.
-      </p>
-      <div class="constraints">
-        <span class="chip">BUDGET ≤ £5,000</span>
-        <span class="chip warn">NO 4WD</span>
-        <span class="chip time" id="countdown">▣ SUBMISSIONS CLOSE IN 14:23:00</span>
+      <p class="hero-body" id="heroBody"></p>
+      <div class="constraints" id="challengeConstraints">
+        <span class="chip time" id="countdown">▣ LOADING...</span>
       </div>
     </div>
 
@@ -592,9 +587,12 @@ footer { text-align: center; padding: 30px; color: rgba(255, 255, 255, 0.4); fon
 
 <div class="toast" id="toast"></div>
 
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script>
 // ============ DATA ============
+const SUPABASE_URL = 'https://ptmfshtisnjipsfwxfcu.supabase.co';
+const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InB0bWZzaHRpc25qaXBzZnd4ZmN1Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzc1NTY5NzAsImV4cCI6MjA5MzEzMjk3MH0.HmALfJmhECeFRwPrcNnv50lOtgu8uqNllH8T7LEC0-U';
+const sb = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+let TODAY = null;
 
 const SILHOUETTES = {
   hatch: '<svg viewBox="0 0 200 60" xmlns="http://www.w3.org/2000/svg"><path d="M10 50 L25 30 L60 18 L130 18 L150 30 L190 32 L190 50 Z" fill="#ff2bd6" stroke="#00f0ff" stroke-width="1.5"/><circle cx="50" cy="50" r="9" fill="#0a0214" stroke="#00f0ff" stroke-width="1.5"/><circle cx="160" cy="50" r="9" fill="#0a0214" stroke="#00f0ff" stroke-width="1.5"/></svg>',
@@ -826,39 +824,33 @@ const CARS = [
   { id:199, year:1998, make:'Land Rover', model:'Range Rover P38 4.6 HSE', country:'UK', hp:218, engine:'4.6L NA V8', weight:2200, drivetrain:'4WD', body:'4x4', price:3500, zeroToSixty:9.7 },
   { id:200, year:1995, make:'Land Rover', model:'Discovery 1 V8', country:'UK', hp:182, engine:'3.9L NA V8', weight:1980, drivetrain:'4WD', body:'4x4', price:3000, zeroToSixty:12.5 },
   { id:201, year:1991, make:'Lancia', model:'Delta HF Integrale Evo', country:'IT', hp:210, engine:'2.0L Turbo I4', weight:1360, drivetrain:'AWD', body:'hatch', price:80000, zeroToSixty:5.7 },
-  { id:202, year:1998, make:'Honda', model:'Accord Type R CH1', country:'JP', hp:212, engine:'2.2L NA I4', weight:1220, drivetrain:'FWD', body:'saloon', price:4500, zeroToSixty:6.7 },
-  { id:203, year:2001, make:'Saab', model:'9-5 Aero Estate', country:'SE', hp:250, engine:'2.3L Turbo I4', weight:1590, drivetrain:'FWD', body:'estate', price:2500, zeroToSixty:6.9 },
-  { id:204, year:2002, make:'Jaguar', model:'S-Type 4.2 V8', country:'UK', hp:298, engine:'4.2L NA V8', weight:1745, drivetrain:'RWD', body:'saloon', price:3000, zeroToSixty:6.2 },
-  { id:205, year:1997, make:'Jaguar', model:'XJ6 X300 Sport', country:'UK', hp:249, engine:'4.0L NA I6', weight:1760, drivetrain:'RWD', body:'saloon', price:4000, zeroToSixty:7.2 },
-  { id:206, year:2001, make:'Rover', model:'75 V6 Connoisseur', country:'UK', hp:177, engine:'2.5L NA V6', weight:1560, drivetrain:'RWD', body:'saloon', price:2000, zeroToSixty:8.2 },
-  { id:207, year:2001, make:'Skoda', model:'Octavia vRS Mk1', country:'DE', hp:180, engine:'1.8L Turbo I4', weight:1320, drivetrain:'FWD', body:'hatch', price:3500, zeroToSixty:7.3 },
-  { id:208, year:2003, make:'Vauxhall', model:'Astra Coupe Turbo', country:'UK', hp:200, engine:'2.0L Turbo I4', weight:1330, drivetrain:'FWD', body:'coupe', price:2500, zeroToSixty:6.8 },
-  { id:209, year:2002, make:'Ford', model:'Puma 1.7 Racing', country:'UK', hp:125, engine:'1.7L NA I4', weight:1025, drivetrain:'FWD', body:'coupe', price:3500, zeroToSixty:8.5 },
-  { id:210, year:2002, make:'SEAT', model:'Leon Cupra R Mk1', country:'DE', hp:225, engine:'1.8L Turbo I4', weight:1308, drivetrain:'FWD', body:'hatch', price:4500, zeroToSixty:6.6 },
-  { id:211, year:1999, make:'Saab', model:'9-3 Viggen Coupe', country:'SE', hp:230, engine:'2.3L Turbo I4', weight:1370, drivetrain:'FWD', body:'coupe', price:4000, zeroToSixty:6.6 },
-  { id:212, year:2001, make:'Vauxhall', model:'Omega 3.2 V6 Elite', country:'UK', hp:211, engine:'3.2L NA V6', weight:1620, drivetrain:'RWD', body:'saloon', price:2500, zeroToSixty:7.2 },
-  { id:213, year:1998, make:'Honda', model:'Legend V6 3.5', country:'JP', hp:206, engine:'3.5L NA V6', weight:1770, drivetrain:'FWD', body:'saloon', price:2500, zeroToSixty:7.6 },
-  { id:214, year:1997, make:'Peugeot', model:'406 Coupe V6', country:'FR', hp:194, engine:'3.0L NA V6', weight:1390, drivetrain:'FWD', body:'coupe', price:3500, zeroToSixty:7.5 },
-  { id:215, year:2000, make:'Alfa Romeo', model:'156 2.5 V6', country:'IT', hp:192, engine:'2.5L NA V6', weight:1360, drivetrain:'FWD', body:'saloon', price:3500, zeroToSixty:7.2 },
-  { id:216, year:2002, make:'Alfa Romeo', model:'147 GTA', country:'IT', hp:250, engine:'3.2L NA V6', weight:1370, drivetrain:'FWD', body:'hatch', price:7000, zeroToSixty:6.3 },
-  { id:217, year:1986, make:'Lancia', model:'Thema 8.32', country:'IT', hp:215, engine:'3.0L NA V8', weight:1380, drivetrain:'FWD', body:'saloon', price:35000, zeroToSixty:6.8 },
-  { id:218, year:1997, make:'Jaguar', model:'XJR Supercharged X308', country:'UK', hp:375, engine:'4.0L Supercharged V8', weight:1855, drivetrain:'RWD', body:'saloon', price:5000, zeroToSixty:5.8 },
-  { id:219, year:2000, make:'Ford', model:'Mondeo ST200', country:'UK', hp:205, engine:'2.5L NA V6', weight:1390, drivetrain:'FWD', body:'saloon', price:3500, zeroToSixty:6.8 },
-  { id:220, year:1994, make:'Citroen', model:'Xantia Activa V6', country:'FR', hp:200, engine:'3.0L NA V6', weight:1370, drivetrain:'FWD', body:'hatch', price:4500, zeroToSixty:7.8 },
-  { id:221, year:1994, make:'BMW', model:'840Ci E31', country:'DE', hp:286, engine:'4.0L NA V8', weight:1750, drivetrain:'RWD', body:'coupe', price:12000, zeroToSixty:6.8 },
-  { id:222, year:1993, make:'Mitsubishi', model:'Galant VR-4', country:'JP', hp:240, engine:'2.0L Twin-Turbo V6', weight:1540, drivetrain:'AWD', body:'saloon', price:5000, zeroToSixty:6.1 },
+  { id:202, year:1998, make:'Honda', model:'Accord Type R CH1', country:'JP', hp:212, engine:'2.2L NA I4', weight:1196, drivetrain:'FWD', body:'hatch', price:6000, zeroToSixty:6.7 },
+  { id:203, year:2000, make:'Saab', model:'9-5 Aero', country:'SE', hp:250, engine:'2.3L Turbo I4', weight:1530, drivetrain:'FWD', body:'saloon', price:2500, zeroToSixty:7.0 },
+  { id:204, year:2003, make:'Jaguar', model:'S-Type R', country:'UK', hp:400, engine:'4.2L SC V8', weight:1715, drivetrain:'RWD', body:'saloon', price:5000, zeroToSixty:5.3 },
+  { id:205, year:1995, make:'Jaguar', model:'XJ6 X300', country:'UK', hp:249, engine:'4.0L NA I6', weight:1750, drivetrain:'RWD', body:'saloon', price:4000, zeroToSixty:7.6 },
+  { id:206, year:1999, make:'Jaguar', model:'XJR X308', country:'UK', hp:370, engine:'4.0L SC V8', weight:1755, drivetrain:'RWD', body:'saloon', price:4500, zeroToSixty:5.8 },
+  { id:207, year:2001, make:'Rover', model:'75 V6', country:'UK', hp:178, engine:'2.5L NA V6', weight:1545, drivetrain:'RWD', body:'saloon', price:2500, zeroToSixty:8.2 },
+  { id:208, year:2001, make:'Skoda', model:'Octavia vRS Mk1', country:'CZ', hp:180, engine:'1.8L Turbo I4', weight:1330, drivetrain:'FWD', body:'hatch', price:4000, zeroToSixty:7.5 },
+  { id:209, year:2002, make:'Vauxhall', model:'Astra Coupe Turbo', country:'UK', hp:190, engine:'2.0L Turbo I4', weight:1335, drivetrain:'FWD', body:'coupe', price:3500, zeroToSixty:7.2 },
+  { id:210, year:1999, make:'Ford', model:'Puma Racing', country:'UK', hp:155, engine:'1.7L NA I4', weight:1070, drivetrain:'FWD', body:'coupe', price:6000, zeroToSixty:8.0 },
+  { id:211, year:2000, make:'Ford', model:'Mondeo ST200', country:'UK', hp:205, engine:'2.5L NA V6', weight:1435, drivetrain:'FWD', body:'estate', price:3500, zeroToSixty:7.0 },
+  { id:212, year:2002, make:'SEAT', model:'Leon Cupra R Mk1', country:'ES', hp:225, engine:'1.8L Turbo I4', weight:1310, drivetrain:'FWD', body:'hatch', price:6000, zeroToSixty:6.6 },
+  { id:213, year:1999, make:'Saab', model:'9-3 Viggen', country:'SE', hp:225, engine:'2.0L Turbo I4', weight:1430, drivetrain:'FWD', body:'coupe', price:4500, zeroToSixty:6.7 },
+  { id:214, year:1999, make:'Vauxhall', model:'Omega 3.0 V6', country:'UK', hp:210, engine:'3.0L NA V6', weight:1550, drivetrain:'RWD', body:'saloon', price:2000, zeroToSixty:8.0 },
+  { id:215, year:1996, make:'Honda', model:'Legend V6', country:'JP', hp:205, engine:'3.2L NA V6', weight:1700, drivetrain:'FWD', body:'saloon', price:3000, zeroToSixty:8.1 },
+  { id:216, year:1997, make:'Peugeot', model:'406 Coupe V6', country:'FR', hp:194, engine:'3.0L NA V6', weight:1475, drivetrain:'FWD', body:'coupe', price:4500, zeroToSixty:8.0 },
+  { id:217, year:2002, make:'Alfa Romeo', model:'156 GTA', country:'IT', hp:250, engine:'3.2L NA V6', weight:1415, drivetrain:'RWD', body:'saloon', price:6500, zeroToSixty:6.3 },
+  { id:218, year:2003, make:'Alfa Romeo', model:'147 GTA', country:'IT', hp:250, engine:'3.2L NA V6', weight:1370, drivetrain:'FWD', body:'hatch', price:7000, zeroToSixty:6.3 },
+  { id:219, year:1987, make:'Lancia', model:'Thema 8.32', country:'IT', hp:215, engine:'3.0L Ferrari NA V8', weight:1430, drivetrain:'FWD', body:'saloon', price:14000, zeroToSixty:7.5 },
+  { id:220, year:1998, make:'Citroen', model:'Xantia Activa V6', country:'FR', hp:190, engine:'3.0L NA V6', weight:1460, drivetrain:'FWD', body:'hatch', price:3500, zeroToSixty:8.1 },
+  { id:221, year:1995, make:'BMW', model:'840Ci', country:'DE', hp:286, engine:'4.0L NA V8', weight:1840, drivetrain:'RWD', body:'coupe', price:14000, zeroToSixty:8.0 },
+  { id:222, year:1992, make:'Mitsubishi', model:'Galant VR-4', country:'JP', hp:240, engine:'2.0L Turbo I4', weight:1430, drivetrain:'AWD', body:'saloon', price:6000, zeroToSixty:6.2 },
 ];
 
-// ============ SUPABASE CLIENT ============
-const SUPABASE_URL = 'https://ptmfshtisnjipsfwxfcu.supabase.co';
-const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InB0bWZzaHRpc25qaXBzZnd4ZmN1Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzc1NTY5NzAsImV4cCI6MjA5MzEzMjk3MH0.HmALfJmhECeFRwPrcNnv50lOtgu8uqNllH8T7LEC0-U';
-const sb = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 
-// (mock data removed — using live Supabase data)
 
 // ============ STATE ============
 const fmt = n => '£' + n.toLocaleString();
-let TODAY = null;
 let selectedId = null;
 let currentUser = null;
 let currentUserId = null;
@@ -1022,7 +1014,7 @@ function renderSelected() {
   if (btn && !btn.disabled) btn.addEventListener('click', submitPick);
 }
 
-// ============ SUBMIT (Supabase) ============
+// ============ SUBMIT ============
 async function submitPick() {
   if (!TODAY) { showToast('NO ACTIVE CHALLENGE LOADED'); return; }
   if (!currentUser) { document.getElementById('loginModal').classList.add('show'); return; }
@@ -1031,7 +1023,7 @@ async function submitPick() {
   const { data, error } = await sb.from('submissions').insert({
     challenge_id: TODAY.id, user_id: currentUserId, username: currentUser, car_id: c.id
   }).select().single();
-  if (error) { showToast('ERROR: ' + error.message); return; }
+  if (error) { showToast('SUBMIT FAILED: ' + error.message); return; }
   userSubmissionId = data.id;
   const others = submissions.length;
   document.getElementById('lockedSilhouette').innerHTML = SILHOUETTES[c.body] || SILHOUETTES.coupe;
@@ -1040,7 +1032,6 @@ async function submitPick() {
   document.getElementById('duelOthersA').textContent = others;
   document.getElementById('duelOthersB').textContent = others;
   document.getElementById('submitModal').classList.add('show');
-  await loadSubmissions();
   renderSelected();
   updateSubBadge();
 }
@@ -1057,7 +1048,8 @@ function renderSubmissions() {
     if (!c) return '';
     const isYours = s.id === userSubmissionId;
     const hasVoted = userVotes.has(s.id);
-    let rankCls = '', rankIcon = `#${idx+1}`;
+    let rankCls = '';
+    let rankIcon = `#${idx+1}`;
     if (subsSort === 'votes') {
       if (idx === 0) { rankCls = 'gold'; rankIcon = '1ST'; }
       else if (idx === 1) { rankCls = 'silver'; rankIcon = '2ND'; }
@@ -1065,41 +1057,35 @@ function renderSubmissions() {
     }
     return `<div class="sub-card ${isYours ? 'your-pick' : ''} ${rankCls}">
       <div class="sub-rank">${rankIcon}</div>
-      <div class="sub-user">→ ${s.username}</div>
+      <div class="sub-user">→ ${(s.username||'').toUpperCase()}</div>
       <div class="sub-time">${timeAgo(new Date(s.created_at).getTime())}</div>
       <div class="sub-silhouette">${SILHOUETTES[c.body] || SILHOUETTES.coupe}</div>
       <div class="sub-car-name">${c.year} ${c.make} ${c.model}</div>
       <div class="sub-specs">${FLAGS[c.country]} · ${c.hp}hp · ${c.drivetrain} · <span class="price">${fmt(c.price)}</span></div>
       <div class="sub-actions">
-        <div class="vote-count">▲ ${s.votes_count || 0}</div>
+        <div class="vote-count">▲ ${s.votes_count||0}</div>
         <button class="vote-btn ${hasVoted ? 'voted' : ''} ${isYours ? 'own' : ''}" data-sub="${s.id}" ${isYours ? 'disabled' : ''}>
           <span class="vote-arrow">▲</span> ${isYours ? 'YOUR PICK' : (hasVoted ? 'VOTED' : 'VOTE')}
         </button>
       </div>
     </div>`;
-  }).join('') || '<p style="color:rgba(255,255,255,0.5);text-align:center;padding:40px;font-family:VT323,monospace;font-size:22px;letter-spacing:2px;">NO SUBMISSIONS YET. BE FIRST.</p>';
+  }).join('');
 
   grid.querySelectorAll('.vote-btn[data-sub]').forEach(btn => {
     btn.addEventListener('click', async () => {
       if (!currentUser) { document.getElementById('loginModal').classList.add('show'); return; }
       const subId = btn.dataset.sub;
       if (userVotes.has(subId)) {
-        const { error } = await sb.from('votes').delete().eq('submission_id', subId).eq('user_id', currentUserId);
-        if (!error) {
-          userVotes.delete(subId);
-          const sub = submissions.find(x => x.id === subId);
-          if (sub) sub.votes_count = Math.max(0, (sub.votes_count||0) - 1);
-          showToast('VOTE WITHDRAWN'); renderSubmissions();
-        }
+        await sb.from('votes').delete().match({ submission_id: subId, user_id: currentUserId });
+        userVotes.delete(subId);
+        showToast('VOTE WITHDRAWN');
       } else {
-        const { error } = await sb.from('votes').insert({ submission_id: subId, user_id: currentUserId, challenge_id: TODAY.id });
-        if (!error) {
-          userVotes.add(subId);
-          const sub = submissions.find(x => x.id === subId);
-          if (sub) sub.votes_count = (sub.votes_count||0) + 1;
-          showToast('VOTE LOCKED IN'); renderSubmissions();
-        } else { showToast('ERROR: ' + error.message); }
+        await sb.from('votes').insert({ submission_id: subId, user_id: currentUserId });
+        userVotes.add(subId);
+        showToast('VOTE LOCKED IN');
       }
+      await loadSubmissions();
+      renderSubmissions();
     });
   });
 }
@@ -1107,7 +1093,9 @@ function renderSubmissions() {
 document.querySelectorAll('.sort-toggle button').forEach(btn => {
   btn.addEventListener('click', () => {
     document.querySelectorAll('.sort-toggle button').forEach(b => b.classList.remove('active'));
-    btn.classList.add('active'); subsSort = btn.dataset.sort; renderSubmissions();
+    btn.classList.add('active');
+    subsSort = btn.dataset.sort;
+    renderSubmissions();
   });
 });
 
@@ -1115,44 +1103,41 @@ function updateSubBadge() {
   document.getElementById('subCountBadge').textContent = `(${submissions.length})`;
 }
 
-// ============ FAME RENDER (Supabase) ============
+// ============ FAME RENDER ============
 async function renderFame() {
-  const { data: winners, error } = await sb.from('winners')
-    .select('*, challenges(title)').order('challenge_id', { ascending: false }).limit(1);
-  if (error || !winners || winners.length === 0) {
-    document.getElementById('fameRunners').innerHTML = '<p style="color:rgba(255,255,255,0.5);text-align:center;font-family:VT323,monospace;font-size:18px;letter-spacing:2px;">CHECK BACK AFTER THE FIRST CHALLENGE CLOSES.</p>';
-    return;
+  const { data: winners } = await sb.from('winners')
+    .select('*, challenges(title, number)')
+    .order('created_at', { ascending: false })
+    .limit(10);
+  if (!winners || winners.length === 0) return;
+  const top = winners[0];
+  const winnerCar = CARS.find(x => x.id === top.car_id);
+  if (winnerCar) {
+    document.getElementById('fameWinnerSilhouette').innerHTML = SILHOUETTES[winnerCar.body] || SILHOUETTES.coupe;
+    document.getElementById('fameWinnerName').innerHTML = `${winnerCar.year} ${winnerCar.make.toUpperCase()}<br>${winnerCar.model.toUpperCase()}`;
+    document.getElementById('fameWinnerSpecs').textContent = `${FLAGS[winnerCar.country]||''} · ${winnerCar.hp}hp · ${winnerCar.drivetrain} · ${fmt(winnerCar.price)}`;
   }
-  const w = winners[0];
-  const winner = CARS.find(x => x.id === w.car_id);
-  if (!winner) return;
-  document.getElementById('fameWinnerSilhouette').innerHTML = SILHOUETTES[winner.body] || SILHOUETTES.coupe;
-  document.getElementById('fameWinnerName').innerHTML = `${winner.year} ${winner.make.toUpperCase()}<br>${winner.model.toUpperCase()}`;
-  document.getElementById('fameWinnerSpecs').textContent = `${FLAGS[winner.country] || ''} · ${winner.hp}hp · ${winner.drivetrain} · ${fmt(winner.price)}`;
   const runners = document.getElementById('fameRunners');
-  if (w.runners_up && w.runners_up.length > 0) {
-    runners.innerHTML = w.runners_up.map((r, i) => {
-      const c = CARS.find(x => x.id === r.car_id);
-      if (!c) return '';
-      const medal = ['SILVER', 'BRONZE', '4TH'][i] || `${i+2}TH`;
-      return `<div class="sub-card" style="position:relative;">
-        <div class="sub-rank" style="color:rgba(255,255,255,0.45);">${medal}</div>
-        <div class="sub-user">→ ${r.username}</div>
-        <div class="sub-silhouette">${SILHOUETTES[c.body] || SILHOUETTES.coupe}</div>
-        <div class="sub-car-name">${c.year} ${c.make} ${c.model}</div>
-        <div class="sub-specs">${FLAGS[c.country]} · ${c.hp}hp · ${c.drivetrain} · <span class="price">${fmt(c.price)}</span></div>
-        <div class="sub-actions"><div class="vote-count">▲ ${r.votes}</div></div>
-      </div>`;
-    }).join('');
-  } else {
-    runners.innerHTML = '<p style="color:rgba(255,255,255,0.5);text-align:center;font-family:VT323,monospace;font-size:18px;letter-spacing:2px;">CHECK BACK AFTER THE FIRST CHALLENGE CLOSES.</p>';
-  }
+  runners.innerHTML = winners.slice(1).map((w, i) => {
+    const c = CARS.find(x => x.id === w.car_id);
+    if (!c) return '';
+    const medal = ['SILVER', 'BRONZE', '4TH', '5TH'][i] || `${i+2}TH`;
+    return `<div class="sub-card" style="position:relative;">
+      <div class="sub-rank" style="color:rgba(255,255,255,0.45);">${medal}</div>
+      <div class="sub-user">→ ${(w.username||'').toUpperCase()}</div>
+      <div class="sub-silhouette">${SILHOUETTES[c.body] || SILHOUETTES.coupe}</div>
+      <div class="sub-car-name">${c.year} ${c.make} ${c.model}</div>
+      <div class="sub-specs">${FLAGS[c.country]} · ${c.hp}hp · ${c.drivetrain} · <span class="price">${fmt(c.price)}</span></div>
+      <div class="sub-actions"><div class="vote-count">▲ ${w.votes_count||0}</div></div>
+    </div>`;
+  }).join('');
 }
 
 // ============ TOAST ============
 function showToast(msg) {
   const t = document.getElementById('toast');
-  t.textContent = msg; t.classList.add('show');
+  t.textContent = msg;
+  t.classList.add('show');
   clearTimeout(t._timer);
   t._timer = setTimeout(() => t.classList.remove('show'), 1800);
 }
@@ -1161,9 +1146,9 @@ function showToast(msg) {
 function applyUserChip() {
   const btn = document.getElementById('loginBtn');
   if (currentUser) {
-    btn.textContent = currentUser; btn.classList.remove('nav-cta'); btn.classList.add('user-chip');
-  } else {
-    btn.textContent = 'LOG IN'; btn.classList.add('nav-cta'); btn.classList.remove('user-chip');
+    btn.textContent = currentUser;
+    btn.classList.remove('nav-cta');
+    btn.classList.add('user-chip');
   }
 }
 
@@ -1173,14 +1158,17 @@ document.getElementById('loginBtn').addEventListener('click', () => {
 document.getElementById('loginForm').addEventListener('submit', async (e) => {
   e.preventDefault();
   const data = new FormData(e.target);
-  const username = data.get('username').trim();
+  const username = data.get('username').trim().toUpperCase();
   const password = data.get('password');
   const fakeEmail = username.toLowerCase() + '@pistonwave.com';
-  let result = await sb.auth.signInWithPassword({ email: fakeEmail, password });
-  if (result.error) result = await sb.auth.signUp({ email: fakeEmail, password });
-  if (result.error) { showToast('ERROR: ' + result.error.message); return; }
-  currentUser = username.toUpperCase();
-  currentUserId = result.data.user?.id || result.data.session?.user?.id;
+  let { data: session, error } = await sb.auth.signInWithPassword({ email: fakeEmail, password });
+  if (error) {
+    const { data: signUpData, error: signUpError } = await sb.auth.signUp({ email: fakeEmail, password });
+    if (signUpError) { showToast('LOGIN FAILED'); return; }
+    session = signUpData;
+  }
+  currentUser = username;
+  currentUserId = session?.user?.id || session?.session?.user?.id;
   document.getElementById('loginModal').classList.remove('show');
   applyUserChip();
   showToast('WELCOME, ' + currentUser);
@@ -1202,26 +1190,6 @@ document.querySelectorAll('.modal-bg').forEach(bg => {
   document.getElementById(id).addEventListener('change', () => { visibleCount = 24; renderCars(); });
 });
 
-// ============ COUNTDOWN ============
-function tickCountdown() {
-  const el = document.getElementById('countdown');
-  const now = new Date();
-  let close;
-  if (TODAY && TODAY.closes_at) {
-    close = new Date(TODAY.closes_at);
-  } else {
-    close = new Date(); close.setHours(23, 59, 0, 0);
-    if (now > close) close.setDate(close.getDate() + 1);
-  }
-  const diff = close - now;
-  if (diff <= 0) { el.textContent = '▣ SUBMISSIONS CLOSED'; return; }
-  const h = Math.floor(diff / 3600000);
-  const m = Math.floor((diff % 3600000) / 60000);
-  const s = Math.floor((diff % 60000) / 1000);
-  const pad = n => String(n).padStart(2, '0');
-  el.textContent = `▣ SUBMISSIONS CLOSE IN ${pad(h)}:${pad(m)}:${pad(s)}`;
-}
-
 // ============ SUPABASE LOADERS ============
 async function loadChallenge() {
   const now = new Date().toISOString();
@@ -1233,34 +1201,63 @@ async function loadChallenge() {
     data = fallback.data;
   }
   if (!data) return;
-  TODAY = { id: data.id, number: data.number, title: data.title, closes_at: data.closes_at, max_price: data.max_price, drivetrain_blacklist: data.drivetrain_blacklist || [] };
+  TODAY = {
+    id: data.id, number: data.number, title: data.title, description: data.description,
+    closes_at: data.closes_at, max_price: data.max_price,
+    drivetrain_blacklist: data.drivetrain_blacklist || []
+  };
+  // Update hero
   document.getElementById('challengeTag').textContent = '▶ CHALLENGE ' + String(data.number).padStart(3, '0');
   document.getElementById('heroTitle').textContent = data.title;
+  document.getElementById('heroBody').textContent = data.description || '';
+  // Build constraint chips dynamically
+  const container = document.getElementById('challengeConstraints');
+  const chips = [];
+  if (data.max_price) chips.push(`<span class="chip">BUDGET ≤ ${fmt(data.max_price)}</span>`);
+  if (data.drivetrain_blacklist && data.drivetrain_blacklist.length > 0) {
+    data.drivetrain_blacklist.forEach(dt => chips.push(`<span class="chip warn">NO ${dt}</span>`));
+  }
+  chips.push(`<span class="chip time" id="countdown">▣ LOADING...</span>`);
+  container.innerHTML = chips.join('');
 }
 
 async function loadSubmissions() {
   if (!TODAY) return;
-  const { data, error } = await sb.from('submissions')
-    .select('*').eq('challenge_id', TODAY.id).order('votes_count', { ascending: false });
-  if (!error && data) { submissions = data; updateSubBadge(); }
+  const { data } = await sb.from('submissions')
+    .select('*').eq('challenge_id', TODAY.id)
+    .order('votes_count', { ascending: false });
+  submissions = data || [];
+  updateSubBadge();
 }
 
 async function loadUserState() {
   if (!currentUserId || !TODAY) return;
-  const { data: mySub } = await sb.from('submissions').select('id')
-    .eq('challenge_id', TODAY.id).eq('user_id', currentUserId).single();
+  const { data: mySub } = await sb.from('submissions')
+    .select('id').eq('challenge_id', TODAY.id).eq('user_id', currentUserId).single();
   if (mySub) userSubmissionId = mySub.id;
-  const { data: myVotes } = await sb.from('votes').select('submission_id')
-    .eq('user_id', currentUserId).eq('challenge_id', TODAY.id);
+  const { data: myVotes } = await sb.from('votes').select('submission_id').eq('user_id', currentUserId);
   if (myVotes) userVotes = new Set(myVotes.map(v => v.submission_id));
 }
 
 function subscribeRealtime() {
-  if (!TODAY) return;
-  sb.channel('submissions-' + TODAY.id)
-    .on('postgres_changes', { event: '*', schema: 'public', table: 'submissions', filter: `challenge_id=eq.${TODAY.id}` },
-      async () => { await loadSubmissions(); renderSubmissions(); })
-    .subscribe();
+  sb.channel('submissions').on('postgres_changes',
+    { event: '*', schema: 'public', table: 'submissions' },
+    async () => { await loadSubmissions(); renderSubmissions(); updateSubBadge(); }
+  ).subscribe();
+}
+
+// ============ COUNTDOWN ============
+function tickCountdown() {
+  const el = document.getElementById('countdown');
+  if (!el) return;
+  const target = TODAY ? new Date(TODAY.closes_at) : (() => { const d = new Date(); d.setHours(23,59,0,0); return d; })();
+  const diff = target - new Date();
+  if (diff <= 0) { el.textContent = '▣ SUBMISSIONS CLOSED'; return; }
+  const h = Math.floor(diff / 3600000);
+  const m = Math.floor((diff % 3600000) / 60000);
+  const s = Math.floor((diff % 60000) / 1000);
+  const pad = n => String(n).padStart(2, '0');
+  el.textContent = `▣ SUBMISSIONS CLOSE IN ${pad(h)}:${pad(m)}:${pad(s)}`;
 }
 
 // ============ INIT ============
@@ -1268,15 +1265,17 @@ async function init() {
   const { data: { session } } = await sb.auth.getSession();
   if (session?.user) {
     currentUserId = session.user.id;
-    currentUser = session.user.email.replace('@pistonwave.com', '').toUpperCase();
+    const meta = session.user.email.replace('@pistonwave.com', '').toUpperCase();
+    currentUser = meta;
+    applyUserChip();
   }
   await loadChallenge();
   await loadSubmissions();
-  if (currentUserId) await loadUserState();
-  applyUserChip();
-  updateSubBadge();
+  await loadUserState();
   renderCars();
   renderSelected();
+  renderFame();
+  updateSubBadge();
   subscribeRealtime();
   tickCountdown();
   setInterval(tickCountdown, 1000);
