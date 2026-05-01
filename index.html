@@ -1032,6 +1032,8 @@ async function submitPick() {
   document.getElementById('duelOthersA').textContent = others;
   document.getElementById('duelOthersB').textContent = others;
   document.getElementById('submitModal').classList.add('show');
+  await loadSubmissions();
+  renderSubmissions();
   renderSelected();
   updateSubBadge();
 }
@@ -1118,7 +1120,7 @@ async function renderFame() {
     document.getElementById('fameWinnerSpecs').textContent = `${FLAGS[winnerCar.country]||''} · ${winnerCar.hp}hp · ${winnerCar.drivetrain} · ${fmt(winnerCar.price)}`;
   }
   const runners = document.getElementById('fameRunners');
-  runners.innerHTML = winners.slice(1).map((w, i) => {
+  runners.innerHTML = (winners.slice(1) || []).map((w, i) => {
     const c = CARS.find(x => x.id === w.car_id);
     if (!c) return '';
     const medal = ['SILVER', 'BRONZE', '4TH', '5TH'][i] || `${i+2}TH`;
@@ -1157,9 +1159,9 @@ document.getElementById('loginBtn').addEventListener('click', () => {
 });
 document.getElementById('loginForm').addEventListener('submit', async (e) => {
   e.preventDefault();
-  const data = new FormData(e.target);
-  const username = data.get('username').trim().toUpperCase();
-  const password = data.get('password');
+  const fd = new FormData(e.target);
+  const username = fd.get('username').trim().toUpperCase();
+  const password = fd.get('password');
   const fakeEmail = username.toLowerCase() + '@pistonwave.com';
   let { data: session, error } = await sb.auth.signInWithPassword({ email: fakeEmail, password });
   if (error) {
@@ -1206,11 +1208,9 @@ async function loadChallenge() {
     closes_at: data.closes_at, max_price: data.max_price,
     drivetrain_blacklist: data.drivetrain_blacklist || []
   };
-  // Update hero
   document.getElementById('challengeTag').textContent = '▶ CHALLENGE ' + String(data.number).padStart(3, '0');
   document.getElementById('heroTitle').textContent = data.title;
   document.getElementById('heroBody').textContent = data.description || '';
-  // Build constraint chips dynamically
   const container = document.getElementById('challengeConstraints');
   const chips = [];
   if (data.max_price) chips.push(`<span class="chip">BUDGET ≤ ${fmt(data.max_price)}</span>`);
@@ -1265,8 +1265,7 @@ async function init() {
   const { data: { session } } = await sb.auth.getSession();
   if (session?.user) {
     currentUserId = session.user.id;
-    const meta = session.user.email.replace('@pistonwave.com', '').toUpperCase();
-    currentUser = meta;
+    currentUser = session.user.email.replace('@pistonwave.com', '').toUpperCase();
     applyUserChip();
   }
   await loadChallenge();
