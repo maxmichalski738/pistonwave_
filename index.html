@@ -598,6 +598,7 @@ footer { text-align: center; padding: 30px; color: rgba(255, 255, 255, 0.4); fon
     <a data-tab="fame">Hall of Fame</a>
     <a data-tab="garage">Garage</a>
     <a data-tab="gc">Trio Challenge</a>
+    <a data-tab="gcv">Trio Votes <span id="gcvBadge" style="font-family:VT323,monospace;color:var(--yellow);"></span></a>
   </div>
   <button id="loginBtn" class="nav-cta">Log in</button>
 </nav>
@@ -815,7 +816,16 @@ footer { text-align: center; padding: 30px; color: rgba(255, 255, 255, 0.4); fon
     <div class="cars-grid" id="gcCarsGrid"></div>
     <button class="show-more-btn" id="gcLoadMore" style="display:none;">SHOW MORE CARS ▼</button>
 
-    <div class="gc-submissions-heading">▶ SUBMITTED TRIOS</div>
+  </section>
+
+  <!-- TRIO VOTES TAB -->
+  <section id="tab-gcv" class="tab-section">
+    <div class="hero">
+      <div class="hero-tag" id="gcvTag">▶ TRIO VOTES</div>
+      <h1 class="hero-title" id="gcvTitle">LOADING...</h1>
+      <div class="constraints" id="gcvConstraints"></div>
+    </div>
+    <div class="gc-submissions-heading">▶ ALL SUBMITTED TRIOS</div>
     <div id="gcSubmissionsGrid"></div>
   </section>
 
@@ -1769,6 +1779,8 @@ async function loadGcChallenge() {
   gcChallenge.drivetrain_blacklist = data.drivetrain_blacklist || [];
   document.getElementById('gcTag').textContent = '▶ TRIO CHALLENGE ' + String(data.number).padStart(3,'0');
   document.getElementById('gcTitle').textContent = data.title;
+  const gcvTagEl = document.getElementById('gcvTag'); if (gcvTagEl) gcvTagEl.textContent = '▶ TRIO CHALLENGE ' + String(data.number).padStart(3,'0');
+  const gcvTitleEl = document.getElementById('gcvTitle'); if (gcvTitleEl) gcvTitleEl.textContent = data.title;
   document.getElementById('gcBody').textContent = data.description || '';
   document.getElementById('gcBudgetTotal').textContent = fmt(data.max_price);
   const con = document.getElementById('gcConstraints');
@@ -1937,12 +1949,12 @@ document.addEventListener('click', async e => {
   await loadGcSubmissions();
   renderGcSubmissions();
   showToast('TRIO SUBMITTED!');
-  const gcSubs = document.getElementById('gcSubmissionsGrid');
-  if (gcSubs) setTimeout(() => gcSubs.scrollIntoView({ behavior: 'smooth', block: 'start' }), 100);
+  setTimeout(() => switchTab('gcv'), 150);
 });
 
 // ============ GC SUBMISSIONS RENDER ════════════════════════════════════
 function renderGcSubmissions() {
+  const badge = document.getElementById('gcvBadge'); if (badge) badge.textContent = gcSubmissions.length > 0 ? gcSubmissions.length : '';
   const container = document.getElementById('gcSubmissionsGrid');
   if (!container) return;
   if (gcSubmissions.length === 0) {
@@ -2021,11 +2033,11 @@ async function showProfile(username) {
   document.getElementById('profileModal').classList.add('show');
   let { data: profile } = await sb.from('profiles').select('id').eq('username', username.toLowerCase()).single();
   if (!profile) {
-    const { data: sub } = await sb.from('submissions').select('user_id').eq('username', username.toLowerCase()).limit(1).single();
+    const { data: sub } = await sb.from('submissions').select('user_id').ilike('username', username).limit(1).single();
     if (sub) profile = { id: sub.user_id };
   }
   if (!profile) {
-    const { data: gsub } = await sb.from('garage_submissions').select('user_id').eq('username', username.toLowerCase()).limit(1).single();
+    const { data: gsub } = await sb.from('garage_submissions').select('user_id').ilike('username', username).limit(1).single();
     if (gsub) profile = { id: gsub.user_id };
   }
   if (!profile) { document.getElementById('profileGarageSlots').innerHTML = '<p style="font-family:VT323,monospace;color:rgba(255,255,255,0.4);font-size:18px;letter-spacing:2px;">NO GARAGE SET UP YET.</p>'; return; }
@@ -2064,6 +2076,8 @@ async function init() {
     currentUserId = session.user.id;
     currentUser = session.user.email.replace('@pistonwave.com', '').toUpperCase();
     applyUserChip();
+    const _uname = session.user.email.replace('@pistonwave.com', '').toLowerCase();
+    await sb.from('profiles').upsert({ id: currentUserId, username: _uname }, { onConflict: 'id' });
   }
   await loadChallenge();
   await loadSubmissions();
