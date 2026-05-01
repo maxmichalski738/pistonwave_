@@ -1937,6 +1937,8 @@ document.addEventListener('click', async e => {
   await loadGcSubmissions();
   renderGcSubmissions();
   showToast('TRIO SUBMITTED!');
+  const gcSubs = document.getElementById('gcSubmissionsGrid');
+  if (gcSubs) setTimeout(() => gcSubs.scrollIntoView({ behavior: 'smooth', block: 'start' }), 100);
 });
 
 // ============ GC SUBMISSIONS RENDER ════════════════════════════════════
@@ -2017,7 +2019,15 @@ async function showProfile(username) {
   document.getElementById('profileUsername').textContent = '→ ' + username.toUpperCase();
   document.getElementById('profileGarageSlots').innerHTML = '<p style="font-family:VT323,monospace;color:rgba(255,255,255,0.4);font-size:18px;">LOADING...</p>';
   document.getElementById('profileModal').classList.add('show');
-  const { data: profile } = await sb.from('profiles').select('id').eq('username', username.toLowerCase()).single();
+  let { data: profile } = await sb.from('profiles').select('id').eq('username', username.toLowerCase()).single();
+  if (!profile) {
+    const { data: sub } = await sb.from('submissions').select('user_id').eq('username', username.toLowerCase()).limit(1).single();
+    if (sub) profile = { id: sub.user_id };
+  }
+  if (!profile) {
+    const { data: gsub } = await sb.from('garage_submissions').select('user_id').eq('username', username.toLowerCase()).limit(1).single();
+    if (gsub) profile = { id: gsub.user_id };
+  }
   if (!profile) { document.getElementById('profileGarageSlots').innerHTML = '<p style="font-family:VT323,monospace;color:rgba(255,255,255,0.4);font-size:18px;letter-spacing:2px;">NO GARAGE SET UP YET.</p>'; return; }
   const { data: garageRows } = await sb.from('garages').select('*').eq('user_id', profile.id);
   const slots = [null,null,null];
@@ -2068,6 +2078,7 @@ async function init() {
   renderGaragePicker();
   renderGcTrio();
   renderGcSubmitBtn();
+  renderGcSubmissions();
   updateSubBadge();
   subscribeRealtime();
   tickCountdown();
