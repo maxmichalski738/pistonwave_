@@ -423,6 +423,83 @@ footer { text-align: center; padding: 30px; color: rgba(255, 255, 255, 0.4); fon
   transition: transform 0.25s, opacity 0.25s;
 }
 .toast.show { transform: translateX(-50%) translateY(0); opacity: 1; }
+
+/* ===== GARAGE TAB ===== */
+.garage-hero { margin-bottom: 36px; }
+.garage-slots {
+  display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px;
+  margin-bottom: 48px;
+}
+@media (max-width: 700px) { .garage-slots { grid-template-columns: 1fr; } }
+.garage-slot {
+  background: rgba(255,43,214,0.05);
+  border: 1px solid rgba(255,43,214,0.3);
+  padding: 20px 16px; text-align: center; position: relative;
+  transition: border-color 0.2s;
+}
+.garage-slot.empty { border-style: dashed; }
+.garage-slot.filled { border-color: rgba(0,240,255,0.5); }
+.slot-number {
+  font-family: 'VT323', monospace; font-size: 13px; letter-spacing: 3px;
+  color: var(--magenta); margin-bottom: 10px;
+}
+.slot-silhouette { height: 72px; margin-bottom: 10px; opacity: 0.25; }
+.garage-slot.filled .slot-silhouette { opacity: 1; }
+.slot-empty-text {
+  font-family: 'VT323', monospace; font-size: 22px; color: rgba(244,244,255,0.25);
+  letter-spacing: 3px;
+}
+.slot-car-name {
+  font-family: 'Press Start 2P', monospace; font-size: 9px; line-height: 1.7;
+  color: var(--cyan); margin-bottom: 6px;
+}
+.slot-specs {
+  font-family: 'VT323', monospace; font-size: 18px; color: rgba(244,244,255,0.6);
+  letter-spacing: 1px; margin-bottom: 12px;
+}
+.slot-remove-btn {
+  background: none; border: 1px solid rgba(255,58,58,0.4); color: var(--red);
+  font-family: 'Rajdhani', sans-serif; font-weight: 700; font-size: 11px;
+  letter-spacing: 2px; padding: 5px 12px; cursor: pointer; text-transform: uppercase;
+  transition: all 0.15s;
+}
+.slot-remove-btn:hover { background: rgba(255,58,58,0.15); border-color: var(--red); }
+
+.garage-picker-heading {
+  font-family: 'Press Start 2P', monospace; font-size: 11px; color: var(--yellow);
+  letter-spacing: 3px; margin-bottom: 24px; padding-top: 12px;
+  border-top: 1px solid rgba(255,43,214,0.2);
+}
+.car-card.in-garage { border-color: var(--cyan); }
+.car-garage-badge {
+  position: absolute; bottom: 6px; left: 50%; transform: translateX(-50%);
+  font-family: 'VT323', monospace; font-size: 13px; color: var(--cyan);
+  letter-spacing: 1.5px; white-space: nowrap;
+}
+.garage-slot-buttons { display: flex; flex-direction: column; gap: 8px; margin-top: 16px; }
+.btn-garage-slot {
+  width: 100%; padding: 12px 8px;
+  background: rgba(255,43,214,0.1); border: 1px solid rgba(255,43,214,0.5);
+  color: var(--white); font-family: 'Rajdhani', sans-serif;
+  font-weight: 700; letter-spacing: 1.5px; font-size: 13px; text-transform: uppercase;
+  cursor: pointer; transition: all 0.15s; line-height: 1.3;
+}
+.btn-garage-slot:hover:not(:disabled) { background: rgba(255,43,214,0.25); border-color: var(--magenta); }
+.btn-garage-slot.in-slot { border-color: var(--cyan); color: var(--cyan); background: rgba(0,240,255,0.08); cursor: default; }
+.btn-garage-slot.replace { border-color: rgba(255,230,0,0.4); color: var(--yellow); }
+.btn-garage-slot.replace:hover { background: rgba(255,230,0,0.1); border-color: var(--yellow); }
+.btn-garage-slot:disabled { opacity: 0.5; cursor: default; }
+.btn-garage-add {
+  width: 100%; padding: 10px; margin-top: 8px;
+  background: rgba(0,240,255,0.08); border: 1px solid rgba(0,240,255,0.4);
+  color: var(--cyan); font-family: 'Rajdhani', sans-serif;
+  font-weight: 700; letter-spacing: 2px; font-size: 13px; text-transform: uppercase;
+  cursor: pointer; transition: all 0.15s;
+}
+.btn-garage-add:hover:not(:disabled) { background: rgba(0,240,255,0.18); border-color: var(--cyan); }
+.btn-garage-add.in-garage { color: rgba(0,240,255,0.4); border-color: rgba(0,240,255,0.2); cursor: default; }
+.btn-garage-add.full { border-color: rgba(255,230,0,0.4); color: var(--yellow); }
+.btn-garage-add.full:hover { background: rgba(255,230,0,0.1); }
 </style>
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 </head>
@@ -436,13 +513,13 @@ footer { text-align: center; padding: 30px; color: rgba(255, 255, 255, 0.4); fon
     <a data-tab="today" class="active">Today's Drive</a>
     <a data-tab="submissions">Submissions <span id="subCountBadge" style="font-family:'VT323',monospace;color:var(--yellow);"></span></a>
     <a data-tab="fame">Hall of Fame</a>
-    <a class="disabled" title="Coming soon">Garage</a>
+    <a data-tab="garage">Garage</a>
   </div>
   <button id="loginBtn" class="nav-cta">Log in</button>
 </nav>
 
 <main>
-  <div class="proto-banner">▼ PROTOTYPE v0.3 — 201 CARS · CHEAP HEROES + ENTHUSIAST ICONS · NO REAL DATA SAVED YET ▼</div>
+  <div class="proto-banner">▼ BETA — LIVE DATA · VOTES SAVE · REAL LEADERBOARD ▼</div>
 
   <!-- TAB: TODAY'S DRIVE -->
   <section id="tab-today" class="tab-section active">
@@ -540,6 +617,68 @@ footer { text-align: center; padding: 30px; color: rgba(255, 255, 255, 0.4); fon
     <p style="text-align:center;color:rgba(255,255,255,0.45);font-family:'VT323',monospace;font-size:18px;letter-spacing:2px;">
       ▣ AS WE ROLL ON, THE HALL OF FAME GROWS. CHECK BACK DAILY.
     </p>
+  </section>
+
+  <!-- TAB: GARAGE -->
+  <section id="tab-garage" class="tab-section">
+    <div class="hero garage-hero">
+      <div class="hero-tag">▶ YOUR GARAGE</div>
+      <h1 class="hero-title">3 CARS. YOUR RULES.</h1>
+      <p class="hero-body">Pick three cars that define you. On garage challenge days, only your garage cars are eligible.</p>
+    </div>
+
+    <div class="garage-slots" id="garageSlots">
+      <div class="garage-slot empty" id="gslot-0">
+        <div class="slot-number">SLOT 1</div>
+        <div class="slot-silhouette" id="gslot-sil-0"></div>
+        <div class="slot-empty-text" id="gslot-txt-0">EMPTY</div>
+      </div>
+      <div class="garage-slot empty" id="gslot-1">
+        <div class="slot-number">SLOT 2</div>
+        <div class="slot-silhouette" id="gslot-sil-1"></div>
+        <div class="slot-empty-text" id="gslot-txt-1">EMPTY</div>
+      </div>
+      <div class="garage-slot empty" id="gslot-2">
+        <div class="slot-number">SLOT 3</div>
+        <div class="slot-silhouette" id="gslot-sil-2"></div>
+        <div class="slot-empty-text" id="gslot-txt-2">EMPTY</div>
+      </div>
+    </div>
+
+    <div class="garage-picker-heading">▶ PICK YOUR CARS</div>
+    <div class="picker-grid">
+      <section>
+        <div class="filters">
+          <input type="text" id="garageSearch" placeholder="Search make, model, year...">
+          <select id="garageFilterCountry"><option value="">All countries</option></select>
+          <select id="garageFilterDrivetrain">
+            <option value="">All drivetrains</option>
+            <option value="FWD">FWD</option><option value="RWD">RWD</option>
+            <option value="AWD">AWD</option><option value="4WD">4WD</option>
+          </select>
+          <select id="garageFilterBody">
+            <option value="">All body types</option>
+            <option value="hatch">Hatch</option><option value="saloon">Saloon</option>
+            <option value="estate">Estate</option><option value="coupe">Coupe</option>
+            <option value="roadster">Roadster</option><option value="supercar">Supercar</option>
+            <option value="4x4">4x4</option>
+          </select>
+          <select id="garageSort">
+            <option value="default">Sort: Default</option>
+            <option value="price-asc">Price ↑</option>
+            <option value="price-desc">Price ↓</option>
+            <option value="hp-desc">Power ↓</option>
+            <option value="year-desc">Year ↓</option>
+          </select>
+        </div>
+        <div class="cars-grid" id="garageCarsGrid"></div>
+        <button class="load-more" id="garageLoadMore" style="display:none;">LOAD MORE CARS</button>
+      </section>
+      <aside class="selected-panel empty" id="garageSelectedPanel">
+        <div class="selected-empty-icon">[ ◇ ]</div>
+        <p style="margin-top:12px;font-family:'VT323',monospace;font-size:22px;letter-spacing:2px;">SELECT A CAR<br>TO ADD TO<br>YOUR GARAGE.</p>
+      </aside>
+    </div>
   </section>
 </main>
 
@@ -907,6 +1046,7 @@ function switchTab(tab) {
   document.querySelectorAll('.nav-links a').forEach(a => a.classList.toggle('active', a.dataset.tab === tab));
   if (tab === 'submissions') renderSubmissions();
   if (tab === 'fame') renderFame();
+  if (tab === 'garage') { renderGaragePicker(); renderGarageSelected(); }
   window.scrollTo({ top: 0, behavior: 'smooth' });
 }
 
@@ -1009,9 +1149,22 @@ function renderSelected() {
     <button class="btn-submit" id="submitPick" ${(TODAY && elig && !alreadySubmitted) ? '' : 'disabled'}>
       ${!TODAY ? 'LOADING...' : alreadySubmitted ? 'ALREADY SUBMITTED' : elig ? 'SUBMIT THIS PICK' : 'INELIGIBLE'}
     </button>
+    ${(() => {
+      const gs = garageSlots.indexOf(c.id);
+      if (gs >= 0) return `<button class="btn-garage-add in-garage" disabled>✓ IN GARAGE — SLOT ${gs+1}</button>`;
+      if (garageSlots.filter(x=>x!==null).length < 3) return `<button class="btn-garage-add" id="garageQuickAdd">+ ADD TO GARAGE</button>`;
+      return `<button class="btn-garage-add full" id="garageQuickAdd">GARAGE FULL — SWAP IN GARAGE TAB</button>`;
+    })()}
   `;
   const btn = document.getElementById('submitPick');
   if (btn && !btn.disabled) btn.addEventListener('click', submitPick);
+  const gaBtn = document.getElementById('garageQuickAdd');
+  if (gaBtn && !gaBtn.disabled && !gaBtn.classList.contains('full')) {
+    gaBtn.addEventListener('click', () => {
+      const slot = garageSlots.indexOf(null);
+      if (slot >= 0) saveToGarage(slot, c.id);
+    });
+  }
 }
 
 // ============ SUBMIT ============
@@ -1192,6 +1345,197 @@ document.querySelectorAll('.modal-bg').forEach(bg => {
   document.getElementById(id).addEventListener('change', () => { visibleCount = 24; renderCars(); });
 });
 
+
+// ============ GARAGE STATE ============
+let garageSlots = [null, null, null];   // car_id per slot (0-indexed)
+let garageSlotIds = [null, null, null]; // DB row UUID per slot
+let garageSelectedId = null;
+let garageVisibleCount = 24;
+
+// ============ GARAGE LOADERS ============
+async function loadGarage() {
+  if (!currentUserId) return;
+  const { data } = await sb.from('garages').select('*').eq('user_id', currentUserId);
+  garageSlots = [null, null, null];
+  garageSlotIds = [null, null, null];
+  if (data) data.forEach(row => {
+    const i = row.slot - 1;
+    garageSlots[i] = row.car_id;
+    garageSlotIds[i] = row.id;
+  });
+  renderGarage();
+}
+
+function renderGarage() {
+  for (let i = 0; i < 3; i++) {
+    const el = document.getElementById('gslot-' + i);
+    if (!el) continue;
+    const carId = garageSlots[i];
+    // clear old remove button listeners by replacing element
+    const fresh = el.cloneNode(false);
+    el.parentNode.replaceChild(fresh, el);
+    fresh.id = 'gslot-' + i;
+    if (!carId) {
+      fresh.className = 'garage-slot empty';
+      fresh.innerHTML = `<div class="slot-number">SLOT ${i+1}</div>
+        <div class="slot-silhouette" style="opacity:0.15">${SILHOUETTES.coupe}</div>
+        <div class="slot-empty-text">EMPTY</div>`;
+    } else {
+      const c = CARS.find(x => x.id === carId);
+      if (!c) continue;
+      fresh.className = 'garage-slot filled';
+      fresh.innerHTML = `<div class="slot-number">SLOT ${i+1}</div>
+        <div class="slot-silhouette">${SILHOUETTES[c.body] || SILHOUETTES.coupe}</div>
+        <div class="slot-car-name">${c.year} ${c.make}<br>${c.model.toUpperCase()}</div>
+        <div class="slot-specs">${c.hp}hp · ${c.drivetrain} · ${fmt(c.price)}</div>
+        <button class="slot-remove-btn" data-slot="${i}">✕ REMOVE</button>`;
+      fresh.querySelector('.slot-remove-btn').addEventListener('click', e => {
+        e.stopPropagation(); removeFromGarage(i);
+      });
+    }
+  }
+  // refresh the quick-add button on the today tab selected panel if visible
+  if (selectedId !== null) renderSelected();
+}
+
+async function saveToGarage(slot, carId) {
+  if (!currentUser) { document.getElementById('loginModal').classList.add('show'); return; }
+  const { error } = await sb.from('garages').upsert(
+    { user_id: currentUserId, car_id: carId, slot: slot + 1 },
+    { onConflict: 'user_id,slot' }
+  );
+  if (error) { showToast('SAVE FAILED: ' + error.message); return; }
+  await loadGarage();
+  renderGaragePicker();
+  renderGarageSelected();
+  showToast('PARKED IN SLOT ' + (slot + 1));
+}
+
+async function removeFromGarage(slot) {
+  if (!garageSlotIds[slot]) return;
+  const { error } = await sb.from('garages').delete().eq('id', garageSlotIds[slot]);
+  if (error) { showToast('REMOVE FAILED'); return; }
+  garageSlots[slot] = null;
+  garageSlotIds[slot] = null;
+  renderGarage();
+  renderGaragePicker();
+  renderGarageSelected();
+  showToast('REMOVED FROM SLOT ' + (slot + 1));
+}
+
+// ============ GARAGE PICKER ============
+function renderGaragePicker() {
+  const grid = document.getElementById('garageCarsGrid');
+  if (!grid) return;
+  const search = (document.getElementById('garageSearch')?.value || '').toLowerCase();
+  const country = document.getElementById('garageFilterCountry')?.value || '';
+  const drivetrain = document.getElementById('garageFilterDrivetrain')?.value || '';
+  const body = document.getElementById('garageFilterBody')?.value || '';
+  const sort = document.getElementById('garageSort')?.value || 'default';
+
+  let cars = CARS.filter(c => {
+    if (search && !`${c.year} ${c.make} ${c.model}`.toLowerCase().includes(search)) return false;
+    if (country && c.country !== country) return false;
+    if (drivetrain && c.drivetrain !== drivetrain) return false;
+    if (body && c.body !== body) return false;
+    return true;
+  });
+  if (sort === 'price-asc') cars.sort((a,b) => a.price - b.price);
+  else if (sort === 'price-desc') cars.sort((a,b) => b.price - a.price);
+  else if (sort === 'hp-desc') cars.sort((a,b) => b.hp - a.hp);
+  else if (sort === 'year-desc') cars.sort((a,b) => b.year - a.year);
+
+  const visible = cars.slice(0, garageVisibleCount);
+  grid.innerHTML = visible.map(c => {
+    const inGarage = garageSlots.includes(c.id);
+    const isSelected = c.id === garageSelectedId;
+    return `<div class="car-card ${isSelected ? 'selected' : ''} ${inGarage ? 'in-garage' : ''}" data-gid="${c.id}" style="position:relative;">
+      <div class="car-flag">${FLAGS[c.country] || ''}</div>
+      <div class="car-silhouette">${SILHOUETTES[c.body] || SILHOUETTES.coupe}</div>
+      <div class="car-name">${c.year} ${c.make}</div>
+      <div class="car-model">${c.model}</div>
+      <div class="car-stats">${c.hp}hp · ${c.drivetrain} · ${fmt(c.price)}</div>
+      ${inGarage ? '<div class="car-garage-badge">IN GARAGE</div>' : ''}
+    </div>`;
+  }).join('');
+
+  const lmBtn = document.getElementById('garageLoadMore');
+  if (lmBtn) lmBtn.style.display = cars.length > garageVisibleCount ? '' : 'none';
+
+  grid.querySelectorAll('.car-card[data-gid]').forEach(el => {
+    el.addEventListener('click', () => {
+      garageSelectedId = parseInt(el.dataset.gid);
+      renderGaragePicker();
+      renderGarageSelected();
+    });
+  });
+}
+
+function renderGarageSelected() {
+  const panel = document.getElementById('garageSelectedPanel');
+  if (!panel) return;
+  if (garageSelectedId === null) {
+    panel.className = 'selected-panel empty';
+    panel.innerHTML = `<div class="selected-empty-icon">[ ◇ ]</div>
+      <p style="margin-top:12px;font-family:'VT323',monospace;font-size:22px;letter-spacing:2px;">SELECT A CAR<br>TO ADD TO<br>YOUR GARAGE.</p>`;
+    return;
+  }
+  const c = CARS.find(x => x.id === garageSelectedId);
+  if (!c) return;
+  panel.className = 'selected-panel';
+
+  const slotBtns = [0,1,2].map(i => {
+    const slotCar = garageSlots[i];
+    if (slotCar === c.id)
+      return `<button class="btn-garage-slot in-slot" disabled>✓ IN SLOT ${i+1}</button>`;
+    if (slotCar === null)
+      return `<button class="btn-garage-slot" data-gslot="${i}">PARK IN SLOT ${i+1}</button>`;
+    const existing = CARS.find(x => x.id === slotCar);
+    return `<button class="btn-garage-slot replace" data-gslot="${i}">REPLACE SLOT ${i+1}<br><small style="font-size:10px;opacity:0.7;">${existing ? existing.model.toUpperCase() : ''}</small></button>`;
+  }).join('');
+
+  panel.innerHTML = `
+    <div class="sel-silhouette">${SILHOUETTES[c.body] || SILHOUETTES.coupe}</div>
+    <div class="sel-name">${c.year} ${c.make}<br>${c.model.toUpperCase()}</div>
+    <div class="sel-variant">${FLAGS[c.country] || ''} · ${c.body.toUpperCase()}</div>
+    <div class="specs">
+      <div class="spec"><div class="spec-label">Engine</div><div class="spec-value">${c.engine}</div></div>
+      <div class="spec"><div class="spec-label">Power</div><div class="spec-value">${c.hp} hp</div></div>
+      <div class="spec"><div class="spec-label">Weight</div><div class="spec-value">${c.weight} kg</div></div>
+      <div class="spec"><div class="spec-label">Drivetrain</div><div class="spec-value">${c.drivetrain}</div></div>
+      <div class="spec"><div class="spec-label">0-60 mph</div><div class="spec-value">${c.zeroToSixty}s</div></div>
+      <div class="spec"><div class="spec-label">Used Price</div><div class="spec-value">${fmt(c.price)}</div></div>
+    </div>
+    <div class="garage-slot-buttons">${slotBtns}</div>
+  `;
+  panel.querySelectorAll('.btn-garage-slot[data-gslot]').forEach(btn => {
+    btn.addEventListener('click', () => saveToGarage(parseInt(btn.dataset.gslot), c.id));
+  });
+}
+
+// Garage filters
+['garageSearch','garageFilterCountry','garageFilterDrivetrain','garageFilterBody','garageSort'].forEach(id => {
+  const el = document.getElementById(id);
+  if (!el) return;
+  el.addEventListener('input', () => { garageVisibleCount = 24; renderGaragePicker(); });
+  el.addEventListener('change', () => { garageVisibleCount = 24; renderGaragePicker(); });
+});
+document.getElementById('garageLoadMore')?.addEventListener('click', () => {
+  garageVisibleCount += 24; renderGaragePicker();
+});
+
+// Populate garage country dropdown (same as main)
+(function() {
+  const countries = [...new Set(CARS.map(c => c.country))].sort();
+  const sel = document.getElementById('garageFilterCountry');
+  if (!sel) return;
+  countries.forEach(co => {
+    const o = document.createElement('option');
+    o.value = co; o.textContent = `${FLAGS[co] || ''} ${co}`;
+    sel.appendChild(o);
+  });
+})();
+
 // ============ SUPABASE LOADERS ============
 async function loadChallenge() {
   const now = new Date().toISOString();
@@ -1271,9 +1615,11 @@ async function init() {
   await loadChallenge();
   await loadSubmissions();
   await loadUserState();
+  await loadGarage();
   renderCars();
   renderSelected();
   renderFame();
+  renderGaragePicker();
   updateSubBadge();
   subscribeRealtime();
   tickCountdown();
