@@ -1770,9 +1770,9 @@ async function loadGcChallenge() {
   document.getElementById('gcTag').textContent = '▶ TRIO CHALLENGE ' + String(data.number).padStart(3,'0');
   document.getElementById('gcTitle').textContent = data.title;
   document.getElementById('gcBody').textContent = data.description || '';
-  document.getElementById('gcBudgetTotal').textContent = fmt(data.total_budget);
+  document.getElementById('gcBudgetTotal').textContent = fmt(data.max_price);
   const con = document.getElementById('gcConstraints');
-  const chips = [`<span class="chip">COMBINED BUDGET ≤ ${fmt(data.total_budget)}</span>`];
+  const chips = [`<span class="chip">COMBINED BUDGET ≤ ${fmt(data.max_price)}</span>`];
   (data.drivetrain_blacklist||[]).forEach(dt => chips.push(`<span class="chip warn">NO ${dt}</span>`));
   chips.push(`<span class="chip time" id="gcCountdown">▣ LOADING...</span>`);
   con.innerHTML = chips.join('');
@@ -1850,7 +1850,7 @@ function renderGcTrio() {
   }).join('');
 
   const total = gcTrioTotal();
-  const budget = gcChallenge?.total_budget || 0;
+  const budget = gcChallenge?.max_price || 0;
   const pct = budget > 0 ? Math.min(100, (total/budget)*100) : 0;
   const over = total > budget;
   document.getElementById('gcSpent').textContent = fmt(total);
@@ -1866,9 +1866,9 @@ function renderGcSubmitBtn() {
     btn.disabled = true; btn.textContent = 'TRIO SUBMITTED ✓'; return;
   }
   const total = gcTrioTotal();
-  const over = gcChallenge && total > gcChallenge.total_budget;
+  const over = gcChallenge && total > gcChallenge.max_price;
   if (gcTrio.length < 3) { btn.disabled = true; btn.textContent = `SELECT ${3-gcTrio.length} MORE CAR${3-gcTrio.length!==1?'S':''}...`; }
-  else if (over) { btn.disabled = true; btn.textContent = `OVER BUDGET BY ${fmt(total - gcChallenge.total_budget)}`; }
+  else if (over) { btn.disabled = true; btn.textContent = `OVER BUDGET BY ${fmt(total - gcChallenge.max_price)}`; }
   else { btn.disabled = false; btn.textContent = 'SUBMIT YOUR TRIO'; }
 }
 
@@ -1924,7 +1924,7 @@ document.addEventListener('click', async e => {
   if (!currentUser) { document.getElementById('loginModal').classList.add('show'); return; }
   if (!gcChallenge || gcTrio.length !== 3) return;
   const total = gcTrioTotal();
-  if (total > gcChallenge.total_budget) { showToast('OVER BUDGET'); return; }
+  if (total > gcChallenge.max_price) { showToast('OVER BUDGET'); return; }
   const cars = gcTrio.map(id => CARS.find(x => x.id === id));
   const { data, error } = await sb.from('garage_submissions').insert({
     challenge_id: gcChallenge.id, user_id: currentUserId, username: currentUser,
@@ -1944,7 +1944,7 @@ function renderGcSubmissions() {
   const container = document.getElementById('gcSubmissionsGrid');
   if (!container) return;
   if (gcSubmissions.length === 0) {
-    container.innerHTML = '<p style="font-family:'VT323',monospace;font-size:20px;color:rgba(255,255,255,0.4);letter-spacing:2px;text-align:center;padding:32px 0;">NO SUBMISSIONS YET. BE THE FIRST.</p>';
+    container.innerHTML = '<p style="font-family:VT323,monospace;font-size:20px;color:rgba(255,255,255,0.4);letter-spacing:2px;text-align:center;padding:32px 0;">NO SUBMISSIONS YET. BE THE FIRST.</p>';
     return;
   }
   container.innerHTML = gcSubmissions.map((s, idx) => {
@@ -2015,10 +2015,10 @@ document.getElementById('gcLoadMore')?.addEventListener('click', () => { gcVisib
 async function showProfile(username) {
   if (!username) return;
   document.getElementById('profileUsername').textContent = '→ ' + username.toUpperCase();
-  document.getElementById('profileGarageSlots').innerHTML = '<p style="font-family:'VT323',monospace;color:rgba(255,255,255,0.4);font-size:18px;">LOADING...</p>';
+  document.getElementById('profileGarageSlots').innerHTML = '<p style="font-family:VT323,monospace;color:rgba(255,255,255,0.4);font-size:18px;">LOADING...</p>';
   document.getElementById('profileModal').classList.add('show');
   const { data: profile } = await sb.from('profiles').select('id').eq('username', username.toLowerCase()).single();
-  if (!profile) { document.getElementById('profileGarageSlots').innerHTML = '<p style="font-family:'VT323',monospace;color:rgba(255,255,255,0.4);font-size:18px;letter-spacing:2px;">NO GARAGE SET UP YET.</p>'; return; }
+  if (!profile) { document.getElementById('profileGarageSlots').innerHTML = '<p style="font-family:VT323,monospace;color:rgba(255,255,255,0.4);font-size:18px;letter-spacing:2px;">NO GARAGE SET UP YET.</p>'; return; }
   const { data: garageRows } = await sb.from('garages').select('*').eq('user_id', profile.id);
   const slots = [null,null,null];
   (garageRows||[]).forEach(r => { slots[r.slot-1]=r.car_id; });
