@@ -500,6 +500,89 @@ footer { text-align: center; padding: 30px; color: rgba(255, 255, 255, 0.4); fon
 .btn-garage-add.in-garage { color: rgba(0,240,255,0.4); border-color: rgba(0,240,255,0.2); cursor: default; }
 .btn-garage-add.full { border-color: rgba(255,230,0,0.4); color: var(--yellow); }
 .btn-garage-add.full:hover { background: rgba(255,230,0,0.1); }
+
+/* ===== GARAGE CHALLENGE TAB ===== */
+.gc-trio-area {
+  background: rgba(0,240,255,0.04); border: 1px solid rgba(0,240,255,0.2);
+  padding: 24px; margin-bottom: 36px;
+}
+.gc-trio-label {
+  font-family: 'VT323', monospace; font-size: 18px; color: var(--cyan);
+  letter-spacing: 3px; margin-bottom: 14px;
+}
+.gc-trio-slots {
+  display: grid; grid-template-columns: repeat(3,1fr); gap: 12px; margin-bottom: 18px;
+}
+.gc-trio-slot {
+  background: rgba(7,0,15,0.6); border: 1px dashed rgba(0,240,255,0.3);
+  padding: 14px 10px; text-align: center; position: relative; min-height: 120px;
+  display: flex; flex-direction: column; align-items: center; justify-content: center;
+}
+.gc-trio-slot.filled { border-style: solid; border-color: rgba(0,240,255,0.6); }
+.gc-trio-slot .slot-number { font-family:'VT323',monospace; font-size:13px; color:var(--cyan); letter-spacing:2px; margin-bottom:6px; }
+.gc-trio-slot .slot-silhouette { height:54px; margin-bottom:6px; }
+.gc-trio-slot .slot-empty-text { font-family:'VT323',monospace; font-size:20px; color:rgba(244,244,255,0.2); }
+.gc-trio-slot .slot-car-name { font-family:'Press Start 2P',monospace; font-size:7px; color:var(--yellow); line-height:1.7; }
+.gc-trio-slot .slot-price { font-family:'VT323',monospace; font-size:18px; color:var(--green); }
+.gc-trio-slot .slot-remove-btn { margin-top:6px; background:none; border:1px solid rgba(255,58,58,0.4); color:var(--red); font-family:'Rajdhani',sans-serif; font-weight:700; font-size:10px; letter-spacing:1px; padding:3px 8px; cursor:pointer; }
+.gc-budget-bar { margin-bottom: 14px; }
+.gc-budget-text { font-family:'VT323',monospace; font-size:22px; color:var(--white); letter-spacing:2px; margin-bottom:6px; }
+.gc-budget-text span.over { color: var(--red); }
+.gc-budget-track { height:4px; background:rgba(255,255,255,0.1); border-radius:2px; overflow:hidden; }
+.gc-budget-fill { height:100%; background: var(--cyan); transition: width 0.3s, background 0.3s; }
+.gc-budget-fill.over { background: var(--red); }
+.gc-picker-heading {
+  font-family:'Press Start 2P',monospace; font-size:11px; color:var(--yellow);
+  letter-spacing:3px; margin-bottom:20px; padding-top:8px;
+}
+.car-card.in-trio { border-color: var(--green); }
+.car-trio-badge {
+  position:absolute; bottom:6px; left:50%; transform:translateX(-50%);
+  font-family:'VT323',monospace; font-size:13px; color:var(--green); letter-spacing:1px; white-space:nowrap;
+}
+.gc-submissions-heading {
+  font-family:'Press Start 2P',monospace; font-size:11px; color:var(--magenta);
+  letter-spacing:3px; margin: 36px 0 20px; padding-top:20px;
+  border-top: 1px solid rgba(255,43,214,0.2);
+}
+.gc-sub-card {
+  background: rgba(255,43,214,0.05); border: 1px solid rgba(255,43,214,0.25);
+  padding: 20px; margin-bottom: 14px; display:grid;
+  grid-template-columns: 50px 1fr auto; gap:16px; align-items:start;
+}
+.gc-sub-rank { font-family:'VT323',monospace; font-size:26px; color:rgba(255,255,255,0.4); }
+.gc-sub-rank.gold { color:var(--yellow); }
+.gc-sub-rank.silver { color:#c0c0c0; }
+.gc-sub-rank.bronze { color:#cd7f32; }
+.gc-sub-trio { display:grid; grid-template-columns:repeat(3,1fr); gap:10px; }
+.gc-sub-car { text-align:center; }
+.gc-sub-sil { height:50px; }
+.gc-sub-carname { font-family:'Press Start 2P',monospace; font-size:7px; color:var(--cyan); line-height:1.6; }
+.gc-sub-price { font-family:'VT323',monospace; font-size:16px; color:var(--green); }
+.gc-sub-meta { font-family:'VT323',monospace; font-size:16px; color:rgba(244,244,255,0.5); margin-top:8px; }
+.gc-sub-user { font-family:'VT323',monospace; font-size:20px; color:var(--white); letter-spacing:1px; cursor:pointer; }
+.gc-sub-user:hover { color: var(--cyan); text-decoration: underline; }
+.gc-sub-votes { text-align:right; }
+.gc-vote-count { font-family:'VT323',monospace; font-size:28px; color:var(--yellow); }
+.gc-vote-btn { background:none; border:1px solid rgba(255,230,0,0.4); color:var(--yellow); font-family:'Rajdhani',sans-serif; font-weight:700; font-size:12px; letter-spacing:2px; padding:6px 14px; cursor:pointer; margin-top:6px; display:block; width:100%; }
+.gc-vote-btn:hover:not(:disabled) { background:rgba(255,230,0,0.1); }
+.gc-vote-btn.voted { background:rgba(255,230,0,0.15); border-color:var(--yellow); }
+.gc-vote-btn:disabled { opacity:0.4; cursor:default; }
+.your-trio-card { border-color: var(--cyan); }
+/* ===== PROFILE MODAL ===== */
+.profile-modal-box {
+  background: var(--bg-mid); border: 1px solid rgba(255,43,214,0.5);
+  padding: 32px; max-width: 760px; width: 90%; max-height: 90vh; overflow-y:auto;
+  position: relative;
+}
+.profile-username {
+  font-family:'Press Start 2P',monospace; font-size:14px; color:var(--cyan);
+  letter-spacing:3px; margin-bottom:6px;
+}
+.profile-tag { font-family:'VT323',monospace; font-size:18px; color:var(--magenta); letter-spacing:2px; margin-bottom:24px; }
+.profile-garage-label { font-family:'VT323',monospace; font-size:20px; color:var(--yellow); letter-spacing:3px; margin-bottom:14px; }
+.username-link { cursor:pointer; }
+.username-link:hover { color:var(--cyan); text-decoration:underline; }
 </style>
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 </head>
@@ -514,6 +597,7 @@ footer { text-align: center; padding: 30px; color: rgba(255, 255, 255, 0.4); fon
     <a data-tab="submissions">Submissions <span id="subCountBadge" style="font-family:'VT323',monospace;color:var(--yellow);"></span></a>
     <a data-tab="fame">Hall of Fame</a>
     <a data-tab="garage">Garage</a>
+    <a data-tab="gc">Trio Challenge</a>
   </div>
   <button id="loginBtn" class="nav-cta">Log in</button>
 </nav>
@@ -672,7 +756,7 @@ footer { text-align: center; padding: 30px; color: rgba(255, 255, 255, 0.4); fon
           </select>
         </div>
         <div class="cars-grid" id="garageCarsGrid"></div>
-        <button class="load-more" id="garageLoadMore" style="display:none;">LOAD MORE CARS</button>
+        <button class="show-more-btn" id="garageLoadMore" style="display:none;">LOAD MORE CARS ▼</button>
       </section>
       <aside class="selected-panel empty" id="garageSelectedPanel">
         <div class="selected-empty-icon">[ ◇ ]</div>
@@ -680,6 +764,71 @@ footer { text-align: center; padding: 30px; color: rgba(255, 255, 255, 0.4); fon
       </aside>
     </div>
   </section>
+
+  <!-- TAB: TRIO / GARAGE CHALLENGE -->
+  <section id="tab-gc" class="tab-section">
+    <div class="hero">
+      <div class="hero-tag" id="gcTag">▶ LOADING...</div>
+      <h1 class="hero-title" id="gcTitle">LOADING...</h1>
+      <p class="hero-body" id="gcBody"></p>
+      <div class="constraints" id="gcConstraints">
+        <span class="chip time" id="gcCountdown">▣ LOADING...</span>
+      </div>
+    </div>
+
+    <div class="gc-trio-area" id="gcTrioArea">
+      <div class="gc-trio-label">YOUR TRIO</div>
+      <div class="gc-trio-slots" id="gcTrioSlots"></div>
+      <div class="gc-budget-bar">
+        <div class="gc-budget-text">
+          <span id="gcSpent">£0</span> spent of <span id="gcBudgetTotal">£0</span> budget
+        </div>
+        <div class="gc-budget-track"><div class="gc-budget-fill" id="gcBudgetFill" style="width:0%"></div></div>
+      </div>
+      <button class="btn-submit" id="gcSubmitBtn" disabled>SELECT 3 CARS TO SUBMIT</button>
+    </div>
+
+    <div class="gc-picker-heading">▶ BUILD YOUR TRIO</div>
+    <div class="filters">
+      <input type="text" id="gcSearch" placeholder="Search make, model, year...">
+      <select id="gcFilterCountry"><option value="">All countries</option></select>
+      <select id="gcFilterDrivetrain">
+        <option value="">All drivetrains</option>
+        <option value="FWD">FWD</option><option value="RWD">RWD</option>
+        <option value="AWD">AWD</option><option value="4WD">4WD</option>
+      </select>
+      <select id="gcFilterBody">
+        <option value="">All body types</option>
+        <option value="hatch">Hatch</option><option value="saloon">Saloon</option>
+        <option value="estate">Estate</option><option value="coupe">Coupe</option>
+        <option value="roadster">Roadster</option><option value="supercar">Supercar</option>
+        <option value="4x4">4x4</option>
+      </select>
+      <select id="gcSort">
+        <option value="default">Sort: Default</option>
+        <option value="price-asc">Price ↑</option>
+        <option value="price-desc">Price ↓</option>
+        <option value="hp-desc">Power ↓</option>
+        <option value="year-desc">Year ↓</option>
+      </select>
+    </div>
+    <div class="cars-grid" id="gcCarsGrid"></div>
+    <button class="show-more-btn" id="gcLoadMore" style="display:none;">SHOW MORE CARS ▼</button>
+
+    <div class="gc-submissions-heading">▶ SUBMITTED TRIOS</div>
+    <div id="gcSubmissionsGrid"></div>
+  </section>
+
+  <!-- PROFILE MODAL -->
+  <div class="modal-bg" id="profileModal">
+    <div class="modal-box profile-modal-box">
+      <button class="modal-close" id="closeProfile">✕</button>
+      <div class="profile-username" id="profileUsername"></div>
+      <div class="profile-tag">PISTONWAVE MEMBER</div>
+      <div class="profile-garage-label">THE GARAGE</div>
+      <div class="garage-slots" id="profileGarageSlots" style="margin-bottom:0;"></div>
+    </div>
+  </div>
 </main>
 
 <footer>PISTONWAVE :: A DAILY CAR CHALLENGE :: VOTING + GARAGES IN BETA</footer>
@@ -1047,6 +1196,7 @@ function switchTab(tab) {
   if (tab === 'submissions') renderSubmissions();
   if (tab === 'fame') renderFame();
   if (tab === 'garage') { renderGaragePicker(); renderGarageSelected(); }
+  if (tab === 'gc') { renderGcPicker(); renderGcTrio(); renderGcSubmissions(); }
   window.scrollTo({ top: 0, behavior: 'smooth' });
 }
 
@@ -1212,7 +1362,7 @@ function renderSubmissions() {
     }
     return `<div class="sub-card ${isYours ? 'your-pick' : ''} ${rankCls}">
       <div class="sub-rank">${rankIcon}</div>
-      <div class="sub-user">→ ${(s.username||'').toUpperCase()}</div>
+      <div class="sub-user username-link" onclick="showProfile('${s.username||''}')" >→ ${(s.username||'').toUpperCase()}</div>
       <div class="sub-time">${timeAgo(new Date(s.created_at).getTime())}</div>
       <div class="sub-silhouette">${SILHOUETTES[c.body] || SILHOUETTES.coupe}</div>
       <div class="sub-car-name">${c.year} ${c.make} ${c.model}</div>
@@ -1324,6 +1474,7 @@ document.getElementById('loginForm').addEventListener('submit', async (e) => {
   }
   currentUser = username;
   currentUserId = session?.user?.id || session?.session?.user?.id;
+  if (currentUserId) await sb.from('profiles').upsert({ id: currentUserId, username: username.toLowerCase() }, { onConflict: 'id' });
   document.getElementById('loginModal').classList.remove('show');
   applyUserChip();
   showToast('WELCOME, ' + currentUser);
@@ -1467,6 +1618,10 @@ function renderGaragePicker() {
       garageSelectedId = parseInt(el.dataset.gid);
       renderGaragePicker();
       renderGarageSelected();
+      const panel = document.getElementById('garageSelectedPanel');
+      if (panel && panel.getBoundingClientRect().bottom > window.innerHeight) {
+        panel.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      }
     });
   });
 }
@@ -1590,6 +1745,294 @@ function subscribeRealtime() {
   ).subscribe();
 }
 
+
+// ============ GARAGE CHALLENGE STATE ============
+let gcChallenge = null;
+let gcTrio = [];          // array of car_ids (max 3)
+let gcSubmissions = [];
+let gcUserSubId = null;
+let gcVotes = new Set();
+let gcVisibleCount = 24;
+
+// ============ GARAGE CHALLENGE LOADERS ============
+async function loadGcChallenge() {
+  const now = new Date().toISOString();
+  let { data, error } = await sb.from('garage_challenges')
+    .select('*').gte('closes_at', now)
+    .order('closes_at', { ascending: true }).limit(1).single();
+  if (error || !data) {
+    const fb = await sb.from('garage_challenges').select('*').order('closes_at', { ascending: false }).limit(1).single();
+    data = fb.data;
+  }
+  if (!data) return;
+  gcChallenge = data;
+  gcChallenge.drivetrain_blacklist = data.drivetrain_blacklist || [];
+  document.getElementById('gcTag').textContent = '▶ TRIO CHALLENGE ' + String(data.number).padStart(3,'0');
+  document.getElementById('gcTitle').textContent = data.title;
+  document.getElementById('gcBody').textContent = data.description || '';
+  document.getElementById('gcBudgetTotal').textContent = fmt(data.total_budget);
+  const con = document.getElementById('gcConstraints');
+  const chips = [`<span class="chip">COMBINED BUDGET ≤ ${fmt(data.total_budget)}</span>`];
+  (data.drivetrain_blacklist||[]).forEach(dt => chips.push(`<span class="chip warn">NO ${dt}</span>`));
+  chips.push(`<span class="chip time" id="gcCountdown">▣ LOADING...</span>`);
+  con.innerHTML = chips.join('');
+}
+
+async function loadGcSubmissions() {
+  if (!gcChallenge) return;
+  const { data } = await sb.from('garage_submissions')
+    .select('*').eq('challenge_id', gcChallenge.id)
+    .order('votes_count', { ascending: false });
+  gcSubmissions = data || [];
+}
+
+async function loadGcUserState() {
+  if (!currentUserId || !gcChallenge) return;
+  const { data } = await sb.from('garage_submissions')
+    .select('id, car1_id, car2_id, car3_id')
+    .eq('challenge_id', gcChallenge.id).eq('user_id', currentUserId).single();
+  if (data) {
+    gcUserSubId = data.id;
+    gcTrio = [data.car1_id, data.car2_id, data.car3_id];
+  }
+  const { data: votes } = await sb.from('garage_votes').select('submission_id').eq('user_id', currentUserId);
+  if (votes) gcVotes = new Set(votes.map(v => v.submission_id));
+}
+
+function gcIsEligible(c) {
+  if (!gcChallenge) return true;
+  if (gcChallenge.drivetrain_blacklist && gcChallenge.drivetrain_blacklist.includes(c.drivetrain)) return false;
+  return true;
+}
+
+// ============ TRIO MANAGEMENT ============
+function gcTrioTotal() {
+  return gcTrio.reduce((sum, id) => {
+    const c = CARS.find(x => x.id === id);
+    return sum + (c ? c.price : 0);
+  }, 0);
+}
+
+function gcToggleCar(carId) {
+  const idx = gcTrio.indexOf(carId);
+  if (idx >= 0) {
+    gcTrio.splice(idx, 1);
+  } else if (gcTrio.length < 3) {
+    gcTrio.push(carId);
+  } else {
+    showToast('TRIO FULL — REMOVE A CAR FIRST');
+    return;
+  }
+  renderGcTrio();
+  renderGcPicker();
+  renderGcSubmitBtn();
+}
+
+function renderGcTrio() {
+  const slots = document.getElementById('gcTrioSlots');
+  if (!slots) return;
+  const display = [...gcTrio];
+  while (display.length < 3) display.push(null);
+  slots.innerHTML = display.map((carId, i) => {
+    if (!carId) return `<div class="gc-trio-slot">
+      <div class="slot-number">CAR ${i+1}</div>
+      <div class="slot-silhouette" style="opacity:0.12">${SILHOUETTES.coupe}</div>
+      <div class="slot-empty-text">EMPTY</div></div>`;
+    const c = CARS.find(x => x.id === carId);
+    if (!c) return '';
+    return `<div class="gc-trio-slot filled">
+      <div class="slot-number">CAR ${i+1}</div>
+      <div class="slot-silhouette">${SILHOUETTES[c.body]||SILHOUETTES.coupe}</div>
+      <div class="slot-car-name">${c.year} ${c.make}<br>${c.model.toUpperCase()}</div>
+      <div class="slot-price">${fmt(c.price)}</div>
+      ${!gcUserSubId ? `<button class="slot-remove-btn" onclick="gcToggleCar(${carId})">✕ REMOVE</button>` : ''}
+    </div>`;
+  }).join('');
+
+  const total = gcTrioTotal();
+  const budget = gcChallenge?.total_budget || 0;
+  const pct = budget > 0 ? Math.min(100, (total/budget)*100) : 0;
+  const over = total > budget;
+  document.getElementById('gcSpent').textContent = fmt(total);
+  document.getElementById('gcSpent').className = over ? 'over' : '';
+  const fill = document.getElementById('gcBudgetFill');
+  if (fill) { fill.style.width = pct + '%'; fill.className = 'gc-budget-fill' + (over ? ' over' : ''); }
+}
+
+function renderGcSubmitBtn() {
+  const btn = document.getElementById('gcSubmitBtn');
+  if (!btn) return;
+  if (gcUserSubId) {
+    btn.disabled = true; btn.textContent = 'TRIO SUBMITTED ✓'; return;
+  }
+  const total = gcTrioTotal();
+  const over = gcChallenge && total > gcChallenge.total_budget;
+  if (gcTrio.length < 3) { btn.disabled = true; btn.textContent = `SELECT ${3-gcTrio.length} MORE CAR${3-gcTrio.length!==1?'S':''}...`; }
+  else if (over) { btn.disabled = true; btn.textContent = `OVER BUDGET BY ${fmt(total - gcChallenge.total_budget)}`; }
+  else { btn.disabled = false; btn.textContent = 'SUBMIT YOUR TRIO'; }
+}
+
+// ============ GC PICKER ════════════════════════════════════════════════
+function renderGcPicker() {
+  const grid = document.getElementById('gcCarsGrid');
+  if (!grid) return;
+  const search = (document.getElementById('gcSearch')?.value||'').toLowerCase();
+  const country = document.getElementById('gcFilterCountry')?.value||'';
+  const drivetrain = document.getElementById('gcFilterDrivetrain')?.value||'';
+  const body = document.getElementById('gcFilterBody')?.value||'';
+  const sort = document.getElementById('gcSort')?.value||'default';
+
+  let cars = CARS.filter(c => {
+    if (!gcIsEligible(c)) return false;
+    if (search && !`${c.year} ${c.make} ${c.model}`.toLowerCase().includes(search)) return false;
+    if (country && c.country !== country) return false;
+    if (drivetrain && c.drivetrain !== drivetrain) return false;
+    if (body && c.body !== body) return false;
+    return true;
+  });
+  if (sort==='price-asc') cars.sort((a,b)=>a.price-b.price);
+  else if (sort==='price-desc') cars.sort((a,b)=>b.price-a.price);
+  else if (sort==='hp-desc') cars.sort((a,b)=>b.hp-a.hp);
+  else if (sort==='year-desc') cars.sort((a,b)=>b.year-a.year);
+
+  const visible = cars.slice(0, gcVisibleCount);
+  grid.innerHTML = visible.map(c => {
+    const inTrio = gcTrio.includes(c.id);
+    return `<div class="car-card ${inTrio?'in-trio':''}" data-gcid="${c.id}" style="position:relative;">
+      <div class="car-flag">${FLAGS[c.country]||''}</div>
+      <div class="car-silhouette">${SILHOUETTES[c.body]||SILHOUETTES.coupe}</div>
+      <div class="car-name">${c.year} ${c.make}</div>
+      <div class="car-model">${c.model}</div>
+      <div class="car-stats">${c.hp}hp · ${c.drivetrain} · ${fmt(c.price)}</div>
+      ${inTrio?'<div class="car-trio-badge">IN TRIO</div>':''}
+    </div>`;
+  }).join('');
+
+  const lm = document.getElementById('gcLoadMore');
+  if (lm) lm.style.display = cars.length > gcVisibleCount ? '' : 'none';
+
+  if (!gcUserSubId) {
+    grid.querySelectorAll('.car-card[data-gcid]').forEach(el => {
+      el.addEventListener('click', () => gcToggleCar(parseInt(el.dataset.gcid)));
+    });
+  }
+}
+
+// ============ GC SUBMIT ════════════════════════════════════════════════
+document.addEventListener('click', async e => {
+  if (e.target.id !== 'gcSubmitBtn' || e.target.disabled) return;
+  if (!currentUser) { document.getElementById('loginModal').classList.add('show'); return; }
+  if (!gcChallenge || gcTrio.length !== 3) return;
+  const total = gcTrioTotal();
+  if (total > gcChallenge.total_budget) { showToast('OVER BUDGET'); return; }
+  const cars = gcTrio.map(id => CARS.find(x => x.id === id));
+  const { data, error } = await sb.from('garage_submissions').insert({
+    challenge_id: gcChallenge.id, user_id: currentUserId, username: currentUser,
+    car1_id: gcTrio[0], car2_id: gcTrio[1], car3_id: gcTrio[2], total_price: total
+  }).select().single();
+  if (error) { showToast('SUBMIT FAILED: ' + error.message); return; }
+  gcUserSubId = data.id;
+  renderGcTrio();
+  renderGcSubmitBtn();
+  await loadGcSubmissions();
+  renderGcSubmissions();
+  showToast('TRIO SUBMITTED!');
+});
+
+// ============ GC SUBMISSIONS RENDER ════════════════════════════════════
+function renderGcSubmissions() {
+  const container = document.getElementById('gcSubmissionsGrid');
+  if (!container) return;
+  if (gcSubmissions.length === 0) {
+    container.innerHTML = '<p style="font-family:'VT323',monospace;font-size:20px;color:rgba(255,255,255,0.4);letter-spacing:2px;text-align:center;padding:32px 0;">NO SUBMISSIONS YET. BE THE FIRST.</p>';
+    return;
+  }
+  container.innerHTML = gcSubmissions.map((s, idx) => {
+    const cars = [s.car1_id, s.car2_id, s.car3_id].map(id => CARS.find(x => x.id === id));
+    const isYours = s.id === gcUserSubId;
+    const hasVoted = gcVotes.has(s.id);
+    let rankCls = '', rankIcon = `#${idx+1}`;
+    if (idx===0){rankCls='gold';rankIcon='1ST';}
+    else if(idx===1){rankCls='silver';rankIcon='2ND';}
+    else if(idx===2){rankCls='bronze';rankIcon='3RD';}
+    return `<div class="gc-sub-card ${isYours?'your-trio-card':''}">
+      <div class="gc-sub-rank ${rankCls}">${rankIcon}</div>
+      <div>
+        <div class="gc-sub-user username-link" onclick="showProfile('${s.username||''}')">→ ${(s.username||'').toUpperCase()}</div>
+        <div class="gc-sub-meta">${timeAgo(new Date(s.created_at).getTime())} · TOTAL: ${fmt(s.total_price||0)}</div>
+        <div class="gc-sub-trio">${cars.map(c => c ? `
+          <div class="gc-sub-car">
+            <div class="gc-sub-sil">${SILHOUETTES[c.body]||SILHOUETTES.coupe}</div>
+            <div class="gc-sub-carname">${c.year} ${c.make}<br>${c.model.toUpperCase()}</div>
+            <div class="gc-sub-price">${fmt(c.price)}</div>
+          </div>` : '').join('')}
+        </div>
+      </div>
+      <div class="gc-sub-votes">
+        <div class="gc-vote-count">▲ ${s.votes_count||0}</div>
+        <button class="gc-vote-btn ${hasVoted?'voted':''} ${isYours?'own':''}" data-gcsub="${s.id}" ${isYours?'disabled':''}>
+          ${isYours?'YOUR TRIO':hasVoted?'VOTED':'VOTE'}
+        </button>
+      </div>
+    </div>`;
+  }).join('');
+
+  container.querySelectorAll('.gc-vote-btn[data-gcsub]').forEach(btn => {
+    btn.addEventListener('click', async () => {
+      if (!currentUser) { document.getElementById('loginModal').classList.add('show'); return; }
+      const subId = btn.dataset.gcsub;
+      if (gcVotes.has(subId)) {
+        await sb.from('garage_votes').delete().match({ submission_id: subId, user_id: currentUserId });
+        gcVotes.delete(subId);
+        showToast('VOTE WITHDRAWN');
+      } else {
+        await sb.from('garage_votes').insert({ submission_id: subId, user_id: currentUserId });
+        gcVotes.add(subId);
+        showToast('VOTE LOCKED IN');
+      }
+      await loadGcSubmissions();
+      renderGcSubmissions();
+    });
+  });
+}
+
+// ============ GC FILTERS ════════════════════════════════════════════════
+['gcSearch','gcFilterCountry','gcFilterDrivetrain','gcFilterBody','gcSort'].forEach(id => {
+  const el = document.getElementById(id);
+  if (!el) return;
+  el.addEventListener('input', () => { gcVisibleCount=24; renderGcPicker(); });
+  el.addEventListener('change', () => { gcVisibleCount=24; renderGcPicker(); });
+});
+document.getElementById('gcLoadMore')?.addEventListener('click', () => { gcVisibleCount+=24; renderGcPicker(); });
+(function(){
+  const countries = [...new Set(CARS.map(c=>c.country))].sort();
+  const sel = document.getElementById('gcFilterCountry');
+  if (!sel) return;
+  countries.forEach(co => { const o=document.createElement('option'); o.value=co; o.textContent=`${FLAGS[co]||''} ${co}`; sel.appendChild(o); });
+})();
+
+// ============ PROFILE MODAL ═════════════════════════════════════════════
+async function showProfile(username) {
+  if (!username) return;
+  document.getElementById('profileUsername').textContent = '→ ' + username.toUpperCase();
+  document.getElementById('profileGarageSlots').innerHTML = '<p style="font-family:'VT323',monospace;color:rgba(255,255,255,0.4);font-size:18px;">LOADING...</p>';
+  document.getElementById('profileModal').classList.add('show');
+  const { data: profile } = await sb.from('profiles').select('id').eq('username', username.toLowerCase()).single();
+  if (!profile) { document.getElementById('profileGarageSlots').innerHTML = '<p style="font-family:'VT323',monospace;color:rgba(255,255,255,0.4);font-size:18px;letter-spacing:2px;">NO GARAGE SET UP YET.</p>'; return; }
+  const { data: garageRows } = await sb.from('garages').select('*').eq('user_id', profile.id);
+  const slots = [null,null,null];
+  (garageRows||[]).forEach(r => { slots[r.slot-1]=r.car_id; });
+  document.getElementById('profileGarageSlots').innerHTML = slots.map((carId,i) => {
+    if (!carId) return `<div class="garage-slot empty"><div class="slot-number">SLOT ${i+1}</div><div class="slot-silhouette" style="opacity:0.15">${SILHOUETTES.coupe}</div><div class="slot-empty-text">EMPTY</div></div>`;
+    const c = CARS.find(x=>x.id===carId);
+    if (!c) return '';
+    return `<div class="garage-slot filled"><div class="slot-number">SLOT ${i+1}</div><div class="slot-silhouette">${SILHOUETTES[c.body]||SILHOUETTES.coupe}</div><div class="slot-car-name">${c.year} ${c.make}<br>${c.model.toUpperCase()}</div><div class="slot-specs">${c.hp}hp · ${c.drivetrain} · ${fmt(c.price)}</div></div>`;
+  }).join('');
+}
+document.getElementById('closeProfile').addEventListener('click', () => document.getElementById('profileModal').classList.remove('show'));
+document.getElementById('profileModal').addEventListener('click', e => { if (e.target === document.getElementById('profileModal')) document.getElementById('profileModal').classList.remove('show'); });
+
+// GC countdown (ticker updated in main tickCountdown)
 // ============ COUNTDOWN ============
 function tickCountdown() {
   const el = document.getElementById('countdown');
@@ -1616,10 +2059,15 @@ async function init() {
   await loadSubmissions();
   await loadUserState();
   await loadGarage();
+  await loadGcChallenge();
+  await loadGcSubmissions();
+  await loadGcUserState();
   renderCars();
   renderSelected();
   renderFame();
   renderGaragePicker();
+  renderGcTrio();
+  renderGcSubmitBtn();
   updateSubBadge();
   subscribeRealtime();
   tickCountdown();
