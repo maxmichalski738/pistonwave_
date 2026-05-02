@@ -600,55 +600,18 @@ footer { text-align: center; padding: 30px; color: rgba(255, 255, 255, 0.4); fon
   padding: 40px 44px 36px; max-width: 560px; width: 90%;
   position: relative;
 }
-.welcome-tag {
-  font-family: 'VT323', monospace; font-size: 14px; color: var(--magenta);
-  letter-spacing: 4px; margin-bottom: 14px;
-}
-.welcome-title {
-  font-size: 36px; font-weight: 700; color: var(--white);
-  letter-spacing: 3px; margin-bottom: 6px; line-height: 1.1;
-}
+.welcome-tag { font-family: 'VT323', monospace; font-size: 14px; color: var(--magenta); letter-spacing: 4px; margin-bottom: 14px; }
+.welcome-title { font-size: 36px; font-weight: 700; color: var(--white); letter-spacing: 3px; margin-bottom: 6px; line-height: 1.1; }
 .welcome-title span { color: var(--cyan); }
-.welcome-body {
-  font-family: 'VT323', monospace; font-size: 19px; color: rgba(244,244,255,0.75);
-  letter-spacing: 1px; line-height: 1.6; margin: 20px 0 28px;
-}
+.welcome-body { font-family: 'VT323', monospace; font-size: 19px; color: rgba(244,244,255,0.75); letter-spacing: 1px; line-height: 1.6; margin: 20px 0 28px; }
 .welcome-body strong { color: var(--white); }
-.welcome-features {
-  display: flex; flex-direction: column; gap: 10px; margin-bottom: 28px;
-}
-.welcome-feature {
-  font-family: 'VT323', monospace; font-size: 18px; color: rgba(244,244,255,0.65);
-  letter-spacing: 1px; padding-left: 20px; position: relative;
-}
+.welcome-features { display: flex; flex-direction: column; gap: 10px; margin-bottom: 28px; }
+.welcome-feature { font-family: 'VT323', monospace; font-size: 18px; color: rgba(244,244,255,0.65); letter-spacing: 1px; padding-left: 20px; position: relative; }
 .welcome-feature::before { content: '▶'; position: absolute; left: 0; color: var(--cyan); }
-.welcome-go-btn {
-  width: 100%; padding: 14px; background: transparent;
-  border: 1px solid var(--magenta); color: var(--magenta);
-  font-family: 'Rajdhani', sans-serif; font-weight: 700;
-  font-size: 18px; letter-spacing: 4px; cursor: pointer;
-  transition: all 0.2s;
-}
+.welcome-go-btn { width: 100%; padding: 14px; background: transparent; border: 1px solid var(--magenta); color: var(--magenta); font-family: 'Rajdhani', sans-serif; font-weight: 700; font-size: 18px; letter-spacing: 4px; cursor: pointer; transition: all 0.2s; }
 .welcome-go-btn:hover { background: rgba(255,43,214,0.1); box-shadow: 0 0 20px rgba(255,43,214,0.3); }
 </style>
-  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2">
-// ── WELCOME MODAL (sessionStorage — shows once per browser tab session) ──
-(function() {
-  if (!sessionStorage.getItem('pw_welcomed')) {
-    document.getElementById('welcomeModal').classList.add('show');
-  }
-  document.getElementById('welcomeGoBtn').addEventListener('click', () => {
-    document.getElementById('welcomeModal').classList.remove('show');
-    sessionStorage.setItem('pw_welcomed', '1');
-  });
-  document.getElementById('welcomeModal').addEventListener('click', e => {
-    if (e.target === document.getElementById('welcomeModal')) {
-      document.getElementById('welcomeModal').classList.remove('show');
-      sessionStorage.setItem('pw_welcomed', '1');
-    }
-  });
-})();
-</script>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 </head>
 <body>
 
@@ -1515,12 +1478,12 @@ async function renderFame() {
 }
 
 // ============ TOAST ============
-function showToast(msg) {
+function showToast(msg, duration) {
   const t = document.getElementById('toast');
   t.textContent = msg;
   t.classList.add('show');
   clearTimeout(t._timer);
-  t._timer = setTimeout(() => t.classList.remove('show'), 1800);
+  t._timer = setTimeout(() => t.classList.remove('show'), duration || 1800);
 }
 
 // ============ LOGIN ============
@@ -1635,7 +1598,7 @@ async function saveToGarage(slot, carId) {
   await loadGarage();
   renderGaragePicker();
   renderGarageSelected();
-  showToast('PARKED IN SLOT ' + (slot + 1) + ' — TAP ANY USERNAME ON SUBMISSIONS TO VIEW THEIR GARAGE');
+  showToast('PARKED IN SLOT ' + (slot + 1) + ' — TAP ANY USERNAME ON SUBMISSIONS TO VIEW THEIR GARAGE', 6000);
 }
 
 async function removeFromGarage(slot) {
@@ -2168,6 +2131,23 @@ async function init() {
   setInterval(tickCountdown, 1000);
 }
 init();
+
+// ── WELCOME MODAL (sessionStorage — shows once per browser tab, not on reload) ──
+document.addEventListener('DOMContentLoaded', function() {
+  if (!sessionStorage.getItem('pw_welcomed')) {
+    document.getElementById('welcomeModal').classList.add('show');
+  }
+  document.getElementById('welcomeGoBtn').addEventListener('click', function() {
+    document.getElementById('welcomeModal').classList.remove('show');
+    sessionStorage.setItem('pw_welcomed', '1');
+  });
+  document.getElementById('welcomeModal').addEventListener('click', function(e) {
+    if (e.target === document.getElementById('welcomeModal')) {
+      document.getElementById('welcomeModal').classList.remove('show');
+      sessionStorage.setItem('pw_welcomed', '1');
+    }
+  });
+});
 </script>
 
   <!-- WELCOME MODAL -->
@@ -2175,9 +2155,7 @@ init();
     <div class="welcome-modal-box">
       <div class="welcome-tag">▶ WELCOME TO</div>
       <div class="welcome-title">PISTON<span>WAVE</span></div>
-      <div class="welcome-body">
-        The daily car challenge platform. Every day a new brief drops — a budget, a drivetrain rule, a mission. <strong>You pick the car you'd choose.</strong> Then vote for the best pick from everyone else.
-      </div>
+      <div class="welcome-body">The daily car challenge platform. Every day a new brief drops — a budget, a drivetrain rule, a mission. <strong>You pick the car you'd choose.</strong> Then vote for the best pick from everyone else.</div>
       <div class="welcome-features">
         <div class="welcome-feature">A new <strong>Daily Drive</strong> challenge every 24 hours</div>
         <div class="welcome-feature">Browse and vote on everyone's submissions</div>
