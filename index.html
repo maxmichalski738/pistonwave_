@@ -1808,9 +1808,8 @@ function renderSubmissions() {
       renderSubmissions();
     });
   });
-}
 
-// Delete daily drive pick
+  // Delete daily drive pick
   grid.querySelectorAll('.delete-pick-btn').forEach(btn => {
     btn.addEventListener('click', async () => {
       const subId = btn.dataset.delSub;
