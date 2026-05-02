@@ -200,7 +200,7 @@ main { padding: 36px 36px 100px; max-width: 1600px; margin: 0 auto; }
   border-color: var(--cyan);
   box-shadow: 0 0 24px rgba(0, 240, 255, 0.35);
 }
-.car-card.ineligible { opacity: 0.45; }
+.car-card.ineligible { opacity: 0.45; cursor: not-allowed; }
 .car-card.ineligible::after {
   content: 'INELIGIBLE'; position: absolute;
   top: 10px; right: 10px;
@@ -338,6 +338,14 @@ main { padding: 36px 36px 100px; max-width: 1600px; margin: 0 auto; }
 .vote-btn.voted:hover { background: var(--cyan); border-color: var(--cyan); box-shadow: 0 0 18px rgba(0, 240, 255, 0.5); }
 .vote-arrow { font-size: 18px; }
 .vote-btn.own { opacity: 0.4; cursor: not-allowed; }
+
+.delete-pick-btn {
+  background: none; border: 1px solid rgba(255,58,58,0.45); color: var(--red);
+  font-family: 'Rajdhani', sans-serif; font-weight: 700; font-size: 11px;
+  letter-spacing: 1.5px; padding: 5px 10px; cursor: pointer;
+  text-transform: uppercase; transition: all 0.15s; margin-left: 6px;
+}
+.delete-pick-btn:hover { background: rgba(255,58,58,0.12); border-color: var(--red); }
 
 /* ===== HALL OF FAME ===== */
 .fame-hero {
@@ -981,6 +989,7 @@ footer { text-align: center; padding: 30px; color: rgba(255, 255, 255, 0.4); fon
         <div class="gc-budget-track"><div class="gc-budget-fill" id="gcBudgetFill" style="width:0%"></div></div>
       </div>
       <button class="btn-submit" id="gcSubmitBtn" disabled>SELECT 3 CARS TO SUBMIT</button>
+      <button class="btn-submit" id="gcDeleteBtn" style="display:none;margin-top:8px;background:transparent;border:1px solid rgba(255,58,58,0.5);color:var(--red);box-shadow:none;font-size:11px;">✕ DELETE TRIO &amp; RESUBMIT</button>
     </div>
 
     <div class="gc-picker-heading">▶ BUILD YOUR TRIO</div>
@@ -1654,6 +1663,11 @@ function renderCars() {
 
   grid.querySelectorAll('.car-card').forEach(el => {
     el.addEventListener('click', () => {
+      if (el.classList.contains('ineligible')) {
+        const c = CARS.find(x => x.id === parseInt(el.dataset.id));
+        if (c) showToast('INELIGIBLE: ' + ineligibleReasons(c).join(' · '), 3000);
+        return;
+      }
       selectedId = parseInt(el.dataset.id);
       renderCars();
       renderSelected();
@@ -1767,9 +1781,12 @@ function renderSubmissions() {
       <div class="sub-specs">${FLAGS[c.country]} · ${c.hp}hp · ${c.drivetrain} · <span class="price">${fmt(c.price)}</span></div>
       <div class="sub-actions">
         <div class="vote-count">▲ ${s.votes_count||0}</div>
-        <button class="vote-btn ${hasVoted ? 'voted' : ''} ${isYours ? 'own' : ''}" data-sub="${s.id}" ${isYours ? 'disabled' : ''}>
-          <span class="vote-arrow">▲</span> ${isYours ? 'YOUR PICK' : (hasVoted ? 'VOTED' : 'VOTE')}
-        </button>
+        <div style="display:flex;gap:6px;align-items:center;flex-wrap:wrap;">
+          <button class="vote-btn ${hasVoted ? 'voted' : ''} ${isYours ? 'own' : ''}" data-sub="${s.id}" ${isYours ? 'disabled' : ''}>
+            <span class="vote-arrow">▲</span> ${isYours ? 'YOUR PICK' : (hasVoted ? 'VOTED' : 'VOTE')}
+          </button>
+          ${isYours ? `<button class="delete-pick-btn" data-del-sub="${s.id}">✕ DELETE</button>` : ''}
+        </div>
       </div>
     </div>`;
   }).join('');
@@ -1789,6 +1806,24 @@ function renderSubmissions() {
       }
       await loadSubmissions();
       renderSubmissions();
+    });
+  });
+}
+
+// Delete daily drive pick
+  grid.querySelectorAll('.delete-pick-btn').forEach(btn => {
+    btn.addEventListener('click', async () => {
+      const subId = btn.dataset.delSub;
+      if (!confirm('Delete your pick? You can choose again.')) return;
+      const { error } = await sb.from('submissions').delete().eq('id', subId).eq('user_id', currentUserId);
+      if (error) { showToast('ERROR: ' + error.message); return; }
+      userSubmissionId = null;
+      selectedId = null;
+      showToast('PICK DELETED — CHOOSE AGAIN');
+      await loadSubmissions();
+      renderSubmissions();
+      renderSelected();
+      renderCars();
     });
   });
 }
@@ -2204,6 +2239,11 @@ async function loadGcUserState() {
 function gcIsEligible(c) {
   if (!gcChallenge) return true;
   if (gcChallenge.drivetrain_blacklist && gcChallenge.drivetrain_blacklist.includes(c.drivetrain)) return false;
+  // Budget: car already in trio is always selectable (for removal); others must fit remaining budget
+  if (!gcTrio.includes(c.id)) {
+    const remaining = (gcChallenge.max_price || 0) - gcTrioTotal();
+    if (c.price > remaining) return false;
+  }
   return true;
 }
 
@@ -2263,10 +2303,14 @@ function renderGcTrio() {
 
 function renderGcSubmitBtn() {
   const btn = document.getElementById('gcSubmitBtn');
+  const delBtn = document.getElementById('gcDeleteBtn');
   if (!btn) return;
   if (gcUserSubId) {
-    btn.disabled = true; btn.textContent = 'TRIO SUBMITTED ✓'; return;
+    btn.disabled = true; btn.textContent = 'TRIO SUBMITTED ✓';
+    if (delBtn) delBtn.style.display = '';
+    return;
   }
+  if (delBtn) delBtn.style.display = 'none';
   const total = gcTrioTotal();
   const over = gcChallenge && total > gcChallenge.max_price;
   if (gcTrio.length < 3) { btn.disabled = true; btn.textContent = `SELECT ${3-gcTrio.length} MORE CAR${3-gcTrio.length!==1?'S':''}...`; }
@@ -2285,7 +2329,6 @@ function renderGcPicker() {
   const sort = document.getElementById('gcSort')?.value||'default';
 
   let cars = CARS.filter(c => {
-    if (!gcIsEligible(c)) return false;
     if (search && !`${c.year} ${c.make} ${c.model}`.toLowerCase().includes(search)) return false;
     if (country && c.country !== country) return false;
     if (drivetrain && c.drivetrain !== drivetrain) return false;
@@ -2300,7 +2343,8 @@ function renderGcPicker() {
   const visible = cars.slice(0, gcVisibleCount);
   grid.innerHTML = visible.map(c => {
     const inTrio = gcTrio.includes(c.id);
-    return `<div class="car-card ${inTrio?'in-trio':''}" data-gcid="${c.id}" style="position:relative;">
+    const gcElig = gcIsEligible(c);
+    return `<div class="car-card ${inTrio?'in-trio':''} ${gcElig?'':'ineligible'}" data-gcid="${c.id}" style="position:relative;">
       <div class="car-flag">${FLAGS[c.country]||''}</div>
       <div class="car-silhouette">${SILHOUETTES[c.body]||SILHOUETTES.coupe}</div>
       <div class="car-name">${c.year} ${c.make}</div>
@@ -2315,7 +2359,20 @@ function renderGcPicker() {
 
   if (!gcUserSubId) {
     grid.querySelectorAll('.car-card[data-gcid]').forEach(el => {
-      el.addEventListener('click', () => gcToggleCar(parseInt(el.dataset.gcid)));
+      el.addEventListener('click', () => {
+        if (el.classList.contains('ineligible')) {
+          const c = CARS.find(x => x.id === parseInt(el.dataset.gcid));
+          if (!c) return;
+          if (gcChallenge?.drivetrain_blacklist?.includes(c.drivetrain)) {
+            showToast(c.drivetrain + ' DRIVETRAIN NOT ALLOWED FOR THIS CHALLENGE', 3000);
+          } else {
+            const remaining = (gcChallenge?.max_price || 0) - gcTrioTotal();
+            showToast('TOO EXPENSIVE — ' + fmt(c.price) + ' · ONLY ' + fmt(remaining) + ' REMAINING', 3500);
+          }
+          return;
+        }
+        gcToggleCar(parseInt(el.dataset.gcid));
+      });
     });
   }
 }
@@ -2492,6 +2549,23 @@ async function init() {
   setInterval(tickCountdown, 1000);
 }
 init();
+
+// ── TRIO DELETE HANDLER ──
+document.addEventListener('click', async e => {
+  if (e.target.id !== 'gcDeleteBtn') return;
+  if (!gcUserSubId) return;
+  if (!confirm('Delete your trio submission? You can pick again.')) return;
+  const { error } = await sb.from('garage_submissions').delete().eq('id', gcUserSubId).eq('user_id', currentUserId);
+  if (error) { showToast('ERROR: ' + error.message); return; }
+  gcUserSubId = null;
+  gcTrio = [];
+  showToast('TRIO DELETED — PICK AGAIN');
+  renderGcTrio();
+  renderGcPicker();
+  renderGcSubmitBtn();
+  await loadGcSubmissions();
+  renderGcSubmissions();
+});
 
 // ── WELCOME MODAL (sessionStorage — shows once per browser tab, not on reload) ──
 document.addEventListener('DOMContentLoaded', function() {
