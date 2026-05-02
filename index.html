@@ -74,7 +74,9 @@ nav {
   text-shadow: -2px 0 var(--magenta), 2px 0 var(--cyan), 0 0 18px rgba(0, 240, 255, 0.6);
   cursor: pointer; user-select: none;
 }
-.nav-links { display: flex; gap: 28px; }
+.nav-links { display: flex; gap: 0; align-items: center; }
+.nav-links a { margin: 0 14px; }
+.nav-sep { color: rgba(255,255,255,0.18); font-size: 22px; margin: 0 6px; user-select: none; }
 .nav-links a {
   color: var(--white); text-decoration: none;
   font-weight: 600; letter-spacing: 1.4px;
@@ -583,8 +585,70 @@ footer { text-align: center; padding: 30px; color: rgba(255, 255, 255, 0.4); fon
 .profile-garage-label { font-family:VT323,monospace; font-size:20px; color:var(--yellow); letter-spacing:3px; margin-bottom:14px; }
 .username-link { cursor:pointer; }
 .username-link:hover { color:var(--cyan); text-decoration:underline; }
+
+/* ── WELCOME MODAL ───────────────────────────────────────── */
+.welcome-modal-bg {
+  position: fixed; inset: 0; background: rgba(0,0,0,0.82);
+  display: flex; align-items: center; justify-content: center;
+  z-index: 9999; opacity: 0; pointer-events: none;
+  transition: opacity 0.35s ease;
+}
+.welcome-modal-bg.show { opacity: 1; pointer-events: all; }
+.welcome-modal-box {
+  background: #0d0d1a; border: 1px solid var(--cyan);
+  box-shadow: 0 0 40px rgba(0,240,255,0.25), 0 0 80px rgba(0,240,255,0.08);
+  padding: 40px 44px 36px; max-width: 560px; width: 90%;
+  position: relative;
+}
+.welcome-tag {
+  font-family: 'VT323', monospace; font-size: 14px; color: var(--magenta);
+  letter-spacing: 4px; margin-bottom: 14px;
+}
+.welcome-title {
+  font-size: 36px; font-weight: 700; color: var(--white);
+  letter-spacing: 3px; margin-bottom: 6px; line-height: 1.1;
+}
+.welcome-title span { color: var(--cyan); }
+.welcome-body {
+  font-family: 'VT323', monospace; font-size: 19px; color: rgba(244,244,255,0.75);
+  letter-spacing: 1px; line-height: 1.6; margin: 20px 0 28px;
+}
+.welcome-body strong { color: var(--white); }
+.welcome-features {
+  display: flex; flex-direction: column; gap: 10px; margin-bottom: 28px;
+}
+.welcome-feature {
+  font-family: 'VT323', monospace; font-size: 18px; color: rgba(244,244,255,0.65);
+  letter-spacing: 1px; padding-left: 20px; position: relative;
+}
+.welcome-feature::before { content: '▶'; position: absolute; left: 0; color: var(--cyan); }
+.welcome-go-btn {
+  width: 100%; padding: 14px; background: transparent;
+  border: 1px solid var(--magenta); color: var(--magenta);
+  font-family: 'Rajdhani', sans-serif; font-weight: 700;
+  font-size: 18px; letter-spacing: 4px; cursor: pointer;
+  transition: all 0.2s;
+}
+.welcome-go-btn:hover { background: rgba(255,43,214,0.1); box-shadow: 0 0 20px rgba(255,43,214,0.3); }
 </style>
-  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2">
+// ── WELCOME MODAL (sessionStorage — shows once per browser tab session) ──
+(function() {
+  if (!sessionStorage.getItem('pw_welcomed')) {
+    document.getElementById('welcomeModal').classList.add('show');
+  }
+  document.getElementById('welcomeGoBtn').addEventListener('click', () => {
+    document.getElementById('welcomeModal').classList.remove('show');
+    sessionStorage.setItem('pw_welcomed', '1');
+  });
+  document.getElementById('welcomeModal').addEventListener('click', e => {
+    if (e.target === document.getElementById('welcomeModal')) {
+      document.getElementById('welcomeModal').classList.remove('show');
+      sessionStorage.setItem('pw_welcomed', '1');
+    }
+  });
+})();
+</script>
 </head>
 <body>
 
@@ -596,9 +660,11 @@ footer { text-align: center; padding: 30px; color: rgba(255, 255, 255, 0.4); fon
     <a data-tab="today" class="active">Today's Drive</a>
     <a data-tab="submissions">Submissions <span id="subCountBadge" style="font-family:VT323,monospace;color:var(--yellow);"></span></a>
     <a data-tab="fame">Hall of Fame</a>
-    <a data-tab="garage">Garage</a>
+    <span class="nav-sep">╎</span>
     <a data-tab="gc">Trio Challenge</a>
     <a data-tab="gcv">Trio Votes <span id="gcvBadge" style="font-family:VT323,monospace;color:var(--yellow);"></span></a>
+    <span class="nav-sep">╎</span>
+    <a data-tab="garage">Garage</a>
   </div>
   <button id="loginBtn" class="nav-cta">Log in</button>
 </nav>
@@ -1569,7 +1635,7 @@ async function saveToGarage(slot, carId) {
   await loadGarage();
   renderGaragePicker();
   renderGarageSelected();
-  showToast('PARKED IN SLOT ' + (slot + 1));
+  showToast('PARKED IN SLOT ' + (slot + 1) + ' — TAP ANY USERNAME ON SUBMISSIONS TO VIEW THEIR GARAGE');
 }
 
 async function removeFromGarage(slot) {
@@ -2057,16 +2123,19 @@ document.getElementById('profileModal').addEventListener('click', e => { if (e.t
 // GC countdown (ticker updated in main tickCountdown)
 // ============ COUNTDOWN ============
 function tickCountdown() {
-  const el = document.getElementById('countdown');
-  if (!el) return;
-  const target = TODAY ? new Date(TODAY.closes_at) : (() => { const d = new Date(); d.setHours(23,59,0,0); return d; })();
-  const diff = target - new Date();
-  if (diff <= 0) { el.textContent = '▣ SUBMISSIONS CLOSED'; return; }
-  const h = Math.floor(diff / 3600000);
-  const m = Math.floor((diff % 3600000) / 60000);
-  const s = Math.floor((diff % 60000) / 1000);
   const pad = n => String(n).padStart(2, '0');
-  el.textContent = `▣ SUBMISSIONS CLOSE IN ${pad(h)}:${pad(m)}:${pad(s)}`;
+  function updateTimer(el, closesAt) {
+    if (!el) return;
+    const diff = new Date(closesAt) - new Date();
+    if (diff <= 0) { el.textContent = '▣ SUBMISSIONS CLOSED'; return; }
+    const h = Math.floor(diff / 3600000);
+    const m = Math.floor((diff % 3600000) / 60000);
+    const s = Math.floor((diff % 60000) / 1000);
+    el.textContent = `▣ CLOSES IN ${pad(h)}:${pad(m)}:${pad(s)}`;
+  }
+  const fallback = (() => { const d = new Date(); d.setHours(23,59,0,0); return d.toISOString(); })();
+  updateTimer(document.getElementById('countdown'), TODAY ? TODAY.closes_at : fallback);
+  updateTimer(document.getElementById('gcCountdown'), gcChallenge ? gcChallenge.closes_at : fallback);
 }
 
 // ============ INIT ============
@@ -2100,5 +2169,24 @@ async function init() {
 }
 init();
 </script>
+
+  <!-- WELCOME MODAL -->
+  <div class="welcome-modal-bg" id="welcomeModal">
+    <div class="welcome-modal-box">
+      <div class="welcome-tag">▶ WELCOME TO</div>
+      <div class="welcome-title">PISTON<span>WAVE</span></div>
+      <div class="welcome-body">
+        The daily car challenge platform. Every day a new brief drops — a budget, a drivetrain rule, a mission. <strong>You pick the car you'd choose.</strong> Then vote for the best pick from everyone else.
+      </div>
+      <div class="welcome-features">
+        <div class="welcome-feature">A new <strong>Daily Drive</strong> challenge every 24 hours</div>
+        <div class="welcome-feature">Browse and vote on everyone's submissions</div>
+        <div class="welcome-feature">Build your <strong>Personal Garage</strong> — 3 cars that define you</div>
+        <div class="welcome-feature">The <strong>Trio Challenge</strong> — curate a 3-car garage around a daily brief</div>
+        <div class="welcome-feature">All-time best picks live in the <strong>Hall of Fame</strong></div>
+      </div>
+      <button class="welcome-go-btn" id="welcomeGoBtn">LET'S GO ▶</button>
+    </div>
+  </div>
 </body>
 </html>
