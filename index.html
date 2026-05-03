@@ -1820,6 +1820,7 @@ function renderSubmissions() {
       selectedId = null;
       showToast('PICK DELETED — CHOOSE AGAIN');
       await loadSubmissions();
+      await loadUserState();
       renderSubmissions();
       renderSelected();
       renderCars();
@@ -2167,7 +2168,7 @@ async function loadUserState() {
   if (!currentUserId || !TODAY) return;
   const { data: mySub } = await sb.from('submissions')
     .select('id').eq('challenge_id', TODAY.id).eq('user_id', currentUserId).single();
-  if (mySub) userSubmissionId = mySub.id;
+  userSubmissionId = mySub ? mySub.id : null;
   const { data: myVotes } = await sb.from('votes').select('submission_id').eq('user_id', currentUserId);
   if (myVotes) userVotes = new Set(myVotes.map(v => v.submission_id));
 }
