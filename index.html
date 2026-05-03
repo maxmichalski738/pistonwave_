@@ -2385,10 +2385,10 @@ document.addEventListener('click', async e => {
   const total = gcTrioTotal();
   if (total > gcChallenge.max_price) { showToast('OVER BUDGET'); return; }
   const cars = gcTrio.map(id => CARS.find(x => x.id === id));
-  const { data, error } = await sb.from('garage_submissions').insert({
+  const { data, error } = await sb.from('garage_submissions').upsert({
     challenge_id: gcChallenge.id, user_id: currentUserId, username: currentUser,
     car1_id: gcTrio[0], car2_id: gcTrio[1], car3_id: gcTrio[2], total_price: total
-  }).select().single();
+  }, { onConflict: 'challenge_id,user_id' }).select().single();
   if (error) { showToast('SUBMIT FAILED: ' + error.message); return; }
   gcUserSubId = data.id;
   renderGcTrio();
