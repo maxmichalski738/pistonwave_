@@ -150,6 +150,16 @@ nav {
 
 main { padding: 36px 36px 100px; max-width: 1600px; margin: 0 auto; }
 
+.yesterday-banner {
+  display: none; align-items: center; gap: 18px; flex-wrap: wrap;
+  background: rgba(255, 230, 0, 0.04);
+  border: 1px solid rgba(255, 230, 0, 0.2);
+  padding: 10px 20px; margin-bottom: 16px; cursor: default;
+}
+.yesterday-banner .yb-label { font-family: 'Press Start 2P', monospace; font-size: 9px; color: var(--yellow); letter-spacing: 1px; }
+.yesterday-banner .yb-user { font-family: VT323, monospace; font-size: 22px; color: var(--white); letter-spacing: 2px; }
+.yesterday-banner .yb-car  { font-family: VT323, monospace; font-size: 20px; color: var(--cyan); letter-spacing: 1.5px; }
+.yesterday-banner .yb-votes{ font-family: VT323, monospace; font-size: 18px; color: rgba(255,255,255,0.45); }
 .proto-banner {
   text-align: center;
   font-family: 'VT323', monospace; font-size: 18px;
@@ -194,6 +204,9 @@ main { padding: 36px 36px 100px; max-width: 1600px; margin: 0 auto; }
 }
 .chip.warn { border-color: var(--red); background: rgba(255, 58, 58, 0.1); color: var(--red); }
 .chip.time { border-color: var(--cyan); background: rgba(0, 240, 255, 0.1); color: var(--cyan); }
+.chip.time.urgent { border-color: #ff9f00; background: rgba(255, 159, 0, 0.1); color: #ff9f00; }
+.chip.time.critical { border-color: var(--red); background: rgba(255, 58, 58, 0.15); color: var(--red); animation: criticalFlash 1s ease-in-out infinite; }
+@keyframes criticalFlash { 0%, 100% { opacity: 1; } 50% { opacity: 0.65; } }
 
 .picker-grid {
   display: grid; grid-template-columns: 1fr 380px;
@@ -222,6 +235,11 @@ main { padding: 36px 36px 100px; max-width: 1600px; margin: 0 auto; }
   color: rgba(255, 255, 255, 0.7); font-size: 14px;
   cursor: pointer; letter-spacing: 1px; text-transform: uppercase;
 }
+.price-range-wrap { display:flex; flex-direction:column; gap:4px; min-width:180px; }
+.price-range-label { font-family:VT323,monospace; font-size:15px; color:rgba(255,255,255,0.6); letter-spacing:1px; white-space:nowrap; }
+.price-range-label span { color:var(--cyan); }
+.price-sliders { display:flex; flex-direction:column; gap:3px; }
+.price-sliders input[type=range] { width:100%; height:3px; accent-color:var(--cyan); cursor:pointer; }
 .results-count {
   font-family: 'VT323', monospace; font-size: 18px;
   color: rgba(255, 255, 255, 0.55); letter-spacing: 2px;
@@ -334,7 +352,8 @@ main { padding: 36px 36px 100px; max-width: 1600px; margin: 0 auto; }
   transition: border-color 0.15s, box-shadow 0.2s;
 }
 .sub-card:hover { border-color: var(--cyan); box-shadow: 0 0 22px rgba(0, 240, 255, 0.25); }
-.sub-card.your-pick { border-color: var(--magenta); box-shadow: 0 0 28px rgba(255, 43, 214, 0.4); }
+.sub-card.your-pick { border-color: var(--magenta); box-shadow: 0 0 28px rgba(255, 43, 214, 0.5), 0 0 60px rgba(255, 43, 214, 0.18); background: rgba(255, 43, 214, 0.05); animation: yourPickPulse 2.5s ease-in-out infinite; }
+@keyframes yourPickPulse { 0%, 100% { box-shadow: 0 0 28px rgba(255,43,214,0.5), 0 0 60px rgba(255,43,214,0.18); } 50% { box-shadow: 0 0 44px rgba(255,43,214,0.8), 0 0 90px rgba(255,43,214,0.35); } }
 .sub-card.your-pick::before {
   content: 'YOUR PICK'; position: absolute;
   top: -10px; left: 14px;
@@ -850,6 +869,7 @@ footer { text-align: center; padding: 30px; color: rgba(255, 255, 255, 0.4); fon
 
   <!-- TAB: TODAY'S DRIVE -->
   <section id="tab-today" class="tab-section active">
+    <div id="yesterdaysWinnerBanner" class="yesterday-banner"></div>
     <div class="hero">
       <div class="hero-tag" id="challengeTag">▶ LOADING...</div>
       <h1 class="hero-title" id="heroTitle">LOADING...</h1>
@@ -857,6 +877,7 @@ footer { text-align: center; padding: 30px; color: rgba(255, 255, 255, 0.4); fon
       <div class="constraints" id="challengeConstraints">
         <span class="chip time" id="countdown">▣ LOADING...</span>
       </div>
+      <div id="heroPicks" style="font-family:VT323,monospace;font-size:26px;color:var(--yellow);letter-spacing:3px;margin-top:10px;min-height:26px;"></div>
     </div>
 
     <div class="picker-grid">
@@ -888,9 +909,16 @@ footer { text-align: center; padding: 30px; color: rgba(255, 255, 255, 0.4); fon
             <option value="weight-asc">Lightest</option>
           </select>
           <label class="toggle">
-            <input type="checkbox" id="hideIneligible">
+            <input type="checkbox" id="hideIneligible" checked>
             Hide ineligible
           </label>
+          <div class="price-range-wrap">
+            <div class="price-range-label">PRICE <span id="priceRangeLabel">UP TO £500k+</span></div>
+            <div class="price-sliders">
+              <input type="range" id="priceMin" min="0" max="500000" step="500" value="0">
+              <input type="range" id="priceMax" min="0" max="500000" step="500" value="500000">
+            </div>
+          </div>
         </div>
         <div class="results-count" id="resultsCount"></div>
         <div id="carsGrid" class="cars-grid"></div>
@@ -1078,6 +1106,7 @@ footer { text-align: center; padding: 30px; color: rgba(255, 255, 255, 0.4); fon
       <button class="modal-close" id="closeProfile">✕</button>
       <div class="profile-username" id="profileUsername"></div>
       <div class="profile-tag">PISTONWAVE MEMBER</div>
+      <div id="profileStreak" style="font-family:VT323,monospace;font-size:24px;color:var(--yellow);letter-spacing:2px;margin-bottom:12px;display:none;"></div>
       <div class="profile-garage-label">THE GARAGE</div>
       <div class="garage-slots" id="profileGarageSlots" style="margin-bottom:0;"></div>
     </div>
@@ -2276,6 +2305,8 @@ function renderCars() {
   const drivetrain = document.getElementById('filterDrivetrain').value;
   const body = document.getElementById('filterBody').value;
   const hideIneligible = document.getElementById('hideIneligible').checked;
+  const priceMin = parseInt(document.getElementById('priceMin').value) || 0;
+  const priceMax = parseInt(document.getElementById('priceMax').value) || 500000;
   sortBy = document.getElementById('sortBy').value;
 
   let list = CARS.filter(c => {
@@ -2285,6 +2316,7 @@ function renderCars() {
     if (drivetrain && c.drivetrain !== drivetrain) return false;
     if (body && c.body !== body) return false;
     if (hideIneligible && !isEligible(c)) return false;
+    if (c.price < priceMin || c.price > priceMax) return false;
     return true;
   });
 
@@ -2396,6 +2428,7 @@ async function submitPick() {
   }).select().single();
   if (error) { showToast('SUBMIT FAILED: ' + error.message); return; }
   userSubmissionId = data.id;
+  updateStreak();
   const others = submissions.length;
   document.getElementById('lockedSilhouette').innerHTML = SILHOUETTES[c.body] || SILHOUETTES.coupe;
   document.getElementById('lockedName').textContent = `${c.year} ${c.make.toUpperCase()} ${c.model.toUpperCase()}`;
@@ -2523,6 +2556,8 @@ document.querySelectorAll('.sort-toggle button').forEach(btn => {
 
 function updateSubBadge() {
   document.getElementById('subCountBadge').textContent = `(${submissions.length})`;
+  const hp = document.getElementById('heroPicks');
+  if (hp) hp.textContent = submissions.length > 0 ? `◉ ${submissions.length} PICKS TODAY` : '';
 }
 
 // ============ FAME RENDER ============
@@ -2613,6 +2648,15 @@ document.querySelectorAll('.modal-bg').forEach(bg => {
 ['searchInput','filterCountry','filterDrivetrain','filterBody','sortBy','hideIneligible'].forEach(id => {
   document.getElementById(id).addEventListener('input', () => { visibleCount = 24; renderCars(); });
   document.getElementById(id).addEventListener('change', () => { visibleCount = 24; renderCars(); });
+});
+function updatePriceLabel() {
+  const mn = parseInt(document.getElementById('priceMin').value)||0;
+  const mx = parseInt(document.getElementById('priceMax').value)||500000;
+  const fmtP = v => v >= 500000 ? '£500k+' : '£' + (v>=1000 ? (v/1000).toFixed(0)+'k' : v);
+  document.getElementById('priceRangeLabel').textContent = mn > 0 ? fmtP(mn) + ' – ' + fmtP(mx) : 'UP TO ' + fmtP(mx);
+}
+['priceMin','priceMax'].forEach(id => {
+  document.getElementById(id).addEventListener('input', () => { updatePriceLabel(); visibleCount = 24; renderCars(); });
 });
 
 
@@ -3201,6 +3245,13 @@ async function showProfile(username) {
   document.getElementById('profileUsername').textContent = '→ ' + username.toUpperCase();
   document.getElementById('profileGarageSlots').innerHTML = '<p style="font-family:VT323,monospace;color:rgba(255,255,255,0.4);font-size:18px;">LOADING...</p>';
   document.getElementById('profileModal').classList.add('show');
+  const streakEl = document.getElementById('profileStreak');
+  if (streakEl) {
+    const isOwn = currentUser && username.toLowerCase() === currentUser.toLowerCase();
+    const days = getStreak();
+    streakEl.textContent = isOwn && days > 0 ? `🔥 ${days} DAY STREAK` : '';
+    streakEl.style.display = isOwn && days > 0 ? 'block' : 'none';
+  }
   let { data: profile } = await sb.from('profiles').select('id').eq('username', username.toLowerCase()).single();
   if (!profile) {
     const { data: sub } = await sb.from('submissions').select('user_id').ilike('username', username).limit(1).single();
@@ -3231,11 +3282,14 @@ function tickCountdown() {
   function updateTimer(el, closesAt) {
     if (!el) return;
     const diff = new Date(closesAt) - new Date();
-    if (diff <= 0) { el.textContent = '▣ SUBMISSIONS CLOSED'; return; }
+    if (diff <= 0) { el.textContent = '▣ SUBMISSIONS CLOSED'; el.classList.remove('urgent','critical'); return; }
     const h = Math.floor(diff / 3600000);
     const m = Math.floor((diff % 3600000) / 60000);
     const s = Math.floor((diff % 60000) / 1000);
     el.textContent = `▣ CLOSES IN ${pad(h)}:${pad(m)}:${pad(s)}`;
+    if (diff < 3600000) { el.classList.remove('urgent'); el.classList.add('critical'); }
+    else if (diff < 21600000) { el.classList.add('urgent'); el.classList.remove('critical'); }
+    else { el.classList.remove('urgent','critical'); }
   }
   const fallback = (() => { const d = new Date(); d.setHours(23,59,0,0); return d.toISOString(); })();
   updateTimer(document.getElementById('countdown'), TODAY ? TODAY.closes_at : fallback);
@@ -3254,6 +3308,7 @@ async function init() {
   }
   await loadChallenge();
   await loadSubmissions();
+  loadYesterdaysWinner();
   await loadUserState();
   await loadGarage();
   await loadGcChallenge();
@@ -3291,6 +3346,39 @@ document.addEventListener('click', async e => {
 });
 
 // ── WELCOME MODAL (sessionStorage — shows once per browser tab, not on reload) ──
+// ============ STREAK ============
+function updateStreak() {
+  const today = new Date().toISOString().slice(0,10);
+  let s = JSON.parse(localStorage.getItem('pw_streak') || '{"days":0,"last":""}');
+  const yesterday = new Date(Date.now()-86400000).toISOString().slice(0,10);
+  if (s.last === today) return; // already counted today
+  s.days = (s.last === yesterday) ? s.days + 1 : 1;
+  s.last = today;
+  localStorage.setItem('pw_streak', JSON.stringify(s));
+}
+function getStreak() {
+  const s = JSON.parse(localStorage.getItem('pw_streak') || '{"days":0,"last":""}');
+  const today = new Date().toISOString().slice(0,10);
+  const yesterday = new Date(Date.now()-86400000).toISOString().slice(0,10);
+  return (s.last === today || s.last === yesterday) ? s.days : 0;
+}
+
+// ============ YESTERDAY'S WINNER ============
+async function loadYesterdaysWinner() {
+  const yesterday = new Date(Date.now()-86400000).toISOString().slice(0,10);
+  const { data } = await sb.from('submissions')
+    .select('*').eq('challenge_id', yesterday)
+    .order('votes_count', { ascending: false }).limit(1);
+  if (!data || data.length === 0) return;
+  const w = data[0];
+  const c = CARS.find(x => x.id === w.car_id);
+  if (!c) return;
+  const banner = document.getElementById('yesterdaysWinnerBanner');
+  if (!banner) return;
+  banner.innerHTML = `<span class="yb-label">YESTERDAY'S WINNER</span><span class="yb-user">→ ${(w.username||'').toUpperCase()}</span><span class="yb-car">${c.year} ${c.make} ${c.model}</span><span class="yb-votes">▲ ${w.votes_count||0} VOTES</span>`;
+  banner.style.display = 'flex';
+}
+
 document.addEventListener('DOMContentLoaded', function() {
   if (!sessionStorage.getItem('pw_welcomed')) {
     document.getElementById('welcomeModal').classList.add('show');
