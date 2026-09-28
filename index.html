@@ -2623,7 +2623,20 @@ document.getElementById('loginForm').addEventListener('submit', async (e) => {
   let { data: session, error } = await sb.auth.signInWithPassword({ email: fakeEmail, password });
   if (error) {
     const { data: signUpData, error: signUpError } = await sb.auth.signUp({ email: fakeEmail, password });
-    if (signUpError) { showToast('LOGIN FAILED'); return; }
+    if (signUpError) {
+      const msg = signUpError.message || '';
+      if (msg.toLowerCase().includes('already') || msg.toLowerCase().includes('registered') || msg.toLowerCase().includes('taken')) {
+        showToast('WRONG PASSWORD — TRY AGAIN', 4000);
+      } else {
+        showToast('LOGIN FAILED: ' + msg.toUpperCase().slice(0, 40), 4000);
+      }
+      return;
+    }
+    // new sign-up — if session is null, email confirmation is required
+    if (!signUpData.session && !signUpData.user) {
+      showToast('CHECK YOUR EMAIL TO CONFIRM', 4000);
+      return;
+    }
     session = signUpData;
   }
   currentUser = username;
