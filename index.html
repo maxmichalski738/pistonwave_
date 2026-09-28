@@ -59,6 +59,46 @@ html, body {
 }
 @keyframes grid-scroll { from { background-position: 0 0; } to { background-position: 0 60px; } }
 
+
+.share-card-modal {
+  position: fixed; inset: 0; z-index: 9000;
+  display: flex; align-items: center; justify-content: center;
+  background: rgba(7,0,15,0.88); backdrop-filter: blur(6px);
+  opacity: 0; pointer-events: none; transition: opacity 0.25s;
+}
+.share-card-modal.show { opacity: 1; pointer-events: all; }
+.share-card-inner {
+  background: var(--bg-mid); border: 1px solid var(--magenta);
+  box-shadow: 0 0 40px rgba(255,43,214,0.3);
+  padding: 32px 40px; text-align: center; max-width: 420px; width: 90%;
+}
+.share-card-title {
+  font-family: 'Press Start 2P', monospace; font-size: 11px;
+  color: var(--cyan); letter-spacing: 2px; margin-bottom: 20px;
+}
+.share-card-text {
+  font-family: VT323, monospace; font-size: 22px;
+  color: var(--white); line-height: 1.7;
+  background: rgba(0,0,0,0.3); border: 1px solid rgba(255,43,214,0.2);
+  padding: 16px; margin-bottom: 20px; white-space: pre; letter-spacing: 1px;
+}
+.share-card-btns { display: flex; gap: 12px; justify-content: center; }
+.share-copy-btn {
+  background: var(--magenta); color: var(--bg-deep); border: 0;
+  padding: 10px 24px; font-family: 'Rajdhani', sans-serif;
+  font-weight: 700; letter-spacing: 2px; text-transform: uppercase;
+  font-size: 13px; cursor: pointer; box-shadow: 0 0 16px rgba(255,43,214,0.4);
+}
+.share-copy-btn:hover { background: var(--cyan); }
+.share-close-btn {
+  background: transparent; color: rgba(255,255,255,0.5);
+  border: 1px solid rgba(255,255,255,0.2);
+  padding: 10px 20px; font-family: 'Rajdhani', sans-serif;
+  font-weight: 600; letter-spacing: 1px; text-transform: uppercase;
+  font-size: 13px; cursor: pointer;
+}
+.share-close-btn:hover { color: var(--white); }
+
 nav {
   position: sticky; top: 0; z-index: 100;
   display: flex; align-items: center; justify-content: space-between;
@@ -1105,7 +1145,7 @@ const SILHOUETTES = {
   '4x4': '<svg viewBox="0 0 200 60" xmlns="http://www.w3.org/2000/svg"><path d="M10 50 L20 14 L160 14 L180 18 L195 30 L195 50 Z" fill="#ff2bd6" stroke="#00f0ff" stroke-width="1.5"/><circle cx="48" cy="50" r="11" fill="#0a0214" stroke="#00f0ff" stroke-width="1.5"/><circle cx="160" cy="50" r="11" fill="#0a0214" stroke="#00f0ff" stroke-width="1.5"/></svg>'
 };
 
-const FLAGS = { UK:'GB', DE:'DE', JP:'JP', IT:'IT', FR:'FR', SE:'SE', US:'US', KR:'KR', RU:'RU', RS:'RS', HR:'HR' };
+const FLAGS = { UK:'GB', DE:'DE', JP:'JP', IT:'IT', FR:'FR', SE:'SE', US:'US', KR:'KR', RU:'RU', RS:'RS', HR:'HR', ES:'ES', CZ:'CZ', PL:'PL', VN:'VN', CN:'CN' };
 
 const CARS = [
   // ===== BMW =====
@@ -1540,6 +1580,622 @@ const CARS = [
   { id:383, year:1971, make:'Datsun', model:'510 Bluebird SSS', country:'JP', hp:96, engine:'1.6L NA I4', weight:920, drivetrain:'RWD', body:'saloon', price:18000, zeroToSixty:12.0 },
   { id:384, year:1972, make:'Datsun', model:'1200 Coupe', country:'JP', hp:69, engine:'1.2L NA I4', weight:745, drivetrain:'RWD', body:'coupe', price:8000, zeroToSixty:14.0 },
   { id:385, year:1981, make:'Datsun', model:'200SX S110 Turbo', country:'JP', hp:135, engine:'2.0L Turbo I4', weight:1100, drivetrain:'RWD', body:'coupe', price:10000, zeroToSixty:8.5 },
+  // ===== NEW BRANDS & EXPANDED LIST =====
+{ id:386, year:1967, make:'Ford', model:'Escort Mk1 Twin Cam', country:'UK', hp:114, engine:'1.6L NA I4', weight:870, drivetrain:'RWD', body:'saloon', price:22000, zeroToSixty:11.5 },
+  { id:387, year:1973, make:'Ford', model:'Capri RS3100', country:'UK', hp:148, engine:'3.1L NA V6', weight:1050, drivetrain:'RWD', body:'coupe', price:45000, zeroToSixty:7.5 },
+  { id:388, year:1986, make:'Ford', model:'Sierra Cosworth RS', country:'UK', hp:204, engine:'2.0L Turbo I4', weight:1220, drivetrain:'RWD', body:'saloon', price:35000, zeroToSixty:6.2 },
+  { id:389, year:1987, make:'Ford', model:'Sierra RS500 Cosworth', country:'UK', hp:224, engine:'2.0L Turbo I4', weight:1250, drivetrain:'RWD', body:'saloon', price:80000, zeroToSixty:6.0 },
+  { id:390, year:1992, make:'Ford', model:'Escort RS Cosworth', country:'UK', hp:227, engine:'2.0L Turbo I4', weight:1275, drivetrain:'AWD', body:'saloon', price:30000, zeroToSixty:5.9 },
+  { id:391, year:1986, make:'Ford', model:'RS200', country:'UK', hp:250, engine:'1.8L Turbo I4', weight:1085, drivetrain:'AWD', body:'coupe', price:350000, zeroToSixty:4.6 },
+  { id:392, year:2002, make:'Ford', model:'Focus RS Mk1', country:'UK', hp:215, engine:'2.0L Turbo I4', weight:1278, drivetrain:'FWD', body:'hatch', price:14000, zeroToSixty:5.9 },
+  { id:393, year:2009, make:'Ford', model:'Focus RS Mk2', country:'UK', hp:305, engine:'2.5L Turbo I5', weight:1468, drivetrain:'FWD', body:'hatch', price:12000, zeroToSixty:5.9 },
+  { id:394, year:2016, make:'Ford', model:'Focus RS Mk3', country:'UK', hp:350, engine:'2.3L Turbo I4', weight:1574, drivetrain:'AWD', body:'hatch', price:25000, zeroToSixty:4.7 },
+  { id:395, year:2013, make:'Ford', model:'Fiesta ST Mk7', country:'UK', hp:182, engine:'1.6L Turbo I4', weight:1083, drivetrain:'FWD', body:'hatch', price:7000, zeroToSixty:6.9 },
+  { id:396, year:2018, make:'Ford', model:'Fiesta ST Mk8', country:'UK', hp:200, engine:'1.5L Turbo I3', weight:1117, drivetrain:'FWD', body:'hatch', price:14000, zeroToSixty:6.5 },
+  { id:397, year:1998, make:'Ford', model:'Puma 1.7', country:'UK', hp:125, engine:'1.7L NA I4', weight:1074, drivetrain:'FWD', body:'coupe', price:4000, zeroToSixty:8.8 },
+  { id:398, year:2004, make:'Ford', model:'Focus ST170', country:'UK', hp:170, engine:'2.0L NA I4', weight:1275, drivetrain:'FWD', body:'hatch', price:4500, zeroToSixty:7.9 },
+  { id:399, year:2000, make:'Ford', model:'Ka 1.3', country:'UK', hp:60, engine:'1.3L NA I4', weight:895, drivetrain:'FWD', body:'hatch', price:800, zeroToSixty:14.5 },
+  { id:400, year:2004, make:'Ford', model:'Fiesta 1.25 3dr', country:'UK', hp:75, engine:'1.25L NA I4', weight:1030, drivetrain:'FWD', body:'hatch', price:1200, zeroToSixty:12.9 },
+  { id:401, year:1968, make:'Ford', model:'GT40 Mk1', country:'US', hp:485, engine:'4.9L NA V8', weight:1031, drivetrain:'RWD', body:'supercar', price:5000000, zeroToSixty:4.0 },
+  { id:402, year:2006, make:'Ford', model:'GT', country:'US', hp:550, engine:'5.4L Supercharged V8', weight:1574, drivetrain:'RWD', body:'supercar', price:200000, zeroToSixty:3.3 },
+  { id:403, year:2017, make:'Ford', model:'GT (Mk2)', country:'US', hp:647, engine:'3.5L Twin-Turbo V6', weight:1385, drivetrain:'RWD', body:'supercar', price:500000, zeroToSixty:2.9 },
+  { id:404, year:2007, make:'Ford', model:'Mustang Shelby GT500', country:'US', hp:500, engine:'5.4L Supercharged V8', weight:1723, drivetrain:'RWD', body:'coupe', price:28000, zeroToSixty:4.5 },
+  { id:405, year:2012, make:'Ford', model:'Mustang Boss 302', country:'US', hp:444, engine:'5.0L NA V8', weight:1591, drivetrain:'RWD', body:'coupe', price:25000, zeroToSixty:4.4 },
+  { id:406, year:2020, make:'Ford', model:'Mustang Shelby GT500 S550', country:'US', hp:760, engine:'5.2L Supercharged V8', weight:1920, drivetrain:'RWD', body:'coupe', price:85000, zeroToSixty:3.3 },
+  { id:407, year:1994, make:'Ford', model:'Mondeo ST200', country:'UK', hp:200, engine:'2.5L NA V6', weight:1345, drivetrain:'FWD', body:'saloon', price:3500, zeroToSixty:7.0 },
+  { id:408, year:1963, make:'Ford', model:'Cortina Mk1 GT', country:'UK', hp:83, engine:'1.5L NA I4', weight:855, drivetrain:'RWD', body:'saloon', price:18000, zeroToSixty:12.0 },
+  { id:409, year:2012, make:'Ford', model:'Fiesta 1.0 EcoBoost', country:'UK', hp:100, engine:'1.0L Turbo I3', weight:1069, drivetrain:'FWD', body:'hatch', price:3500, zeroToSixty:11.4 },
+  { id:410, year:2019, make:'Ford', model:'Focus ST Estate', country:'UK', hp:280, engine:'2.3L Turbo I4', weight:1570, drivetrain:'FWD', body:'estate', price:20000, zeroToSixty:5.7 },
+  { id:411, year:1983, make:'Vauxhall', model:'Astra Mk1 GTE', country:'UK', hp:115, engine:'1.8L NA I4', weight:930, drivetrain:'FWD', body:'hatch', price:6000, zeroToSixty:9.0 },
+  { id:412, year:1990, make:'Vauxhall', model:'Astra Mk2 GTE 16v', country:'UK', hp:156, engine:'2.0L NA I4', weight:990, drivetrain:'FWD', body:'hatch', price:8000, zeroToSixty:7.4 },
+  { id:413, year:1988, make:'Vauxhall', model:'Nova SR 1.6', country:'UK', hp:100, engine:'1.6L NA I4', weight:820, drivetrain:'FWD', body:'hatch', price:3500, zeroToSixty:9.5 },
+  { id:414, year:1998, make:'Vauxhall', model:'Corsa B 1.6 GSi', country:'UK', hp:109, engine:'1.6L NA I4', weight:960, drivetrain:'FWD', body:'hatch', price:2500, zeroToSixty:9.8 },
+  { id:415, year:2003, make:'Vauxhall', model:'Corsa C 1.0 Twinport', country:'UK', hp:65, engine:'1.0L NA I3', weight:1025, drivetrain:'FWD', body:'hatch', price:900, zeroToSixty:14.5 },
+  { id:416, year:2012, make:'Vauxhall', model:'Corsa D VXR', country:'UK', hp:192, engine:'1.6L Turbo I4', weight:1220, drivetrain:'FWD', body:'hatch', price:7000, zeroToSixty:6.8 },
+  { id:417, year:1994, make:'Vauxhall', model:'Cavalier GSi 2000', country:'UK', hp:150, engine:'2.0L NA I4', weight:1200, drivetrain:'FWD', body:'saloon', price:2000, zeroToSixty:8.5 },
+  { id:418, year:1992, make:'Vauxhall', model:'Calibra 4x4 Turbo', country:'UK', hp:204, engine:'2.0L Turbo I4', weight:1380, drivetrain:'AWD', body:'coupe', price:7500, zeroToSixty:6.0 },
+  { id:419, year:2003, make:'Vauxhall', model:'Astra Mk4 GSi Turbo', country:'UK', hp:200, engine:'2.0L Turbo I4', weight:1385, drivetrain:'FWD', body:'hatch', price:3500, zeroToSixty:6.5 },
+  { id:420, year:2006, make:'Vauxhall', model:'Astra Mk5 VXR', country:'UK', hp:240, engine:'2.0L Turbo I4', weight:1444, drivetrain:'FWD', body:'hatch', price:5500, zeroToSixty:6.0 },
+  { id:421, year:2002, make:'Vauxhall', model:'Monaro CV8', country:'UK', hp:325, engine:'5.7L NA V8', weight:1645, drivetrain:'RWD', body:'coupe', price:12000, zeroToSixty:5.5 },
+  { id:422, year:2007, make:'Vauxhall', model:'VXR8 LS2', country:'UK', hp:411, engine:'6.0L NA V8', weight:1797, drivetrain:'RWD', body:'saloon', price:15000, zeroToSixty:4.9 },
+  { id:423, year:2000, make:'Vauxhall', model:'Vectra B GSi 2.5 V6', country:'UK', hp:170, engine:'2.5L NA V6', weight:1390, drivetrain:'FWD', body:'saloon', price:2000, zeroToSixty:8.0 },
+  { id:424, year:2010, make:'Vauxhall', model:'Astra Mk6 VXR', country:'UK', hp:280, engine:'2.0L Turbo I4', weight:1480, drivetrain:'FWD', body:'hatch', price:8000, zeroToSixty:5.9 },
+  { id:425, year:1995, make:'Vauxhall', model:'Omega 3.0 MV6', country:'UK', hp:211, engine:'3.0L NA V6', weight:1495, drivetrain:'RWD', body:'saloon', price:2500, zeroToSixty:7.5 },
+  { id:426, year:1980, make:'Renault', model:'5 Turbo', country:'FR', hp:160, engine:'1.4L Turbo I4', weight:970, drivetrain:'RWD', body:'hatch', price:55000, zeroToSixty:6.9 },
+  { id:427, year:1985, make:'Renault', model:'5 Turbo 2', country:'FR', hp:160, engine:'1.4L Turbo I4', weight:975, drivetrain:'RWD', body:'hatch', price:35000, zeroToSixty:7.0 },
+  { id:428, year:1991, make:'Renault', model:'Clio 16v', country:'FR', hp:137, engine:'1.8L NA I4', weight:940, drivetrain:'FWD', body:'hatch', price:6500, zeroToSixty:7.9 },
+  { id:429, year:1998, make:'Renault', model:'Clio V6 Phase 1', country:'FR', hp:226, engine:'3.0L NA V6', weight:1335, drivetrain:'RWD', body:'hatch', price:22000, zeroToSixty:6.4 },
+  { id:430, year:2004, make:'Renault', model:'Clio 197', country:'FR', hp:197, engine:'2.0L NA I4', weight:1133, drivetrain:'FWD', body:'hatch', price:8000, zeroToSixty:6.9 },
+  { id:431, year:2010, make:'Renault', model:'Clio 200 Cup', country:'FR', hp:200, engine:'2.0L NA I4', weight:1120, drivetrain:'FWD', body:'hatch', price:9500, zeroToSixty:6.9 },
+  { id:432, year:2013, make:'Renault', model:'Clio RS 220 Trophy', country:'FR', hp:220, engine:'1.6L Turbo I4', weight:1240, drivetrain:'FWD', body:'hatch', price:11000, zeroToSixty:6.6 },
+  { id:433, year:2004, make:'Renault', model:'Megane RS Trophy', country:'FR', hp:225, engine:'2.0L Turbo I4', weight:1365, drivetrain:'FWD', body:'hatch', price:7500, zeroToSixty:6.3 },
+  { id:434, year:2010, make:'Renault', model:'Megane RS 250', country:'FR', hp:250, engine:'2.0L Turbo I4', weight:1378, drivetrain:'FWD', body:'hatch', price:9000, zeroToSixty:6.1 },
+  { id:435, year:2018, make:'Renault', model:'Megane RS 280 Trophy', country:'FR', hp:300, engine:'1.8L Turbo I4', weight:1422, drivetrain:'FWD', body:'hatch', price:22000, zeroToSixty:5.7 },
+  { id:436, year:2001, make:'Renault', model:'Twingo 1.2', country:'FR', hp:60, engine:'1.2L NA I4', weight:870, drivetrain:'FWD', body:'hatch', price:800, zeroToSixty:14.5 },
+  { id:437, year:2019, make:'Renault', model:'Twingo GT', country:'FR', hp:110, engine:'0.9L Turbo I3', weight:1000, drivetrain:'RWD', body:'hatch', price:9000, zeroToSixty:9.6 },
+  { id:438, year:1966, make:'Renault', model:'8 Gordini', country:'FR', hp:103, engine:'1.3L NA I4', weight:740, drivetrain:'RWD', body:'saloon', price:28000, zeroToSixty:9.8 },
+  { id:439, year:1990, make:'Renault', model:'19 16v', country:'FR', hp:137, engine:'1.8L NA I4', weight:1020, drivetrain:'FWD', body:'hatch', price:4000, zeroToSixty:8.1 },
+  { id:440, year:1998, make:'Renault', model:'Laguna 2.0 16v', country:'FR', hp:140, engine:'2.0L NA I4', weight:1350, drivetrain:'FWD', body:'saloon', price:800, zeroToSixty:9.9 },
+  { id:441, year:2002, make:'Renault', model:'Laguna Sport 3.0 V6', country:'FR', hp:207, engine:'3.0L NA V6', weight:1510, drivetrain:'FWD', body:'estate', price:1200, zeroToSixty:7.5 },
+  { id:442, year:2012, make:'Renault', model:'Megane RS 265', country:'FR', hp:265, engine:'2.0L Turbo I4', weight:1390, drivetrain:'FWD', body:'hatch', price:10500, zeroToSixty:6.0 },
+  { id:443, year:2019, make:'Renault', model:'Clio RS Line 1.3', country:'FR', hp:130, engine:'1.3L Turbo I4', weight:1265, drivetrain:'FWD', body:'hatch', price:12000, zeroToSixty:9.9 },
+  { id:444, year:1984, make:'Peugeot', model:'205 GTI 1.6', country:'FR', hp:105, engine:'1.6L NA I4', weight:820, drivetrain:'FWD', body:'hatch', price:14000, zeroToSixty:9.1 },
+  { id:445, year:1987, make:'Peugeot', model:'205 GTI 1.9', country:'FR', hp:130, engine:'1.9L NA I4', weight:855, drivetrain:'FWD', body:'hatch', price:18000, zeroToSixty:7.8 },
+  { id:446, year:1993, make:'Peugeot', model:'106 Rallye S1', country:'FR', hp:100, engine:'1.3L NA I4', weight:815, drivetrain:'FWD', body:'hatch', price:9000, zeroToSixty:9.5 },
+  { id:447, year:1997, make:'Peugeot', model:'106 Rallye S2', country:'FR', hp:120, engine:'1.6L NA I4', weight:885, drivetrain:'FWD', body:'hatch', price:8500, zeroToSixty:8.6 },
+  { id:448, year:1994, make:'Peugeot', model:'106 XSi 1.4', country:'FR', hp:75, engine:'1.4L NA I4', weight:840, drivetrain:'FWD', body:'hatch', price:2500, zeroToSixty:11.0 },
+  { id:449, year:1997, make:'Peugeot', model:'306 GTI-6', country:'FR', hp:167, engine:'2.0L NA I4', weight:1090, drivetrain:'FWD', body:'hatch', price:12000, zeroToSixty:7.2 },
+  { id:450, year:1994, make:'Peugeot', model:'306 Rallye', country:'FR', hp:167, engine:'2.0L NA I4', weight:1060, drivetrain:'FWD', body:'hatch', price:14000, zeroToSixty:7.1 },
+  { id:451, year:2001, make:'Peugeot', model:'206 GTI 180', country:'FR', hp:180, engine:'2.0L NA I4', weight:1130, drivetrain:'FWD', body:'hatch', price:5500, zeroToSixty:7.5 },
+  { id:452, year:2003, make:'Peugeot', model:'206 1.1 Independence', country:'FR', hp:60, engine:'1.1L NA I4', weight:1010, drivetrain:'FWD', body:'hatch', price:700, zeroToSixty:15.5 },
+  { id:453, year:2008, make:'Peugeot', model:'308 GTI 270', country:'FR', hp:270, engine:'1.6L Turbo I4', weight:1340, drivetrain:'FWD', body:'hatch', price:16000, zeroToSixty:6.0 },
+  { id:454, year:1990, make:'Peugeot', model:'405 Mi16', country:'FR', hp:160, engine:'1.9L NA I4', weight:1080, drivetrain:'FWD', body:'saloon', price:5500, zeroToSixty:7.5 },
+  { id:455, year:1998, make:'Peugeot', model:'406 Coupe 3.0 V6', country:'FR', hp:207, engine:'3.0L NA V6', weight:1395, drivetrain:'FWD', body:'coupe', price:4500, zeroToSixty:7.5 },
+  { id:456, year:2013, make:'Peugeot', model:'208 GTI by Peugeot Sport', country:'FR', hp:208, engine:'1.6L Turbo I4', weight:1163, drivetrain:'FWD', body:'hatch', price:10000, zeroToSixty:6.5 },
+  { id:457, year:1974, make:'Peugeot', model:'504 V6 Coupe', country:'FR', hp:136, engine:'2.7L NA V6', weight:1240, drivetrain:'RWD', body:'coupe', price:18000, zeroToSixty:10.5 },
+  { id:458, year:1999, make:'Peugeot', model:'205 1.1 XA', country:'FR', hp:54, engine:'1.1L NA I4', weight:820, drivetrain:'FWD', body:'hatch', price:600, zeroToSixty:17.0 },
+  { id:459, year:1993, make:'Peugeot', model:'309 GTI 16', country:'FR', hp:160, engine:'1.9L NA I4', weight:1005, drivetrain:'FWD', body:'hatch', price:9000, zeroToSixty:7.8 },
+  { id:460, year:2018, make:'Peugeot', model:'308 GTI 250', country:'FR', hp:250, engine:'1.6L Turbo I4', weight:1308, drivetrain:'FWD', body:'hatch', price:18000, zeroToSixty:6.2 },
+  { id:461, year:2006, make:'Peugeot', model:'307 CC 2.0', country:'FR', hp:140, engine:'2.0L NA I4', weight:1470, drivetrain:'FWD', body:'roadster', price:2500, zeroToSixty:9.8 },
+  { id:462, year:1961, make:'Mini', model:'Cooper Mk1', country:'UK', hp:55, engine:'1.0L NA I4', weight:635, drivetrain:'FWD', body:'hatch', price:25000, zeroToSixty:14.0 },
+  { id:463, year:1965, make:'Mini', model:'Cooper S Mk1', country:'UK', hp:76, engine:'1.3L NA I4', weight:660, drivetrain:'FWD', body:'hatch', price:45000, zeroToSixty:11.0 },
+  { id:464, year:1969, make:'Mini', model:'1275GT', country:'UK', hp:59, engine:'1.3L NA I4', weight:690, drivetrain:'FWD', body:'hatch', price:12000, zeroToSixty:13.0 },
+  { id:465, year:2001, make:'Mini', model:'Cooper S R53', country:'UK', hp:163, engine:'1.6L Supercharged I4', weight:1145, drivetrain:'FWD', body:'hatch', price:5500, zeroToSixty:7.4 },
+  { id:466, year:2006, make:'Mini', model:'Cooper S R53 JCW', country:'UK', hp:210, engine:'1.6L Supercharged I4', weight:1180, drivetrain:'FWD', body:'hatch', price:6500, zeroToSixty:6.7 },
+  { id:467, year:2012, make:'Mini', model:'Cooper S R56 JCW', country:'UK', hp:208, engine:'1.6L Turbo I4', weight:1194, drivetrain:'FWD', body:'hatch', price:7500, zeroToSixty:6.5 },
+  { id:468, year:2020, make:'Mini', model:'Cooper S F56 JCW', country:'UK', hp:231, engine:'2.0L Turbo I4', weight:1280, drivetrain:'FWD', body:'hatch', price:22000, zeroToSixty:6.1 },
+  { id:469, year:2020, make:'Mini', model:'GP F56', country:'UK', hp:306, engine:'2.0L Turbo I4', weight:1255, drivetrain:'FWD', body:'hatch', price:35000, zeroToSixty:5.2 },
+  { id:470, year:2005, make:'Mini', model:'Cooper D R50', country:'UK', hp:75, engine:'1.4L Turbo I4', weight:1160, drivetrain:'FWD', body:'hatch', price:3500, zeroToSixty:12.0 },
+  { id:471, year:2017, make:'Hyundai', model:'i30 N Performance', country:'KR', hp:275, engine:'2.0L Turbo I4', weight:1442, drivetrain:'FWD', body:'hatch', price:18000, zeroToSixty:6.1 },
+  { id:472, year:2021, make:'Hyundai', model:'i30 N Project C', country:'KR', hp:280, engine:'2.0L Turbo I4', weight:1415, drivetrain:'FWD', body:'hatch', price:30000, zeroToSixty:6.0 },
+  { id:473, year:2022, make:'Hyundai', model:'i20 N', country:'KR', hp:204, engine:'1.6L Turbo I4', weight:1175, drivetrain:'FWD', body:'hatch', price:22000, zeroToSixty:6.2 },
+  { id:474, year:2019, make:'Hyundai', model:'Veloster N', country:'KR', hp:275, engine:'2.0L Turbo I4', weight:1395, drivetrain:'FWD', body:'hatch', price:18000, zeroToSixty:5.9 },
+  { id:475, year:2021, make:'Hyundai', model:'Elantra N', country:'KR', hp:280, engine:'2.0L Turbo I4', weight:1443, drivetrain:'FWD', body:'saloon', price:28000, zeroToSixty:5.3 },
+  { id:476, year:2022, make:'Hyundai', model:'Ioniq 5 N', country:'KR', hp:641, engine:'Electric Dual Motor', weight:2095, drivetrain:'AWD', body:'hatch', price:62000, zeroToSixty:3.4 },
+  { id:477, year:2019, make:'Hyundai', model:'i10 1.0', country:'KR', hp:67, engine:'1.0L NA I3', weight:985, drivetrain:'FWD', body:'hatch', price:6000, zeroToSixty:13.5 },
+  { id:478, year:2015, make:'Hyundai', model:'Genesis Coupe 3.8 V6', country:'KR', hp:350, engine:'3.8L NA V6', weight:1621, drivetrain:'RWD', body:'coupe', price:12000, zeroToSixty:5.9 },
+  { id:479, year:2022, make:'Hyundai', model:'Kona N', country:'KR', hp:280, engine:'2.0L Turbo I4', weight:1495, drivetrain:'FWD', body:'hatch', price:28000, zeroToSixty:5.5 },
+  { id:480, year:2019, make:'Hyundai', model:'i30 Fastback N', country:'KR', hp:275, engine:'2.0L Turbo I4', weight:1453, drivetrain:'FWD', body:'coupe', price:19000, zeroToSixty:6.1 },
+  { id:481, year:2018, make:'Kia', model:'Stinger GT 3.3 V6', country:'KR', hp:369, engine:'3.3L Twin-Turbo V6', weight:1803, drivetrain:'RWD', body:'saloon', price:18000, zeroToSixty:4.7 },
+  { id:482, year:2022, make:'Kia', model:'Stinger GT-S AWD', country:'KR', hp:369, engine:'3.3L Twin-Turbo V6', weight:1892, drivetrain:'AWD', body:'saloon', price:32000, zeroToSixty:4.6 },
+  { id:483, year:2019, make:'Kia', model:'ProCeed GT', country:'KR', hp:204, engine:'1.6L Turbo I4', weight:1455, drivetrain:'FWD', body:'estate', price:18000, zeroToSixty:7.5 },
+  { id:484, year:2022, make:'Kia', model:'EV6 GT', country:'KR', hp:585, engine:'Electric Dual Motor', weight:2015, drivetrain:'AWD', body:'estate', price:55000, zeroToSixty:3.5 },
+  { id:485, year:2006, make:'Kia', model:'Picanto 1.0', country:'KR', hp:61, engine:'1.0L NA I4', weight:820, drivetrain:'FWD', body:'hatch', price:800, zeroToSixty:14.0 },
+  { id:486, year:2019, make:'Kia', model:'Ceed GT', country:'KR', hp:204, engine:'1.6L Turbo I4', weight:1394, drivetrain:'FWD', body:'hatch', price:14000, zeroToSixty:7.3 },
+  { id:487, year:2018, make:'Kia', model:'Stinger 2.0T', country:'KR', hp:255, engine:'2.0L Turbo I4', weight:1720, drivetrain:'RWD', body:'saloon', price:14000, zeroToSixty:5.6 },
+  { id:488, year:2023, make:'Kia', model:'Niro EV', country:'KR', hp:204, engine:'Electric Motor', weight:1818, drivetrain:'FWD', body:'hatch', price:34000, zeroToSixty:7.8 },
+  { id:489, year:1961, make:'Jaguar', model:'E-Type Series 1 3.8', country:'UK', hp:265, engine:'3.8L NA I6', weight:1118, drivetrain:'RWD', body:'roadster', price:250000, zeroToSixty:7.1 },
+  { id:490, year:1971, make:'Jaguar', model:'E-Type Series 3 V12', country:'UK', hp:272, engine:'5.3L NA V12', weight:1365, drivetrain:'RWD', body:'roadster', price:120000, zeroToSixty:6.8 },
+  { id:491, year:1975, make:'Jaguar', model:'XJ-S HE 5.3 V12', country:'UK', hp:295, engine:'5.3L NA V12', weight:1778, drivetrain:'RWD', body:'coupe', price:18000, zeroToSixty:7.6 },
+  { id:492, year:1993, make:'Jaguar', model:'XJR 4.0 Supercharged', country:'UK', hp:326, engine:'4.0L Supercharged I6', weight:1872, drivetrain:'RWD', body:'saloon', price:8000, zeroToSixty:5.9 },
+  { id:493, year:2001, make:'Jaguar', model:'XKR 4.0 Coupe', country:'UK', hp:370, engine:'4.0L Supercharged V8', weight:1735, drivetrain:'RWD', body:'coupe', price:12000, zeroToSixty:5.2 },
+  { id:494, year:2009, make:'Jaguar', model:'XFR 5.0 V8', country:'UK', hp:510, engine:'5.0L Supercharged V8', weight:1920, drivetrain:'RWD', body:'saloon', price:18000, zeroToSixty:4.9 },
+  { id:495, year:2014, make:'Jaguar', model:'F-Type R Coupe', country:'UK', hp:550, engine:'5.0L Supercharged V8', weight:1665, drivetrain:'RWD', body:'coupe', price:45000, zeroToSixty:4.0 },
+  { id:496, year:2018, make:'Jaguar', model:'F-Type SVR Convertible', country:'UK', hp:575, engine:'5.0L Supercharged V8', weight:1745, drivetrain:'AWD', body:'roadster', price:65000, zeroToSixty:3.7 },
+  { id:497, year:2017, make:'Jaguar', model:'XE SV Project 8', country:'UK', hp:600, engine:'5.0L Supercharged V8', weight:1750, drivetrain:'AWD', body:'saloon', price:120000, zeroToSixty:3.3 },
+  { id:498, year:2016, make:'Jaguar', model:'F-Pace S 3.0 V6', country:'UK', hp:380, engine:'3.0L Supercharged V6', weight:1890, drivetrain:'AWD', body:'4x4', price:22000, zeroToSixty:5.5 },
+  { id:499, year:2003, make:'Jaguar', model:'S-Type R 4.2 V8', country:'UK', hp:400, engine:'4.2L Supercharged V8', weight:1820, drivetrain:'RWD', body:'saloon', price:5000, zeroToSixty:5.3 },
+  { id:500, year:1985, make:'Jaguar', model:'XJ6 Series 3 4.2', country:'UK', hp:197, engine:'4.2L NA I6', weight:1830, drivetrain:'RWD', body:'saloon', price:8000, zeroToSixty:9.6 },
+  { id:501, year:2022, make:'Jaguar', model:'F-Type P575', country:'UK', hp:575, engine:'5.0L Supercharged V8', weight:1745, drivetrain:'RWD', body:'coupe', price:80000, zeroToSixty:3.5 },
+  { id:502, year:1990, make:'Land Rover', model:'Defender 90 2.5 TDi', country:'UK', hp:107, engine:'2.5L Turbo I4', weight:1780, drivetrain:'AWD', body:'4x4', price:22000, zeroToSixty:14.5 },
+  { id:503, year:2020, make:'Land Rover', model:'Defender 110 V8', country:'UK', hp:525, engine:'5.0L Supercharged V8', weight:2485, drivetrain:'AWD', body:'4x4', price:120000, zeroToSixty:5.0 },
+  { id:504, year:1994, make:'Land Rover', model:'Discovery 1 3.9 V8', country:'UK', hp:185, engine:'3.9L NA V8', weight:2040, drivetrain:'AWD', body:'4x4', price:4000, zeroToSixty:12.0 },
+  { id:505, year:2014, make:'Land Rover', model:'Range Rover Sport SVR', country:'UK', hp:550, engine:'5.0L Supercharged V8', weight:2270, drivetrain:'AWD', body:'4x4', price:45000, zeroToSixty:4.5 },
+  { id:506, year:2022, make:'Land Rover', model:'Range Rover Sport SVR (L461)', country:'UK', hp:635, engine:'4.4L Twin-Turbo V8', weight:2435, drivetrain:'AWD', body:'4x4', price:145000, zeroToSixty:3.8 },
+  { id:507, year:2004, make:'Land Rover', model:'Range Rover 4.4 V8', country:'UK', hp:306, engine:'4.4L NA V8', weight:2555, drivetrain:'AWD', body:'4x4', price:5500, zeroToSixty:8.0 },
+  { id:508, year:2012, make:'Land Rover', model:'Freelander 2 TD4', country:'UK', hp:150, engine:'2.2L Turbo I4', weight:1790, drivetrain:'AWD', body:'4x4', price:5000, zeroToSixty:10.5 },
+  { id:509, year:2019, make:'Land Rover', model:'Range Rover Velar SVAutobiography', country:'UK', hp:550, engine:'5.0L Supercharged V8', weight:2074, drivetrain:'AWD', body:'4x4', price:55000, zeroToSixty:4.5 },
+  { id:510, year:2005, make:'Land Rover', model:'Discovery 3 TDV6', country:'UK', hp:190, engine:'2.7L Turbo V6', weight:2425, drivetrain:'AWD', body:'4x4', price:8000, zeroToSixty:11.0 },
+  { id:511, year:2006, make:'Land Rover', model:'Range Rover Sport 2.7 TDV6', country:'UK', hp:190, engine:'2.7L Turbo V6', weight:2330, drivetrain:'AWD', body:'4x4', price:7000, zeroToSixty:10.5 },
+  { id:512, year:2020, make:'Land Rover', model:'Defender 90 D240', country:'UK', hp:240, engine:'3.0L Turbo I6', weight:2115, drivetrain:'AWD', body:'4x4', price:55000, zeroToSixty:7.4 },
+  { id:513, year:1984, make:'Volvo', model:'240 Turbo', country:'SE', hp:182, engine:'2.1L Turbo I4', weight:1245, drivetrain:'RWD', body:'saloon', price:9000, zeroToSixty:8.0 },
+  { id:514, year:1996, make:'Volvo', model:'850 T5-R', country:'SE', hp:250, engine:'2.3L Turbo I5', weight:1435, drivetrain:'FWD', body:'saloon', price:14000, zeroToSixty:5.9 },
+  { id:515, year:2003, make:'Volvo', model:'S60 R AWD', country:'SE', hp:300, engine:'2.5L Turbo I5', weight:1620, drivetrain:'AWD', body:'saloon', price:12000, zeroToSixty:5.4 },
+  { id:516, year:2004, make:'Volvo', model:'V70 R AWD', country:'SE', hp:300, engine:'2.5L Turbo I5', weight:1680, drivetrain:'AWD', body:'estate', price:10000, zeroToSixty:5.5 },
+  { id:517, year:2008, make:'Volvo', model:'C30 T5', country:'SE', hp:230, engine:'2.5L Turbo I5', weight:1380, drivetrain:'FWD', body:'hatch', price:8000, zeroToSixty:6.5 },
+  { id:518, year:1987, make:'Volvo', model:'480 Turbo', country:'SE', hp:120, engine:'1.7L Turbo I4', weight:1010, drivetrain:'FWD', body:'coupe', price:6000, zeroToSixty:8.5 },
+  { id:519, year:1990, make:'Volvo', model:'940 Turbo', country:'SE', hp:165, engine:'2.3L Turbo I4', weight:1415, drivetrain:'RWD', body:'saloon', price:3500, zeroToSixty:9.0 },
+  { id:520, year:1957, make:'Volvo', model:'122S Amazon', country:'SE', hp:90, engine:'1.8L NA I4', weight:1080, drivetrain:'RWD', body:'saloon', price:18000, zeroToSixty:14.0 },
+  { id:521, year:2001, make:'Volvo', model:'C70 T5 Convertible', country:'SE', hp:240, engine:'2.4L Turbo I5', weight:1720, drivetrain:'FWD', body:'roadster', price:6000, zeroToSixty:6.9 },
+  { id:522, year:2019, make:'Volvo', model:'XC90 T8 Recharge', country:'SE', hp:390, engine:'2.0L Turbo Hybrid I4', weight:2270, drivetrain:'AWD', body:'4x4', price:40000, zeroToSixty:5.3 },
+  { id:523, year:2015, make:'Volvo', model:'V60 Polestar', country:'SE', hp:367, engine:'3.0L Turbo I6', weight:1736, drivetrain:'AWD', body:'estate', price:35000, zeroToSixty:4.9 },
+  { id:524, year:2022, make:'Volvo', model:'C40 Recharge', country:'SE', hp:408, engine:'Electric Dual Motor', weight:2156, drivetrain:'AWD', body:'hatch', price:50000, zeroToSixty:4.7 },
+  { id:525, year:1978, make:'Saab', model:'99 Turbo', country:'SE', hp:145, engine:'2.0L Turbo I4', weight:1115, drivetrain:'FWD', body:'hatch', price:15000, zeroToSixty:9.0 },
+  { id:526, year:1985, make:'Saab', model:'900 Turbo 16S', country:'SE', hp:175, engine:'2.0L Turbo I4', weight:1140, drivetrain:'FWD', body:'hatch', price:12000, zeroToSixty:7.5 },
+  { id:527, year:1991, make:'Saab', model:'900 Turbo Cabriolet', country:'SE', hp:175, engine:'2.0L Turbo I4', weight:1310, drivetrain:'FWD', body:'roadster', price:10000, zeroToSixty:8.0 },
+  { id:528, year:1994, make:'Saab', model:'9000 Aero 2.3T', country:'SE', hp:225, engine:'2.3L Turbo I4', weight:1395, drivetrain:'FWD', body:'saloon', price:6000, zeroToSixty:6.5 },
+  { id:529, year:1999, make:'Saab', model:'9-3 Viggen', country:'SE', hp:230, engine:'2.0L Turbo I4', weight:1385, drivetrain:'FWD', body:'coupe', price:9000, zeroToSixty:6.5 },
+  { id:530, year:2003, make:'Saab', model:'9-5 Aero 2.3T', country:'SE', hp:250, engine:'2.3L Turbo I4', weight:1530, drivetrain:'FWD', body:'saloon', price:4500, zeroToSixty:6.5 },
+  { id:531, year:2007, make:'Saab', model:'9-3 Aero 2.8T V6', country:'SE', hp:280, engine:'2.8L Turbo V6', weight:1500, drivetrain:'FWD', body:'saloon', price:5500, zeroToSixty:6.3 },
+  { id:532, year:1993, make:'Saab', model:'9000 CS 2.3T', country:'SE', hp:200, engine:'2.3L Turbo I4', weight:1345, drivetrain:'FWD', body:'hatch', price:3000, zeroToSixty:7.0 },
+  { id:533, year:1976, make:'Saab', model:'96 V4', country:'SE', hp:65, engine:'1.5L NA V4', weight:875, drivetrain:'FWD', body:'saloon', price:8000, zeroToSixty:16.0 },
+  { id:534, year:1980, make:'Saab', model:'900 GLS Turbo', country:'SE', hp:145, engine:'2.0L Turbo I4', weight:1095, drivetrain:'FWD', body:'hatch', price:6000, zeroToSixty:10.0 },
+  { id:535, year:1966, make:'Alfa Romeo', model:'Spider 105 1600', country:'IT', hp:109, engine:'1.6L NA I4', weight:970, drivetrain:'RWD', body:'roadster', price:22000, zeroToSixty:11.0 },
+  { id:536, year:1995, make:'Alfa Romeo', model:'GTV 2.0 Twin Spark', country:'IT', hp:150, engine:'2.0L NA I4', weight:1320, drivetrain:'FWD', body:'coupe', price:5000, zeroToSixty:8.5 },
+  { id:537, year:1998, make:'Alfa Romeo', model:'GTV V6 3.0', country:'IT', hp:220, engine:'3.0L NA V6', weight:1420, drivetrain:'FWD', body:'coupe', price:9000, zeroToSixty:6.8 },
+  { id:538, year:2003, make:'Alfa Romeo', model:'147 GTA 3.2 V6', country:'IT', hp:250, engine:'3.2L NA V6', weight:1390, drivetrain:'FWD', body:'hatch', price:12000, zeroToSixty:6.3 },
+  { id:539, year:2003, make:'Alfa Romeo', model:'156 GTA 3.2 V6', country:'IT', hp:250, engine:'3.2L NA V6', weight:1480, drivetrain:'FWD', body:'saloon', price:10000, zeroToSixty:6.3 },
+  { id:540, year:2008, make:'Alfa Romeo', model:'8C Competizione', country:'IT', hp:450, engine:'4.7L NA V8', weight:1585, drivetrain:'RWD', body:'coupe', price:200000, zeroToSixty:4.2 },
+  { id:541, year:2013, make:'Alfa Romeo', model:'4C', country:'IT', hp:240, engine:'1.75L Turbo I4', weight:895, drivetrain:'RWD', body:'coupe', price:50000, zeroToSixty:4.5 },
+  { id:542, year:2016, make:'Alfa Romeo', model:'Giulia Quadrifoglio', country:'IT', hp:510, engine:'2.9L Twin-Turbo V6', weight:1580, drivetrain:'RWD', body:'saloon', price:65000, zeroToSixty:3.9 },
+  { id:543, year:2007, make:'Alfa Romeo', model:'Brera 3.2 V6 Q4', country:'IT', hp:260, engine:'3.2L NA V6', weight:1620, drivetrain:'AWD', body:'coupe', price:12000, zeroToSixty:6.3 },
+  { id:544, year:1988, make:'Alfa Romeo', model:'33 1.7 16v', country:'IT', hp:137, engine:'1.7L NA I4', weight:985, drivetrain:'FWD', body:'hatch', price:6000, zeroToSixty:8.0 },
+  { id:545, year:2009, make:'Alfa Romeo', model:'MiTo QV 1.4 Turbo', country:'IT', hp:170, engine:'1.4L Turbo I4', weight:1235, drivetrain:'FWD', body:'hatch', price:5500, zeroToSixty:7.3 },
+  { id:546, year:2014, make:'Alfa Romeo', model:'Giulietta QV', country:'IT', hp:240, engine:'1.75L Turbo I4', weight:1360, drivetrain:'FWD', body:'hatch', price:14000, zeroToSixty:6.8 },
+  { id:547, year:1985, make:'Alfa Romeo', model:'75 Turbo', country:'IT', hp:155, engine:'1.8L Turbo I4', weight:1155, drivetrain:'RWD', body:'saloon', price:12000, zeroToSixty:7.5 },
+  { id:548, year:1984, make:'Alfa Romeo', model:'GTV6 2.5', country:'IT', hp:160, engine:'2.5L NA V6', weight:1130, drivetrain:'RWD', body:'coupe', price:18000, zeroToSixty:7.5 },
+  { id:549, year:2021, make:'Alfa Romeo', model:'Giulia GTA', country:'IT', hp:540, engine:'2.9L Twin-Turbo V6', weight:1520, drivetrain:'RWD', body:'saloon', price:180000, zeroToSixty:3.6 },
+  { id:550, year:1985, make:'Fiat', model:'Uno Turbo', country:'IT', hp:105, engine:'1.3L Turbo I4', weight:840, drivetrain:'FWD', body:'hatch', price:9000, zeroToSixty:8.0 },
+  { id:551, year:1982, make:'Fiat', model:'131 Abarth', country:'IT', hp:140, engine:'2.0L NA I4', weight:980, drivetrain:'RWD', body:'saloon', price:25000, zeroToSixty:9.0 },
+  { id:552, year:1995, make:'Fiat', model:'Barchetta 1.8', country:'IT', hp:130, engine:'1.8L NA I4', weight:1050, drivetrain:'RWD', body:'roadster', price:8000, zeroToSixty:8.9 },
+  { id:553, year:2001, make:'Fiat', model:'Stilo Abarth 2.4', country:'IT', hp:170, engine:'2.4L NA I5', weight:1370, drivetrain:'FWD', body:'hatch', price:3500, zeroToSixty:7.9 },
+  { id:554, year:2016, make:'Fiat', model:'124 Spider Abarth', country:'IT', hp:170, engine:'1.4L Turbo I4', weight:1060, drivetrain:'RWD', body:'roadster', price:22000, zeroToSixty:6.8 },
+  { id:555, year:1982, make:'Fiat', model:'X1/9 1500', country:'IT', hp:85, engine:'1.5L NA I4', weight:890, drivetrain:'RWD', body:'coupe', price:9000, zeroToSixty:9.5 },
+  { id:556, year:2000, make:'Fiat', model:'Punto HGT', country:'IT', hp:130, engine:'1.8L NA I4', weight:1085, drivetrain:'FWD', body:'hatch', price:2500, zeroToSixty:8.9 },
+  { id:557, year:2007, make:'Fiat', model:'Grande Punto Abarth', country:'IT', hp:155, engine:'1.4L Turbo I4', weight:1210, drivetrain:'FWD', body:'hatch', price:5000, zeroToSixty:7.9 },
+  { id:558, year:2010, make:'Fiat', model:'500 Abarth 135', country:'IT', hp:135, engine:'1.4L Turbo I4', weight:1045, drivetrain:'FWD', body:'hatch', price:8000, zeroToSixty:7.9 },
+  { id:559, year:2000, make:'Fiat', model:'Seicento 1.1', country:'IT', hp:54, engine:'1.1L NA I4', weight:750, drivetrain:'FWD', body:'hatch', price:600, zeroToSixty:15.5 },
+  { id:560, year:2007, make:'Suzuki', model:'Swift Sport', country:'JP', hp:125, engine:'1.6L NA I4', weight:1040, drivetrain:'FWD', body:'hatch', price:5000, zeroToSixty:8.5 },
+  { id:561, year:2018, make:'Suzuki', model:'Swift Sport (AZ31)', country:'JP', hp:140, engine:'1.4L Turbo I4', weight:970, drivetrain:'FWD', body:'hatch', price:15000, zeroToSixty:8.1 },
+  { id:562, year:1992, make:'Suzuki', model:'Cappuccino EA11R', country:'JP', hp:64, engine:'0.66L Turbo I3', weight:720, drivetrain:'RWD', body:'roadster', price:9000, zeroToSixty:10.0 },
+  { id:563, year:2019, make:'Suzuki', model:'Jimny JB74', country:'JP', hp:102, engine:'1.5L NA I4', weight:1075, drivetrain:'AWD', body:'4x4', price:17000, zeroToSixty:11.5 },
+  { id:564, year:1999, make:'Suzuki', model:'Ignis Sport', country:'JP', hp:92, engine:'1.3L NA I4', weight:900, drivetrain:'FWD', body:'hatch', price:2500, zeroToSixty:10.5 },
+  { id:565, year:1991, make:'Suzuki', model:'Alto 0.6', country:'JP', hp:38, engine:'0.6L NA I3', weight:680, drivetrain:'FWD', body:'hatch', price:500, zeroToSixty:18.0 },
+  { id:566, year:1984, make:'Suzuki', model:'SJ410', country:'JP', hp:45, engine:'1.0L NA I4', weight:710, drivetrain:'AWD', body:'4x4', price:3500, zeroToSixty:16.0 },
+  { id:567, year:2001, make:'Suzuki', model:'Vitara 1.6', country:'JP', hp:97, engine:'1.6L NA I4', weight:1240, drivetrain:'AWD', body:'4x4', price:3000, zeroToSixty:12.0 },
+  { id:568, year:2001, make:'SEAT', model:'Ibiza Cupra 1.8T 156', country:'ES', hp:156, engine:'1.8L Turbo I4', weight:1125, drivetrain:'FWD', body:'hatch', price:4000, zeroToSixty:7.9 },
+  { id:569, year:2003, make:'SEAT', model:'Leon Cupra R Mk1', country:'ES', hp:225, engine:'1.8L Turbo I4', weight:1340, drivetrain:'FWD', body:'hatch', price:6000, zeroToSixty:6.7 },
+  { id:570, year:2019, make:'SEAT', model:'Leon Cupra R 300', country:'ES', hp:300, engine:'2.0L Turbo I4', weight:1379, drivetrain:'FWD', body:'hatch', price:22000, zeroToSixty:5.8 },
+  { id:571, year:2021, make:'SEAT', model:'Leon Cupra R ST 310 AWD', country:'ES', hp:310, engine:'2.0L Turbo I4', weight:1567, drivetrain:'AWD', body:'estate', price:36000, zeroToSixty:4.9 },
+  { id:572, year:2005, make:'SEAT', model:'Ibiza 1.0 Reference', country:'ES', hp:64, engine:'1.0L NA I4', weight:1020, drivetrain:'FWD', body:'hatch', price:900, zeroToSixty:15.0 },
+  { id:573, year:2018, make:'SEAT', model:'Arona FR 1.0 TSI', country:'ES', hp:115, engine:'1.0L Turbo I3', weight:1220, drivetrain:'FWD', body:'4x4', price:12000, zeroToSixty:10.5 },
+  { id:574, year:2018, make:'SEAT', model:'Ateca Cupra', country:'ES', hp:300, engine:'2.0L Turbo I4', weight:1640, drivetrain:'AWD', body:'4x4', price:28000, zeroToSixty:5.2 },
+  { id:575, year:1999, make:'SEAT', model:'Supercopa Mk3', country:'ES', hp:156, engine:'1.8L Turbo I4', weight:1070, drivetrain:'FWD', body:'hatch', price:3500, zeroToSixty:7.8 },
+  { id:576, year:2006, make:'Skoda', model:'Octavia RS Mk2 2.0 TFSI', country:'CZ', hp:200, engine:'2.0L Turbo I4', weight:1405, drivetrain:'FWD', body:'estate', price:6000, zeroToSixty:6.9 },
+  { id:577, year:2013, make:'Skoda', model:'Octavia RS Mk3 2.0 TSI', country:'CZ', hp:220, engine:'2.0L Turbo I4', weight:1385, drivetrain:'FWD', body:'estate', price:12000, zeroToSixty:6.8 },
+  { id:578, year:2011, make:'Skoda', model:'Fabia vRS 1.4 TSI', country:'CZ', hp:180, engine:'1.4L Turbo I4', weight:1214, drivetrain:'FWD', body:'hatch', price:5500, zeroToSixty:7.3 },
+  { id:579, year:2019, make:'Skoda', model:'Kodiaq RS 2.0 BiTDI', country:'CZ', hp:240, engine:'2.0L Twin-Turbo I4', weight:1950, drivetrain:'AWD', body:'4x4', price:30000, zeroToSixty:6.8 },
+  { id:580, year:2004, make:'Skoda', model:'Fabia 1.2 HTP', country:'CZ', hp:64, engine:'1.2L NA I3', weight:1035, drivetrain:'FWD', body:'hatch', price:1000, zeroToSixty:14.5 },
+  { id:581, year:2021, make:'Skoda', model:'Octavia vRS iV', country:'CZ', hp:245, engine:'1.4L Turbo Hybrid I4', weight:1608, drivetrain:'AWD', body:'estate', price:32000, zeroToSixty:6.2 },
+  { id:582, year:1992, make:'Dodge', model:'Viper RT/10', country:'US', hp:400, engine:'8.0L NA V10', weight:1527, drivetrain:'RWD', body:'roadster', price:45000, zeroToSixty:4.6 },
+  { id:583, year:1996, make:'Dodge', model:'Viper GTS', country:'US', hp:450, engine:'8.0L NA V10', weight:1537, drivetrain:'RWD', body:'coupe', price:55000, zeroToSixty:4.0 },
+  { id:584, year:2008, make:'Dodge', model:'Viper SRT10 ACR', country:'US', hp:600, engine:'8.4L NA V10', weight:1521, drivetrain:'RWD', body:'coupe', price:85000, zeroToSixty:3.9 },
+  { id:585, year:2015, make:'Dodge', model:'Challenger SRT Hellcat', country:'US', hp:717, engine:'6.2L Supercharged V8', weight:2010, drivetrain:'RWD', body:'coupe', price:50000, zeroToSixty:3.7 },
+  { id:586, year:2018, make:'Dodge', model:'Challenger SRT Demon', country:'US', hp:840, engine:'6.2L Supercharged V8', weight:1976, drivetrain:'RWD', body:'coupe', price:90000, zeroToSixty:2.3 },
+  { id:587, year:2015, make:'Dodge', model:'Charger SRT Hellcat', country:'US', hp:717, engine:'6.2L Supercharged V8', weight:2060, drivetrain:'RWD', body:'saloon', price:45000, zeroToSixty:3.7 },
+  { id:588, year:2017, make:'Dodge', model:'Challenger R/T Scat Pack', country:'US', hp:485, engine:'6.4L NA V8', weight:1875, drivetrain:'RWD', body:'coupe', price:32000, zeroToSixty:4.2 },
+  { id:589, year:2021, make:'Dodge', model:'Durango SRT Hellcat', country:'US', hp:710, engine:'6.2L Supercharged V8', weight:2525, drivetrain:'AWD', body:'4x4', price:80000, zeroToSixty:3.5 },
+  { id:590, year:2014, make:'Dodge', model:'Charger SRT8', country:'US', hp:470, engine:'6.4L NA V8', weight:1966, drivetrain:'RWD', body:'saloon', price:22000, zeroToSixty:4.5 },
+  { id:591, year:2023, make:'Dodge', model:'Challenger SRT Jailbreak', country:'US', hp:807, engine:'6.2L Supercharged V8', weight:2015, drivetrain:'RWD', body:'coupe', price:85000, zeroToSixty:3.5 },
+  { id:592, year:1963, make:'Chevrolet', model:'Corvette C2 Sting Ray', country:'US', hp:360, engine:'5.4L NA V8', weight:1371, drivetrain:'RWD', body:'coupe', price:120000, zeroToSixty:5.8 },
+  { id:593, year:1970, make:'Chevrolet', model:'Corvette C3 ZR1', country:'US', hp:370, engine:'5.7L NA V8', weight:1524, drivetrain:'RWD', body:'coupe', price:75000, zeroToSixty:5.7 },
+  { id:594, year:1990, make:'Chevrolet', model:'Corvette C4 ZR-1', country:'US', hp:375, engine:'5.7L NA V8', weight:1521, drivetrain:'RWD', body:'coupe', price:35000, zeroToSixty:5.0 },
+  { id:595, year:2001, make:'Chevrolet', model:'Corvette C5 Z06', country:'US', hp:405, engine:'5.7L NA V8', weight:1456, drivetrain:'RWD', body:'coupe', price:30000, zeroToSixty:4.0 },
+  { id:596, year:2009, make:'Chevrolet', model:'Corvette C6 ZR1', country:'US', hp:638, engine:'6.2L Supercharged V8', weight:1528, drivetrain:'RWD', body:'coupe', price:65000, zeroToSixty:3.4 },
+  { id:597, year:2015, make:'Chevrolet', model:'Corvette C7 Z06', country:'US', hp:650, engine:'6.2L Supercharged V8', weight:1608, drivetrain:'RWD', body:'coupe', price:70000, zeroToSixty:3.0 },
+  { id:598, year:2020, make:'Chevrolet', model:'Corvette C8 Stingray', country:'US', hp:495, engine:'6.2L NA V8', weight:1527, drivetrain:'RWD', body:'supercar', price:65000, zeroToSixty:3.5 },
+  { id:599, year:2023, make:'Chevrolet', model:'Corvette C8 Z06', country:'US', hp:670, engine:'5.5L NA V8', weight:1513, drivetrain:'RWD', body:'supercar', price:95000, zeroToSixty:2.6 },
+  { id:600, year:2010, make:'Chevrolet', model:'Camaro SS 6.2 V8', country:'US', hp:426, engine:'6.2L NA V8', weight:1734, drivetrain:'RWD', body:'coupe', price:22000, zeroToSixty:4.7 },
+  { id:601, year:2017, make:'Chevrolet', model:'Camaro ZL1', country:'US', hp:650, engine:'6.2L Supercharged V8', weight:1923, drivetrain:'RWD', body:'coupe', price:50000, zeroToSixty:3.5 },
+  { id:602, year:2018, make:'Chevrolet', model:'Camaro ZL1 1LE', country:'US', hp:650, engine:'6.2L Supercharged V8', weight:1916, drivetrain:'RWD', body:'coupe', price:65000, zeroToSixty:3.5 },
+  { id:603, year:2002, make:'Chevrolet', model:'Camaro Z28', country:'US', hp:310, engine:'5.7L NA V8', weight:1600, drivetrain:'RWD', body:'coupe', price:8000, zeroToSixty:5.3 },
+  { id:604, year:1970, make:'Chevrolet', model:'El Camino SS 454', country:'US', hp:450, engine:'7.4L NA V8', weight:1680, drivetrain:'RWD', body:'coupe', price:40000, zeroToSixty:5.5 },
+  { id:605, year:1969, make:'Chevrolet', model:'Nova SS 396', country:'US', hp:375, engine:'6.5L NA V8', weight:1530, drivetrain:'RWD', body:'coupe', price:35000, zeroToSixty:5.8 },
+  { id:606, year:1986, make:'Chevrolet', model:'Monte Carlo SS', country:'US', hp:180, engine:'5.0L NA V8', weight:1545, drivetrain:'RWD', body:'coupe', price:8000, zeroToSixty:8.5 },
+  { id:607, year:2003, make:'Bentley', model:'Continental GT W12', country:'UK', hp:552, engine:'6.0L Twin-Turbo W12', weight:2385, drivetrain:'AWD', body:'coupe', price:55000, zeroToSixty:4.8 },
+  { id:608, year:2015, make:'Bentley', model:'Continental GT Speed', country:'UK', hp:626, engine:'6.0L Twin-Turbo W12', weight:2320, drivetrain:'AWD', body:'coupe', price:90000, zeroToSixty:4.0 },
+  { id:609, year:2014, make:'Bentley', model:'Flying Spur W12', country:'UK', hp:625, engine:'6.0L Twin-Turbo W12', weight:2490, drivetrain:'AWD', body:'saloon', price:80000, zeroToSixty:4.3 },
+  { id:610, year:2016, make:'Bentley', model:'Mulsanne Speed', country:'UK', hp:537, engine:'6.75L Twin-Turbo V8', weight:2660, drivetrain:'RWD', body:'saloon', price:150000, zeroToSixty:4.9 },
+  { id:611, year:2016, make:'Bentley', model:'Bentayga W12', country:'UK', hp:600, engine:'6.0L Twin-Turbo W12', weight:2440, drivetrain:'AWD', body:'4x4', price:130000, zeroToSixty:4.1 },
+  { id:612, year:1991, make:'Bentley', model:'Turbo R', country:'UK', hp:328, engine:'6.75L Turbo V8', weight:2440, drivetrain:'RWD', body:'saloon', price:45000, zeroToSixty:6.5 },
+  { id:613, year:1996, make:'Bentley', model:'Azure', country:'UK', hp:385, engine:'6.75L Turbo V8', weight:2540, drivetrain:'RWD', body:'roadster', price:90000, zeroToSixty:5.9 },
+  { id:614, year:2009, make:'Bentley', model:'Continental Supersports', country:'UK', hp:630, engine:'6.0L Twin-Turbo W12', weight:2210, drivetrain:'AWD', body:'coupe', price:80000, zeroToSixty:3.9 },
+  { id:615, year:1974, make:'Rolls-Royce', model:'Silver Shadow II', country:'UK', hp:189, engine:'6.75L NA V8', weight:2185, drivetrain:'RWD', body:'saloon', price:35000, zeroToSixty:10.9 },
+  { id:616, year:1979, make:'Rolls-Royce', model:'Corniche Convertible', country:'UK', hp:189, engine:'6.75L NA V8', weight:2335, drivetrain:'RWD', body:'roadster', price:55000, zeroToSixty:11.0 },
+  { id:617, year:2003, make:'Rolls-Royce', model:'Phantom VII', country:'UK', hp:453, engine:'6.75L NA V12', weight:2495, drivetrain:'RWD', body:'saloon', price:120000, zeroToSixty:5.7 },
+  { id:618, year:2010, make:'Rolls-Royce', model:'Ghost', country:'UK', hp:563, engine:'6.6L Twin-Turbo V12', weight:2360, drivetrain:'AWD', body:'saloon', price:150000, zeroToSixty:4.7 },
+  { id:619, year:2013, make:'Rolls-Royce', model:'Wraith', country:'UK', hp:624, engine:'6.6L Twin-Turbo V12', weight:2360, drivetrain:'RWD', body:'coupe', price:200000, zeroToSixty:4.4 },
+  { id:620, year:2019, make:'Rolls-Royce', model:'Cullinan', country:'UK', hp:563, engine:'6.6L Twin-Turbo V12', weight:2660, drivetrain:'AWD', body:'4x4', price:280000, zeroToSixty:5.2 },
+  { id:621, year:2023, make:'Rolls-Royce', model:'Spectre', country:'UK', hp:577, engine:'Electric Dual Motor', weight:2975, drivetrain:'AWD', body:'coupe', price:330000, zeroToSixty:4.5 },
+  { id:622, year:2022, make:'Rolls-Royce', model:'Phantom Extended', country:'UK', hp:563, engine:'6.6L Twin-Turbo V12', weight:2560, drivetrain:'AWD', body:'saloon', price:420000, zeroToSixty:5.3 },
+  { id:623, year:1992, make:'Bugatti', model:'EB110 GT', country:'IT', hp:560, engine:'3.5L Quad-Turbo V12', weight:1625, drivetrain:'AWD', body:'supercar', price:1500000, zeroToSixty:3.4 },
+  { id:624, year:2005, make:'Bugatti', model:'Veyron 16.4', country:'FR', hp:1001, engine:'8.0L Quad-Turbo W16', weight:1888, drivetrain:'AWD', body:'supercar', price:2000000, zeroToSixty:2.5 },
+  { id:625, year:2010, make:'Bugatti', model:'Veyron Super Sport', country:'FR', hp:1200, engine:'8.0L Quad-Turbo W16', weight:1900, drivetrain:'AWD', body:'supercar', price:2800000, zeroToSixty:2.5 },
+  { id:626, year:2016, make:'Bugatti', model:'Chiron', country:'FR', hp:1500, engine:'8.0L Quad-Turbo W16', weight:1996, drivetrain:'AWD', body:'supercar', price:3000000, zeroToSixty:2.4 },
+  { id:627, year:2021, make:'Bugatti', model:'Chiron Super Sport 300+', country:'FR', hp:1578, engine:'8.0L Quad-Turbo W16', weight:2050, drivetrain:'AWD', body:'supercar', price:4000000, zeroToSixty:2.4 },
+  { id:628, year:2018, make:'Bugatti', model:'Divo', country:'FR', hp:1500, engine:'8.0L Quad-Turbo W16', weight:1895, drivetrain:'AWD', body:'supercar', price:6000000, zeroToSixty:2.4 },
+  { id:629, year:2020, make:'Bugatti', model:'Bolide', country:'FR', hp:1824, engine:'8.0L Quad-Turbo W16', weight:1450, drivetrain:'AWD', body:'supercar', price:4000000, zeroToSixty:2.2 },
+  { id:630, year:2022, make:'Toyota', model:'GR Yaris RZ', country:'JP', hp:261, engine:'1.6L Turbo I3', weight:1280, drivetrain:'AWD', body:'hatch', price:32000, zeroToSixty:5.5 },
+  { id:631, year:2023, make:'Toyota', model:'GR Corolla Circuit', country:'JP', hp:300, engine:'1.6L Turbo I3', weight:1460, drivetrain:'AWD', body:'hatch', price:40000, zeroToSixty:5.1 },
+  { id:632, year:1992, make:'Toyota', model:'Celica GT-Four ST185', country:'JP', hp:235, engine:'2.0L Turbo I4', weight:1350, drivetrain:'AWD', body:'coupe', price:22000, zeroToSixty:6.0 },
+  { id:633, year:1995, make:'Toyota', model:'Celica GT-Four ST205', country:'JP', hp:255, engine:'2.0L Turbo I4', weight:1370, drivetrain:'AWD', body:'coupe', price:28000, zeroToSixty:5.6 },
+  { id:634, year:1984, make:'Toyota', model:'MR2 Mk1 AW11', country:'JP', hp:128, engine:'1.6L NA I4', weight:966, drivetrain:'RWD', body:'coupe', price:9000, zeroToSixty:8.0 },
+  { id:635, year:1993, make:'Toyota', model:'MR2 Mk2 Turbo SW20', country:'JP', hp:245, engine:'2.0L Turbo I4', weight:1300, drivetrain:'RWD', body:'coupe', price:22000, zeroToSixty:5.6 },
+  { id:636, year:2000, make:'Toyota', model:'MR2 Mk3 ZZW30', country:'JP', hp:138, engine:'1.8L NA I4', weight:975, drivetrain:'RWD', body:'roadster', price:8000, zeroToSixty:7.9 },
+  { id:637, year:1983, make:'Toyota', model:'AE86 Trueno GT-Apex', country:'JP', hp:128, engine:'1.6L NA I4', weight:940, drivetrain:'RWD', body:'coupe', price:28000, zeroToSixty:8.6 },
+  { id:638, year:1983, make:'Toyota', model:'AE86 Levin GT-Apex', country:'JP', hp:128, engine:'1.6L NA I4', weight:925, drivetrain:'RWD', body:'coupe', price:24000, zeroToSixty:8.6 },
+  { id:639, year:2021, make:'Toyota', model:'GR86', country:'JP', hp:235, engine:'2.4L NA F4', weight:1270, drivetrain:'RWD', body:'coupe', price:30000, zeroToSixty:6.3 },
+  { id:640, year:1967, make:'Toyota', model:'2000GT', country:'JP', hp:150, engine:'2.0L NA I6', weight:1120, drivetrain:'RWD', body:'coupe', price:800000, zeroToSixty:10.0 },
+  { id:641, year:1984, make:'Toyota', model:'Starlet Turbo S', country:'JP', hp:80, engine:'1.3L Turbo I4', weight:710, drivetrain:'RWD', body:'hatch', price:5000, zeroToSixty:9.5 },
+  { id:642, year:2003, make:'Toyota', model:'Land Cruiser 100 4.7 V8', country:'JP', hp:235, engine:'4.7L NA V8', weight:2580, drivetrain:'AWD', body:'4x4', price:12000, zeroToSixty:10.5 },
+  { id:643, year:2003, make:'Toyota', model:'Corolla E120 1.4 VVT-i', country:'JP', hp:97, engine:'1.4L NA I4', weight:1175, drivetrain:'FWD', body:'saloon', price:1800, zeroToSixty:12.5 },
+  { id:644, year:2009, make:'Toyota', model:'Yaris 1.0', country:'JP', hp:69, engine:'1.0L NA I3', weight:1010, drivetrain:'FWD', body:'hatch', price:2500, zeroToSixty:14.2 },
+  { id:645, year:2004, make:'Toyota', model:'Hilux Mk7 2.5 D-4D', country:'JP', hp:144, engine:'2.5L Turbo I4', weight:1750, drivetrain:'AWD', body:'4x4', price:12000, zeroToSixty:12.5 },
+  { id:646, year:1986, make:'Toyota', model:'Supra Mk3 3.0i Turbo', country:'JP', hp:232, engine:'3.0L Turbo I6', weight:1590, drivetrain:'RWD', body:'coupe', price:25000, zeroToSixty:6.4 },
+  { id:647, year:2022, make:'Toyota', model:'Supra GR A90 3.0 MT', country:'JP', hp:387, engine:'3.0L Turbo I6', weight:1497, drivetrain:'RWD', body:'coupe', price:58000, zeroToSixty:4.0 },
+  { id:648, year:2022, make:'Toyota', model:'bZ4X AWD', country:'JP', hp:218, engine:'Electric Dual Motor', weight:2085, drivetrain:'AWD', body:'4x4', price:44000, zeroToSixty:6.9 },
+  { id:649, year:2019, make:'Toyota', model:'Prius 1.8 Hybrid', country:'JP', hp:122, engine:'1.8L Hybrid I4', weight:1385, drivetrain:'FWD', body:'saloon', price:12000, zeroToSixty:10.6 },
+  { id:650, year:1998, make:'Subaru', model:'Impreza 22B STI', country:'JP', hp:276, engine:'2.2L Turbo F4', weight:1270, drivetrain:'AWD', body:'coupe', price:85000, zeroToSixty:4.8 },
+  { id:651, year:2000, make:'Subaru', model:'Impreza WRX P1', country:'JP', hp:280, engine:'2.0L Turbo F4', weight:1280, drivetrain:'AWD', body:'saloon', price:40000, zeroToSixty:4.7 },
+  { id:652, year:2004, make:'Subaru', model:'Impreza WRX STI Spec C', country:'JP', hp:280, engine:'2.0L Turbo F4', weight:1390, drivetrain:'AWD', body:'saloon', price:28000, zeroToSixty:4.5 },
+  { id:653, year:1994, make:'Subaru', model:'Impreza WRX RA STI', country:'JP', hp:250, engine:'2.0L Turbo F4', weight:1175, drivetrain:'AWD', body:'saloon', price:35000, zeroToSixty:4.8 },
+  { id:654, year:2012, make:'Subaru', model:'BRZ S', country:'JP', hp:200, engine:'2.0L NA F4', weight:1252, drivetrain:'RWD', body:'coupe', price:18000, zeroToSixty:7.6 },
+  { id:655, year:2003, make:'Subaru', model:'Legacy B4 3.0R', country:'JP', hp:245, engine:'3.0L NA F6', weight:1490, drivetrain:'AWD', body:'saloon', price:8000, zeroToSixty:6.1 },
+  { id:656, year:2003, make:'Subaru', model:'Forester XT 2.0', country:'JP', hp:177, engine:'2.0L Turbo F4', weight:1465, drivetrain:'AWD', body:'4x4', price:8000, zeroToSixty:7.2 },
+  { id:657, year:1992, make:'Subaru', model:'Alcyone SVX 3.3', country:'JP', hp:231, engine:'3.3L NA F6', weight:1490, drivetrain:'AWD', body:'coupe', price:8500, zeroToSixty:8.5 },
+  { id:658, year:2001, make:'Subaru', model:'Impreza WRX UK300', country:'JP', hp:218, engine:'2.0L Turbo F4', weight:1330, drivetrain:'AWD', body:'saloon', price:12000, zeroToSixty:5.8 },
+  { id:659, year:1993, make:'Subaru', model:'Vivio RX-R', country:'JP', hp:64, engine:'0.66L Turbo I3', weight:680, drivetrain:'AWD', body:'hatch', price:6000, zeroToSixty:10.5 },
+  { id:660, year:2007, make:'Subaru', model:'Impreza WRX STI (GH)', country:'JP', hp:300, engine:'2.5L Turbo F4', weight:1515, drivetrain:'AWD', body:'hatch', price:18000, zeroToSixty:5.0 },
+  { id:661, year:2019, make:'Subaru', model:'WRX STI Final Edition', country:'JP', hp:300, engine:'2.5L Turbo F4', weight:1540, drivetrain:'AWD', body:'saloon', price:40000, zeroToSixty:5.0 },
+  { id:662, year:1989, make:'Nissan', model:'Skyline R32 GT-R', country:'JP', hp:280, engine:'2.6L Twin-Turbo I6', weight:1430, drivetrain:'AWD', body:'coupe', price:55000, zeroToSixty:5.6 },
+  { id:663, year:1995, make:'Nissan', model:'Skyline R33 GT-R V-Spec', country:'JP', hp:280, engine:'2.6L Twin-Turbo I6', weight:1540, drivetrain:'AWD', body:'coupe', price:65000, zeroToSixty:5.4 },
+  { id:664, year:1999, make:'Nissan', model:'Skyline R34 GT-R V-Spec', country:'JP', hp:280, engine:'2.6L Twin-Turbo I6', weight:1560, drivetrain:'AWD', body:'coupe', price:120000, zeroToSixty:4.8 },
+  { id:665, year:2002, make:'Nissan', model:'Skyline R34 GT-R V-Spec II Nur', country:'JP', hp:280, engine:'2.6L Twin-Turbo I6', weight:1580, drivetrain:'AWD', body:'coupe', price:250000, zeroToSixty:4.7 },
+  { id:666, year:2003, make:'Nissan', model:'350Z Roadster', country:'JP', hp:287, engine:'3.5L NA V6', weight:1530, drivetrain:'RWD', body:'roadster', price:12000, zeroToSixty:5.8 },
+  { id:667, year:2009, make:'Nissan', model:'370Z Nismo', country:'JP', hp:344, engine:'3.7L NA V6', weight:1496, drivetrain:'RWD', body:'coupe', price:20000, zeroToSixty:5.2 },
+  { id:668, year:1999, make:'Nissan', model:'Silvia S15 Spec-R', country:'JP', hp:250, engine:'2.0L Turbo I4', weight:1240, drivetrain:'RWD', body:'coupe', price:35000, zeroToSixty:5.6 },
+  { id:669, year:1994, make:'Nissan', model:'Silvia S14 Kouki', country:'JP', hp:220, engine:'2.0L Turbo I4', weight:1255, drivetrain:'RWD', body:'coupe', price:18000, zeroToSixty:6.2 },
+  { id:670, year:1991, make:'Nissan', model:'Silvia S13 Turbo CA18DET', country:'JP', hp:175, engine:'1.8L Turbo I4', weight:1200, drivetrain:'RWD', body:'coupe', price:9000, zeroToSixty:7.0 },
+  { id:671, year:1990, make:'Nissan', model:'Pulsar GTI-R', country:'JP', hp:230, engine:'2.0L Turbo I4', weight:1170, drivetrain:'AWD', body:'hatch', price:14000, zeroToSixty:5.4 },
+  { id:672, year:1997, make:'Nissan', model:'Stagea 260RS Autech', country:'JP', hp:276, engine:'2.6L Twin-Turbo I6', weight:1690, drivetrain:'AWD', body:'estate', price:28000, zeroToSixty:5.8 },
+  { id:673, year:2008, make:'Nissan', model:'GT-R R35 Black Edition', country:'JP', hp:485, engine:'3.8L Twin-Turbo V6', weight:1740, drivetrain:'AWD', body:'coupe', price:55000, zeroToSixty:3.5 },
+  { id:674, year:2001, make:'Nissan', model:'Nissan 200SX S14a', country:'JP', hp:200, engine:'2.0L Turbo I4', weight:1180, drivetrain:'RWD', body:'coupe', price:7000, zeroToSixty:6.5 },
+  { id:675, year:2014, make:'Nissan', model:'Juke Nismo RS', country:'JP', hp:218, engine:'1.6L Turbo I4', weight:1269, drivetrain:'AWD', body:'4x4', price:16000, zeroToSixty:7.0 },
+  { id:676, year:2003, make:'Nissan', model:'Micra K12 1.2', country:'JP', hp:80, engine:'1.2L NA I4', weight:985, drivetrain:'FWD', body:'hatch', price:1500, zeroToSixty:13.5 },
+  { id:677, year:1970, make:'Porsche', model:'914 2.0', country:'DE', hp:100, engine:'2.0L NA F4', weight:940, drivetrain:'RWD', body:'coupe', price:18000, zeroToSixty:10.5 },
+  { id:678, year:1976, make:'Porsche', model:'924 2.0', country:'DE', hp:125, engine:'2.0L NA I4', weight:1050, drivetrain:'RWD', body:'coupe', price:12000, zeroToSixty:9.0 },
+  { id:679, year:1985, make:'Porsche', model:'944 Turbo', country:'DE', hp:220, engine:'2.5L Turbo I4', weight:1280, drivetrain:'RWD', body:'coupe', price:28000, zeroToSixty:5.9 },
+  { id:680, year:1991, make:'Porsche', model:'944 S2 Cabriolet', country:'DE', hp:211, engine:'3.0L NA I4', weight:1370, drivetrain:'RWD', body:'roadster', price:22000, zeroToSixty:7.0 },
+  { id:681, year:1992, make:'Porsche', model:'928 GTS', country:'DE', hp:350, engine:'5.4L NA V8', weight:1620, drivetrain:'RWD', body:'coupe', price:55000, zeroToSixty:5.4 },
+  { id:682, year:1994, make:'Porsche', model:'968 Club Sport', country:'DE', hp:240, engine:'3.0L NA I4', weight:1270, drivetrain:'RWD', body:'coupe', price:50000, zeroToSixty:6.1 },
+  { id:683, year:1980, make:'Porsche', model:'911 SC Targa 3.0', country:'DE', hp:188, engine:'3.0L NA F6', weight:1160, drivetrain:'RWD', body:'coupe', price:45000, zeroToSixty:7.0 },
+  { id:684, year:1993, make:'Porsche', model:'911 RS America 964', country:'DE', hp:270, engine:'3.6L NA F6', weight:1210, drivetrain:'RWD', body:'coupe', price:180000, zeroToSixty:5.4 },
+  { id:685, year:2007, make:'Porsche', model:'911 GT3 RS 997', country:'DE', hp:415, engine:'3.6L NA F6', weight:1375, drivetrain:'RWD', body:'coupe', price:120000, zeroToSixty:4.2 },
+  { id:686, year:1994, make:'Porsche', model:'911 Speedster 964', country:'DE', hp:265, engine:'3.6L NA F6', weight:1350, drivetrain:'RWD', body:'roadster', price:250000, zeroToSixty:5.4 },
+  { id:687, year:2006, make:'Porsche', model:'Cayman S 987', country:'DE', hp:295, engine:'3.4L NA F6', weight:1340, drivetrain:'RWD', body:'coupe', price:28000, zeroToSixty:5.4 },
+  { id:688, year:2015, make:'Porsche', model:'Cayman GT4 981', country:'DE', hp:385, engine:'3.8L NA F6', weight:1340, drivetrain:'RWD', body:'coupe', price:80000, zeroToSixty:4.5 },
+  { id:689, year:2018, make:'Porsche', model:'911 GT2 RS 991', country:'DE', hp:700, engine:'3.8L Twin-Turbo F6', weight:1470, drivetrain:'RWD', body:'coupe', price:300000, zeroToSixty:2.7 },
+  { id:690, year:2016, make:'Porsche', model:'911 R 991', country:'DE', hp:500, engine:'4.0L NA F6', weight:1370, drivetrain:'RWD', body:'coupe', price:600000, zeroToSixty:3.7 },
+  { id:691, year:2021, make:'Porsche', model:'718 Cayman GT4 RS', country:'DE', hp:500, engine:'4.0L NA F6', weight:1415, drivetrain:'RWD', body:'coupe', price:130000, zeroToSixty:3.4 },
+  { id:692, year:2022, make:'Porsche', model:'911 GT3 992', country:'DE', hp:510, engine:'4.0L NA F6', weight:1435, drivetrain:'RWD', body:'coupe', price:160000, zeroToSixty:3.4 },
+  { id:693, year:2003, make:'Porsche', model:'Cayenne Turbo S', country:'DE', hp:450, engine:'4.5L Twin-Turbo V8', weight:2355, drivetrain:'AWD', body:'4x4', price:25000, zeroToSixty:5.6 },
+  { id:694, year:1978, make:'Ferrari', model:'308 GTB', country:'IT', hp:255, engine:'3.0L NA V8', weight:1090, drivetrain:'RWD', body:'coupe', price:120000, zeroToSixty:7.0 },
+  { id:695, year:1987, make:'Ferrari', model:'328 GTS', country:'IT', hp:270, engine:'3.2L NA V8', weight:1263, drivetrain:'RWD', body:'coupe', price:90000, zeroToSixty:6.0 },
+  { id:696, year:1992, make:'Ferrari', model:'348 tb', country:'IT', hp:300, engine:'3.4L NA V8', weight:1393, drivetrain:'RWD', body:'coupe', price:60000, zeroToSixty:5.8 },
+  { id:697, year:1995, make:'Ferrari', model:'F355 Berlinetta', country:'IT', hp:375, engine:'3.5L NA V8', weight:1350, drivetrain:'RWD', body:'coupe', price:120000, zeroToSixty:4.7 },
+  { id:698, year:1999, make:'Ferrari', model:'360 Modena', country:'IT', hp:400, engine:'3.6L NA V8', weight:1390, drivetrain:'RWD', body:'coupe', price:80000, zeroToSixty:4.5 },
+  { id:699, year:2003, make:'Ferrari', model:'360 Challenge Stradale', country:'IT', hp:425, engine:'3.6L NA V8', weight:1255, drivetrain:'RWD', body:'coupe', price:150000, zeroToSixty:4.1 },
+  { id:700, year:2001, make:'Ferrari', model:'456M GT', country:'IT', hp:442, engine:'5.5L NA V12', weight:1690, drivetrain:'RWD', body:'coupe', price:55000, zeroToSixty:4.8 },
+  { id:701, year:2007, make:'Ferrari', model:'F430 Scuderia', country:'IT', hp:510, engine:'4.3L NA V8', weight:1350, drivetrain:'RWD', body:'coupe', price:200000, zeroToSixty:3.6 },
+  { id:702, year:2014, make:'Ferrari', model:'458 Speciale', country:'IT', hp:605, engine:'4.5L NA V8', weight:1395, drivetrain:'RWD', body:'coupe', price:300000, zeroToSixty:3.0 },
+  { id:703, year:2018, make:'Ferrari', model:'488 Pista', country:'IT', hp:720, engine:'3.9L Twin-Turbo V8', weight:1385, drivetrain:'RWD', body:'coupe', price:280000, zeroToSixty:2.8 },
+  { id:704, year:2020, make:'Ferrari', model:'F8 Tributo', country:'IT', hp:720, engine:'3.9L Twin-Turbo V8', weight:1435, drivetrain:'RWD', body:'coupe', price:220000, zeroToSixty:2.9 },
+  { id:705, year:2020, make:'Ferrari', model:'F8 Spider', country:'IT', hp:720, engine:'3.9L Twin-Turbo V8', weight:1475, drivetrain:'RWD', body:'roadster', price:240000, zeroToSixty:2.9 },
+  { id:706, year:2021, make:'Ferrari', model:'Roma', country:'IT', hp:620, engine:'3.9L Twin-Turbo V8', weight:1472, drivetrain:'RWD', body:'coupe', price:200000, zeroToSixty:3.4 },
+  { id:707, year:2021, make:'Ferrari', model:'812 GTS', country:'IT', hp:800, engine:'6.5L NA V12', weight:1630, drivetrain:'RWD', body:'roadster', price:330000, zeroToSixty:3.0 },
+  { id:708, year:2020, make:'Ferrari', model:'SF90 Stradale', country:'IT', hp:1000, engine:'4.0L Twin-Turbo Hybrid V8', weight:1570, drivetrain:'AWD', body:'supercar', price:520000, zeroToSixty:2.5 },
+  { id:709, year:2019, make:'Ferrari', model:'Monza SP2', country:'IT', hp:810, engine:'6.5L NA V12', weight:1500, drivetrain:'RWD', body:'roadster', price:1600000, zeroToSixty:2.9 },
+  { id:710, year:2022, make:'Ferrari', model:'296 GTB', country:'IT', hp:830, engine:'3.0L Twin-Turbo Hybrid V6', weight:1470, drivetrain:'RWD', body:'coupe', price:270000, zeroToSixty:2.9 },
+  { id:711, year:2023, make:'Ferrari', model:'Purosangue', country:'IT', hp:725, engine:'6.5L NA V12', weight:2033, drivetrain:'AWD', body:'4x4', price:380000, zeroToSixty:3.3 },
+  { id:712, year:1974, make:'Lamborghini', model:'Urraco P250', country:'IT', hp:220, engine:'2.5L NA V8', weight:1175, drivetrain:'RWD', body:'coupe', price:80000, zeroToSixty:8.0 },
+  { id:713, year:1982, make:'Lamborghini', model:'Jalpa 3500', country:'IT', hp:255, engine:'3.5L NA V8', weight:1500, drivetrain:'RWD', body:'coupe', price:90000, zeroToSixty:6.8 },
+  { id:714, year:1974, make:'Lamborghini', model:'Countach LP400', country:'IT', hp:375, engine:'4.0L NA V12', weight:1065, drivetrain:'RWD', body:'supercar', price:900000, zeroToSixty:5.6 },
+  { id:715, year:1988, make:'Lamborghini', model:'Countach 25th Anniversary', country:'IT', hp:455, engine:'5.2L NA V12', weight:1490, drivetrain:'RWD', body:'supercar', price:450000, zeroToSixty:4.8 },
+  { id:716, year:1991, make:'Lamborghini', model:'Diablo VT', country:'IT', hp:492, engine:'5.7L NA V12', weight:1576, drivetrain:'AWD', body:'supercar', price:250000, zeroToSixty:4.1 },
+  { id:717, year:1995, make:'Lamborghini', model:'Diablo SV', country:'IT', hp:530, engine:'5.7L NA V12', weight:1460, drivetrain:'RWD', body:'supercar', price:280000, zeroToSixty:3.9 },
+  { id:718, year:2005, make:'Lamborghini', model:'Murciélago LP640', country:'IT', hp:640, engine:'6.5L NA V12', weight:1650, drivetrain:'AWD', body:'supercar', price:250000, zeroToSixty:3.4 },
+  { id:719, year:2009, make:'Lamborghini', model:'Murciélago LP670-4 SV', country:'IT', hp:670, engine:'6.5L NA V12', weight:1565, drivetrain:'AWD', body:'supercar', price:600000, zeroToSixty:3.2 },
+  { id:720, year:2012, make:'Lamborghini', model:'Gallardo LP570-4 Superleggera', country:'IT', hp:570, engine:'5.2L NA V10', weight:1340, drivetrain:'AWD', body:'supercar', price:160000, zeroToSixty:3.4 },
+  { id:721, year:2016, make:'Lamborghini', model:'Aventador LP750-4 SV', country:'IT', hp:750, engine:'6.5L NA V12', weight:1525, drivetrain:'AWD', body:'supercar', price:400000, zeroToSixty:2.8 },
+  { id:722, year:2018, make:'Lamborghini', model:'Huracán Performante', country:'IT', hp:640, engine:'5.2L NA V10', weight:1382, drivetrain:'AWD', body:'supercar', price:220000, zeroToSixty:2.9 },
+  { id:723, year:2021, make:'Lamborghini', model:'Huracán STO', country:'IT', hp:640, engine:'5.2L NA V10', weight:1339, drivetrain:'RWD', body:'supercar', price:290000, zeroToSixty:3.0 },
+  { id:724, year:2023, make:'Lamborghini', model:'Urus Performante', country:'IT', hp:666, engine:'4.0L Twin-Turbo V8', weight:2150, drivetrain:'AWD', body:'4x4', price:240000, zeroToSixty:3.3 },
+  { id:725, year:2021, make:'Lamborghini', model:'Sián FKP 37', country:'IT', hp:819, engine:'6.5L Hybrid NA V12', weight:1525, drivetrain:'AWD', body:'supercar', price:3000000, zeroToSixty:2.8 },
+  { id:726, year:2022, make:'Lamborghini', model:'Centenario LP770-4', country:'IT', hp:770, engine:'6.5L NA V12', weight:1520, drivetrain:'AWD', body:'supercar', price:2500000, zeroToSixty:2.8 },
+  { id:727, year:2011, make:'McLaren', model:'MP4-12C', country:'UK', hp:592, engine:'3.8L Twin-Turbo V8', weight:1434, drivetrain:'RWD', body:'supercar', price:100000, zeroToSixty:3.1 },
+  { id:728, year:2015, make:'McLaren', model:'570S Coupe', country:'UK', hp:562, engine:'3.8L Twin-Turbo V8', weight:1313, drivetrain:'RWD', body:'supercar', price:120000, zeroToSixty:3.1 },
+  { id:729, year:2018, make:'McLaren', model:'570S Track Pack', country:'UK', hp:562, engine:'3.8L Twin-Turbo V8', weight:1270, drivetrain:'RWD', body:'supercar', price:140000, zeroToSixty:3.1 },
+  { id:730, year:2018, make:'McLaren', model:'600LT Spider', country:'UK', hp:600, engine:'3.8L Twin-Turbo V8', weight:1329, drivetrain:'RWD', body:'roadster', price:180000, zeroToSixty:2.9 },
+  { id:731, year:2017, make:'McLaren', model:'720S Coupe', country:'UK', hp:710, engine:'4.0L Twin-Turbo V8', weight:1419, drivetrain:'RWD', body:'supercar', price:220000, zeroToSixty:2.9 },
+  { id:732, year:2020, make:'McLaren', model:'720S Performance', country:'UK', hp:710, engine:'4.0L Twin-Turbo V8', weight:1419, drivetrain:'RWD', body:'supercar', price:240000, zeroToSixty:2.8 },
+  { id:733, year:2020, make:'McLaren', model:'765LT', country:'UK', hp:755, engine:'4.0L Twin-Turbo V8', weight:1339, drivetrain:'RWD', body:'supercar', price:380000, zeroToSixty:2.8 },
+  { id:734, year:2018, make:'McLaren', model:'Senna', country:'UK', hp:789, engine:'4.0L Twin-Turbo V8', weight:1198, drivetrain:'RWD', body:'supercar', price:800000, zeroToSixty:2.8 },
+  { id:735, year:2020, make:'McLaren', model:'Senna GTR', country:'UK', hp:825, engine:'4.0L Twin-Turbo V8', weight:1188, drivetrain:'RWD', body:'supercar', price:1200000, zeroToSixty:2.8 },
+  { id:736, year:2021, make:'McLaren', model:'Elva', country:'UK', hp:804, engine:'4.0L Twin-Turbo V8', weight:1148, drivetrain:'RWD', body:'roadster', price:1700000, zeroToSixty:3.0 },
+  { id:737, year:2022, make:'McLaren', model:'Artura', country:'UK', hp:671, engine:'3.0L Twin-Turbo Hybrid V6', weight:1498, drivetrain:'RWD', body:'supercar', price:185000, zeroToSixty:3.0 },
+  { id:738, year:2014, make:'McLaren', model:'P1 GTR', country:'UK', hp:986, engine:'3.8L Twin-Turbo Hybrid V8', weight:1198, drivetrain:'RWD', body:'supercar', price:2500000, zeroToSixty:2.8 },
+  { id:739, year:1963, make:'Aston Martin', model:'DB5', country:'UK', hp:282, engine:'4.0L NA I6', weight:1500, drivetrain:'RWD', body:'coupe', price:650000, zeroToSixty:8.1 },
+  { id:740, year:1970, make:'Aston Martin', model:'DB6 Volante', country:'UK', hp:282, engine:'4.0L NA I6', weight:1588, drivetrain:'RWD', body:'roadster', price:400000, zeroToSixty:8.5 },
+  { id:741, year:1977, make:'Aston Martin', model:'V8 Vantage (AM V8)', country:'UK', hp:375, engine:'5.3L NA V8', weight:1842, drivetrain:'RWD', body:'coupe', price:120000, zeroToSixty:5.4 },
+  { id:742, year:2001, make:'Aston Martin', model:'DB9', country:'UK', hp:450, engine:'6.0L NA V12', weight:1760, drivetrain:'RWD', body:'coupe', price:50000, zeroToSixty:4.9 },
+  { id:743, year:2007, make:'Aston Martin', model:'DBS V12', country:'UK', hp:510, engine:'6.0L NA V12', weight:1830, drivetrain:'RWD', body:'coupe', price:80000, zeroToSixty:4.3 },
+  { id:744, year:2011, make:'Aston Martin', model:'V12 Vantage S', country:'UK', hp:573, engine:'6.0L NA V12', weight:1665, drivetrain:'RWD', body:'coupe', price:100000, zeroToSixty:4.0 },
+  { id:745, year:2013, make:'Aston Martin', model:'Vanquish S', country:'UK', hp:568, engine:'6.0L NA V12', weight:1790, drivetrain:'RWD', body:'coupe', price:90000, zeroToSixty:4.0 },
+  { id:746, year:2016, make:'Aston Martin', model:'Rapide AMR', country:'UK', hp:580, engine:'6.0L NA V12', weight:1895, drivetrain:'RWD', body:'saloon', price:80000, zeroToSixty:4.4 },
+  { id:747, year:2017, make:'Aston Martin', model:'DB11 AMR', country:'UK', hp:630, engine:'5.2L Twin-Turbo V12', weight:1870, drivetrain:'RWD', body:'coupe', price:160000, zeroToSixty:3.7 },
+  { id:748, year:2019, make:'Aston Martin', model:'Vantage AMR', country:'UK', hp:503, engine:'4.0L Twin-Turbo V8', weight:1570, drivetrain:'RWD', body:'coupe', price:120000, zeroToSixty:3.9 },
+  { id:749, year:2021, make:'Aston Martin', model:'One-77', country:'UK', hp:750, engine:'7.3L NA V12', weight:1630, drivetrain:'RWD', body:'supercar', price:5000000, zeroToSixty:3.7 },
+  { id:750, year:2022, make:'Aston Martin', model:'Valkyrie AMR Pro', country:'UK', hp:1000, engine:'6.5L Hybrid NA V12', weight:1000, drivetrain:'RWD', body:'supercar', price:3500000, zeroToSixty:2.5 },
+  { id:751, year:2022, make:'Aston Martin', model:'DBX707', country:'UK', hp:707, engine:'4.0L Twin-Turbo V8', weight:2245, drivetrain:'AWD', body:'4x4', price:190000, zeroToSixty:3.3 },
+  { id:752, year:1963, make:'Aston Martin', model:'DB4 GT Zagato', country:'UK', hp:314, engine:'3.7L NA I6', weight:1153, drivetrain:'RWD', body:'coupe', price:8000000, zeroToSixty:6.5 },
+  { id:753, year:2023, make:'Aston Martin', model:'DB12', country:'UK', hp:680, engine:'4.0L Twin-Turbo V8', weight:1760, drivetrain:'RWD', body:'coupe', price:185000, zeroToSixty:3.5 },
+  { id:754, year:1990, make:'Mercedes-Benz', model:'190E 2.5-16 Evo II', country:'DE', hp:272, engine:'2.5L NA I4', weight:1390, drivetrain:'RWD', body:'saloon', price:80000, zeroToSixty:6.8 },
+  { id:755, year:1998, make:'Mercedes-Benz', model:'CLK 55 AMG', country:'DE', hp:347, engine:'5.5L NA V8', weight:1620, drivetrain:'RWD', body:'coupe', price:20000, zeroToSixty:5.3 },
+  { id:756, year:2002, make:'Mercedes-Benz', model:'SL 55 AMG R230', country:'DE', hp:476, engine:'5.5L Supercharged V8', weight:1955, drivetrain:'RWD', body:'roadster', price:30000, zeroToSixty:4.8 },
+  { id:757, year:1998, make:'Mercedes-Benz', model:'E55 AMG W210', country:'DE', hp:354, engine:'5.5L NA V8', weight:1720, drivetrain:'RWD', body:'saloon', price:12000, zeroToSixty:5.5 },
+  { id:758, year:2004, make:'Mercedes-Benz', model:'C55 AMG W203', country:'DE', hp:367, engine:'5.5L NA V8', weight:1590, drivetrain:'RWD', body:'saloon', price:12000, zeroToSixty:5.2 },
+  { id:759, year:2004, make:'Mercedes-Benz', model:'G55 AMG W463', country:'DE', hp:476, engine:'5.5L Supercharged V8', weight:2505, drivetrain:'AWD', body:'4x4', price:55000, zeroToSixty:5.5 },
+  { id:760, year:2013, make:'Mercedes-Benz', model:'C63 AMG Black Series W204', country:'DE', hp:517, engine:'6.2L NA V8', weight:1650, drivetrain:'RWD', body:'coupe', price:80000, zeroToSixty:4.2 },
+  { id:761, year:2012, make:'Mercedes-Benz', model:'E63 AMG Estate W212', country:'DE', hp:557, engine:'5.5L Twin-Turbo V8', weight:1895, drivetrain:'AWD', body:'estate', price:25000, zeroToSixty:4.2 },
+  { id:762, year:2015, make:'Mercedes-Benz', model:'S65 AMG W222', country:'DE', hp:630, engine:'6.0L Twin-Turbo V12', weight:2210, drivetrain:'RWD', body:'saloon', price:120000, zeroToSixty:4.0 },
+  { id:763, year:2016, make:'Mercedes-Benz', model:'AMG GT R', country:'DE', hp:585, engine:'4.0L Twin-Turbo V8', weight:1630, drivetrain:'RWD', body:'coupe', price:150000, zeroToSixty:3.6 },
+  { id:764, year:2020, make:'Mercedes-Benz', model:'AMG GT Black Series', country:'DE', hp:730, engine:'4.0L Twin-Turbo V8', weight:1625, drivetrain:'RWD', body:'coupe', price:330000, zeroToSixty:3.2 },
+  { id:765, year:2013, make:'Mercedes-Benz', model:'A45 AMG W176', country:'DE', hp:360, engine:'2.0L Turbo I4', weight:1525, drivetrain:'AWD', body:'hatch', price:18000, zeroToSixty:4.6 },
+  { id:766, year:2019, make:'Mercedes-Benz', model:'A45 S AMG W177', country:'DE', hp:421, engine:'2.0L Turbo I4', weight:1615, drivetrain:'AWD', body:'hatch', price:48000, zeroToSixty:3.9 },
+  { id:767, year:2014, make:'Mercedes-Benz', model:'GLE 63 S AMG', country:'DE', hp:585, engine:'5.5L Twin-Turbo V8', weight:2320, drivetrain:'AWD', body:'4x4', price:55000, zeroToSixty:4.2 },
+  { id:768, year:1996, make:'Mercedes-Benz', model:'SL 500 R129', country:'DE', hp:320, engine:'5.0L NA V8', weight:1930, drivetrain:'RWD', body:'roadster', price:22000, zeroToSixty:6.5 },
+  { id:769, year:1954, make:'Mercedes-Benz', model:'300SL Gullwing', country:'DE', hp:215, engine:'3.0L NA I6', weight:1295, drivetrain:'RWD', body:'coupe', price:1200000, zeroToSixty:8.8 },
+  { id:770, year:2004, make:'Mercedes-Benz', model:'SLK 32 AMG R170', country:'DE', hp:349, engine:'3.2L Supercharged V6', weight:1430, drivetrain:'RWD', body:'roadster', price:18000, zeroToSixty:5.1 },
+  { id:771, year:2019, make:'Mercedes-Benz', model:'CLA 45 AMG S', country:'DE', hp:421, engine:'2.0L Turbo I4', weight:1685, drivetrain:'AWD', body:'saloon', price:50000, zeroToSixty:4.0 },
+  { id:772, year:2003, make:'Mercedes-Benz', model:'S600 W220 V12', country:'DE', hp:368, engine:'5.5L NA V12', weight:2145, drivetrain:'RWD', body:'saloon', price:15000, zeroToSixty:5.6 },
+  { id:773, year:2022, make:'Mercedes-Benz', model:'EQS 53 AMG 4MATIC+', country:'DE', hp:761, engine:'Electric Dual Motor', weight:2665, drivetrain:'AWD', body:'saloon', price:150000, zeroToSixty:3.4 },
+  { id:774, year:1973, make:'BMW', model:'3.0 CSL', country:'DE', hp:206, engine:'3.0L NA I6', weight:1270, drivetrain:'RWD', body:'coupe', price:200000, zeroToSixty:7.0 },
+  { id:775, year:1984, make:'BMW', model:'M635 CSi', country:'DE', hp:286, engine:'3.5L NA I6', weight:1500, drivetrain:'RWD', body:'coupe', price:60000, zeroToSixty:6.4 },
+  { id:776, year:2001, make:'BMW', model:'M3 E46 GTR Homologation', country:'DE', hp:343, engine:'3.2L NA I6', weight:1495, drivetrain:'RWD', body:'coupe', price:35000, zeroToSixty:4.8 },
+  { id:777, year:2011, make:'BMW', model:'M5 F10', country:'DE', hp:560, engine:'4.4L Twin-Turbo V8', weight:1985, drivetrain:'RWD', body:'saloon', price:35000, zeroToSixty:4.4 },
+  { id:778, year:2018, make:'BMW', model:'M5 Competition F90', country:'DE', hp:625, engine:'4.4L Twin-Turbo V8', weight:1955, drivetrain:'AWD', body:'saloon', price:65000, zeroToSixty:3.3 },
+  { id:779, year:2021, make:'BMW', model:'M8 Competition Gran Coupe', country:'DE', hp:625, engine:'4.4L Twin-Turbo V8', weight:2165, drivetrain:'AWD', body:'coupe', price:100000, zeroToSixty:3.3 },
+  { id:780, year:2021, make:'BMW', model:'i4 M50', country:'DE', hp:544, engine:'Electric Dual Motor', weight:2125, drivetrain:'AWD', body:'saloon', price:70000, zeroToSixty:3.9 },
+  { id:781, year:2020, make:'BMW', model:'M2 CS', country:'DE', hp:444, engine:'3.0L Twin-Turbo I6', weight:1507, drivetrain:'RWD', body:'coupe', price:80000, zeroToSixty:4.2 },
+  { id:782, year:2021, make:'BMW', model:'M3 Competition G80', country:'DE', hp:510, engine:'3.0L Twin-Turbo I6', weight:1730, drivetrain:'RWD', body:'saloon', price:75000, zeroToSixty:3.9 },
+  { id:783, year:2022, make:'BMW', model:'M4 CSL', country:'DE', hp:550, engine:'3.0L Twin-Turbo I6', weight:1625, drivetrain:'RWD', body:'coupe', price:135000, zeroToSixty:3.6 },
+  { id:784, year:2022, make:'BMW', model:'M5 CS F90', country:'DE', hp:635, engine:'4.4L Twin-Turbo V8', weight:1940, drivetrain:'AWD', body:'saloon', price:140000, zeroToSixty:3.0 },
+  { id:785, year:1990, make:'BMW', model:'850 CSi', country:'DE', hp:380, engine:'5.6L NA V12', weight:1890, drivetrain:'RWD', body:'coupe', price:55000, zeroToSixty:5.9 },
+  { id:786, year:2000, make:'BMW', model:'Z8', country:'DE', hp:400, engine:'5.0L NA V8', weight:1585, drivetrain:'RWD', body:'roadster', price:120000, zeroToSixty:4.7 },
+  { id:787, year:2009, make:'BMW', model:'Z4 M Roadster E89', country:'DE', hp:340, engine:'3.2L NA I6', weight:1460, drivetrain:'RWD', body:'roadster', price:28000, zeroToSixty:4.8 },
+  { id:788, year:2018, make:'BMW', model:'X5 M Competition F95', country:'DE', hp:600, engine:'4.4L Twin-Turbo V8', weight:2325, drivetrain:'AWD', body:'4x4', price:80000, zeroToSixty:3.8 },
+  { id:789, year:1979, make:'Volkswagen', model:'Golf Mk1 GTI 1.6', country:'DE', hp:110, engine:'1.6L NA I4', weight:810, drivetrain:'FWD', body:'hatch', price:16000, zeroToSixty:9.0 },
+  { id:790, year:1985, make:'Volkswagen', model:'Golf Mk2 GTI 16v', country:'DE', hp:139, engine:'1.8L NA I4', weight:965, drivetrain:'FWD', body:'hatch', price:14000, zeroToSixty:8.2 },
+  { id:791, year:2003, make:'Volkswagen', model:'Golf Mk4 R32', country:'DE', hp:241, engine:'3.2L NA V6', weight:1530, drivetrain:'AWD', body:'hatch', price:14000, zeroToSixty:6.6 },
+  { id:792, year:2014, make:'Volkswagen', model:'Golf R Mk7', country:'DE', hp:300, engine:'2.0L Turbo I4', weight:1470, drivetrain:'AWD', body:'hatch', price:20000, zeroToSixty:5.1 },
+  { id:793, year:2019, make:'Volkswagen', model:'Golf GTI TCR', country:'DE', hp:290, engine:'2.0L Turbo I4', weight:1355, drivetrain:'FWD', body:'hatch', price:26000, zeroToSixty:5.6 },
+  { id:794, year:2008, make:'Volkswagen', model:'Scirocco R 2.0 TSI', country:'DE', hp:265, engine:'2.0L Turbo I4', weight:1366, drivetrain:'FWD', body:'coupe', price:12000, zeroToSixty:6.0 },
+  { id:795, year:2005, make:'Volkswagen', model:'Polo GTI 1.8T', country:'DE', hp:150, engine:'1.8L Turbo I4', weight:1195, drivetrain:'FWD', body:'hatch', price:5000, zeroToSixty:8.2 },
+  { id:796, year:2021, make:'Volkswagen', model:'Polo GTI 2.0 TSI', country:'DE', hp:207, engine:'2.0L Turbo I4', weight:1260, drivetrain:'FWD', body:'hatch', price:22000, zeroToSixty:6.5 },
+  { id:797, year:2018, make:'Volkswagen', model:'Up! GTI', country:'DE', hp:115, engine:'1.0L Turbo I3', weight:1000, drivetrain:'FWD', body:'hatch', price:12000, zeroToSixty:8.8 },
+  { id:798, year:1996, make:'Volkswagen', model:'Corrado VR6 2.9', country:'DE', hp:190, engine:'2.9L NA VR6', weight:1321, drivetrain:'FWD', body:'coupe', price:12000, zeroToSixty:7.2 },
+  { id:799, year:2003, make:'Volkswagen', model:'Beetle 1.8T', country:'DE', hp:150, engine:'1.8L Turbo I4', weight:1330, drivetrain:'FWD', body:'hatch', price:5000, zeroToSixty:8.5 },
+  { id:800, year:2010, make:'Volkswagen', model:'Touareg R 4.2 V8', country:'DE', hp:350, engine:'4.2L NA V8', weight:2300, drivetrain:'AWD', body:'4x4', price:14000, zeroToSixty:6.0 },
+  { id:801, year:2019, make:'Volkswagen', model:'T-Roc R', country:'DE', hp:300, engine:'2.0L Turbo I4', weight:1560, drivetrain:'AWD', body:'4x4', price:26000, zeroToSixty:4.9 },
+  { id:802, year:2006, make:'Volkswagen', model:'Touareg V10 TDI', country:'DE', hp:313, engine:'5.0L Twin-Turbo V10', weight:2830, drivetrain:'AWD', body:'4x4', price:10000, zeroToSixty:7.2 },
+  { id:803, year:2022, make:'Volkswagen', model:'ID.3 Pro S', country:'DE', hp:204, engine:'Electric Motor', weight:1832, drivetrain:'RWD', body:'hatch', price:38000, zeroToSixty:7.3 },
+  { id:804, year:1984, make:'Audi', model:'Sport Quattro', country:'DE', hp:306, engine:'2.1L Turbo I5', weight:1290, drivetrain:'AWD', body:'coupe', price:450000, zeroToSixty:4.9 },
+  { id:805, year:1994, make:'Audi', model:'RS2 Avant', country:'DE', hp:315, engine:'2.2L Turbo I5', weight:1595, drivetrain:'AWD', body:'estate', price:55000, zeroToSixty:5.4 },
+  { id:806, year:2000, make:'Audi', model:'RS4 B5 Avant', country:'DE', hp:381, engine:'2.7L Twin-Turbo V6', weight:1595, drivetrain:'AWD', body:'estate', price:30000, zeroToSixty:4.9 },
+  { id:807, year:2006, make:'Audi', model:'RS4 B7 Avant', country:'DE', hp:420, engine:'4.2L NA V8', weight:1745, drivetrain:'AWD', body:'estate', price:28000, zeroToSixty:4.8 },
+  { id:808, year:2002, make:'Audi', model:'RS6 C5 Avant', country:'DE', hp:450, engine:'4.2L Twin-Turbo V8', weight:1890, drivetrain:'AWD', body:'estate', price:20000, zeroToSixty:4.7 },
+  { id:809, year:2021, make:'Audi', model:'RS6 C8 Avant 630', country:'DE', hp:630, engine:'4.0L Twin-Turbo Hybrid V8', weight:2160, drivetrain:'AWD', body:'estate', price:100000, zeroToSixty:3.6 },
+  { id:810, year:2007, make:'Audi', model:'R8 4.2 FSI V8', country:'DE', hp:420, engine:'4.2L NA V8', weight:1560, drivetrain:'AWD', body:'supercar', price:60000, zeroToSixty:4.2 },
+  { id:811, year:2016, make:'Audi', model:'R8 V10 Plus', country:'DE', hp:610, engine:'5.2L NA V10', weight:1454, drivetrain:'AWD', body:'supercar', price:140000, zeroToSixty:3.2 },
+  { id:812, year:2017, make:'Audi', model:'TT RS 8S Coupe', country:'DE', hp:400, engine:'2.5L Turbo I5', weight:1510, drivetrain:'AWD', body:'coupe', price:45000, zeroToSixty:3.7 },
+  { id:813, year:2021, make:'Audi', model:'RS3 Sedan 8Y', country:'DE', hp:400, engine:'2.5L Turbo I5', weight:1570, drivetrain:'AWD', body:'saloon', price:58000, zeroToSixty:3.8 },
+  { id:814, year:2022, make:'Audi', model:'e-tron GT RS', country:'DE', hp:646, engine:'Electric Dual Motor', weight:2347, drivetrain:'AWD', body:'saloon', price:140000, zeroToSixty:3.3 },
+  { id:815, year:2013, make:'Audi', model:'RS Q8', country:'DE', hp:600, engine:'4.0L Twin-Turbo V8', weight:2520, drivetrain:'AWD', body:'4x4', price:100000, zeroToSixty:3.8 },
+  { id:816, year:2011, make:'Audi', model:'A1 1.4 TFSI', country:'DE', hp:122, engine:'1.4L Turbo I4', weight:1130, drivetrain:'FWD', body:'hatch', price:6000, zeroToSixty:9.3 },
+  { id:817, year:2009, make:'Audi', model:'A3 1.6 TDI', country:'DE', hp:105, engine:'1.6L Turbo I4', weight:1260, drivetrain:'FWD', body:'saloon', price:5000, zeroToSixty:11.5 },
+  { id:818, year:1988, make:'Audi', model:'80 Quattro 2.0', country:'DE', hp:115, engine:'2.0L NA I4', weight:1100, drivetrain:'AWD', body:'saloon', price:5000, zeroToSixty:10.5 },
+  { id:819, year:1990, make:'Honda', model:'NSX NA1 3.0', country:'JP', hp:270, engine:'3.0L NA V6', weight:1370, drivetrain:'RWD', body:'supercar', price:80000, zeroToSixty:5.9 },
+  { id:820, year:2016, make:'Honda', model:'NSX NC1', country:'JP', hp:573, engine:'3.5L Twin-Turbo Hybrid V6', weight:1725, drivetrain:'AWD', body:'supercar', price:150000, zeroToSixty:3.1 },
+  { id:821, year:1999, make:'Honda', model:'S2000 AP1', country:'JP', hp:240, engine:'2.0L NA I4', weight:1240, drivetrain:'RWD', body:'roadster', price:22000, zeroToSixty:5.9 },
+  { id:822, year:1997, make:'Honda', model:'Civic Type R EK9', country:'JP', hp:185, engine:'1.6L NA I4', weight:1050, drivetrain:'FWD', body:'hatch', price:25000, zeroToSixty:6.8 },
+  { id:823, year:2001, make:'Honda', model:'Civic Type R EP3', country:'JP', hp:200, engine:'2.0L NA I4', weight:1204, drivetrain:'FWD', body:'hatch', price:10000, zeroToSixty:6.8 },
+  { id:824, year:2007, make:'Honda', model:'Civic Type R FN2', country:'JP', hp:201, engine:'2.0L NA I4', weight:1261, drivetrain:'FWD', body:'hatch', price:9000, zeroToSixty:6.6 },
+  { id:825, year:2017, make:'Honda', model:'Civic Type R FK8', country:'JP', hp:320, engine:'2.0L Turbo I4', weight:1380, drivetrain:'FWD', body:'hatch', price:28000, zeroToSixty:5.7 },
+  { id:826, year:1988, make:'Honda', model:'CR-X Si', country:'JP', hp:135, engine:'1.6L NA I4', weight:980, drivetrain:'FWD', body:'coupe', price:7000, zeroToSixty:7.8 },
+  { id:827, year:2004, make:'Honda', model:'Legend 3.5 V6', country:'JP', hp:295, engine:'3.5L NA V6', weight:1800, drivetrain:'AWD', body:'saloon', price:6000, zeroToSixty:6.5 },
+  { id:828, year:1999, make:'Honda', model:'Accord Type R CH1', country:'JP', hp:212, engine:'2.2L NA I4', weight:1275, drivetrain:'FWD', body:'saloon', price:8500, zeroToSixty:6.5 },
+  { id:829, year:1991, make:'Honda', model:'Beat PP1', country:'JP', hp:64, engine:'0.66L NA I3', weight:760, drivetrain:'RWD', body:'roadster', price:6000, zeroToSixty:11.0 },
+  { id:830, year:2003, make:'Honda', model:'Jazz 1.2 DSi', country:'JP', hp:78, engine:'1.2L NA I4', weight:1085, drivetrain:'FWD', body:'hatch', price:2000, zeroToSixty:13.0 },
+  { id:831, year:2015, make:'Honda', model:'S660', country:'JP', hp:64, engine:'0.66L Turbo I3', weight:830, drivetrain:'RWD', body:'roadster', price:15000, zeroToSixty:9.7 },
+  { id:832, year:2005, make:'Honda', model:'Integra Type R DC5', country:'JP', hp:220, engine:'2.0L NA I4', weight:1248, drivetrain:'FWD', body:'coupe', price:18000, zeroToSixty:6.2 },
+  { id:833, year:2023, make:'Honda', model:'Civic Type R FL5', country:'JP', hp:329, engine:'2.0L Turbo I4', weight:1429, drivetrain:'FWD', body:'hatch', price:46000, zeroToSixty:5.4 },
+  { id:834, year:1996, make:'Mitsubishi', model:'Lancer Evo IV', country:'JP', hp:280, engine:'2.0L Turbo I4', weight:1260, drivetrain:'AWD', body:'saloon', price:18000, zeroToSixty:5.0 },
+  { id:835, year:1999, make:'Mitsubishi', model:'Lancer Evo VI Tommi Makinen', country:'JP', hp:280, engine:'2.0L Turbo I4', weight:1310, drivetrain:'AWD', body:'saloon', price:35000, zeroToSixty:4.8 },
+  { id:836, year:2001, make:'Mitsubishi', model:'Lancer Evo VII', country:'JP', hp:280, engine:'2.0L Turbo I4', weight:1400, drivetrain:'AWD', body:'saloon', price:16000, zeroToSixty:5.0 },
+  { id:837, year:2005, make:'Mitsubishi', model:'Lancer Evo IX FQ400', country:'JP', hp:405, engine:'2.0L Turbo I4', weight:1400, drivetrain:'AWD', body:'saloon', price:28000, zeroToSixty:3.5 },
+  { id:838, year:1997, make:'Mitsubishi', model:'GTO Twin Turbo 3.0 V6', country:'JP', hp:286, engine:'3.0L Twin-Turbo V6', weight:1750, drivetrain:'AWD', body:'coupe', price:12000, zeroToSixty:5.8 },
+  { id:839, year:1991, make:'Mitsubishi', model:'Eclipse GSX Turbo', country:'JP', hp:210, engine:'2.0L Turbo I4', weight:1385, drivetrain:'AWD', body:'coupe', price:12000, zeroToSixty:5.9 },
+  { id:840, year:1997, make:'Mitsubishi', model:'FTO GPX 2.0 V6', country:'JP', hp:200, engine:'2.0L NA V6', weight:1140, drivetrain:'FWD', body:'coupe', price:6000, zeroToSixty:7.0 },
+  { id:841, year:2003, make:'Mitsubishi', model:'Carisma 1.6', country:'JP', hp:100, engine:'1.6L NA I4', weight:1225, drivetrain:'FWD', body:'saloon', price:1200, zeroToSixty:12.0 },
+  { id:842, year:1994, make:'Mitsubishi', model:'3000GT VR-4', country:'JP', hp:286, engine:'3.0L Twin-Turbo V6', weight:1780, drivetrain:'AWD', body:'coupe', price:15000, zeroToSixty:5.8 },
+  { id:843, year:2020, make:'Mitsubishi', model:'Space Star 1.0', country:'JP', hp:71, engine:'1.0L NA I3', weight:995, drivetrain:'FWD', body:'hatch', price:10000, zeroToSixty:14.0 },
+  { id:844, year:1978, make:'Mazda', model:'RX-7 FB', country:'JP', hp:105, engine:'1.1L Rotary', weight:1065, drivetrain:'RWD', body:'coupe', price:18000, zeroToSixty:9.5 },
+  { id:845, year:1992, make:'Mazda', model:'RX-7 FC Turbo II', country:'JP', hp:200, engine:'1.3L Turbo Rotary', weight:1270, drivetrain:'RWD', body:'coupe', price:22000, zeroToSixty:6.5 },
+  { id:846, year:1992, make:'Mazda', model:'RX-7 FD Twin Turbo', country:'JP', hp:255, engine:'1.3L Twin-Turbo Rotary', weight:1280, drivetrain:'RWD', body:'coupe', price:38000, zeroToSixty:5.3 },
+  { id:847, year:2003, make:'Mazda', model:'RX-8 231ps', country:'JP', hp:231, engine:'1.3L Renesis Rotary', weight:1360, drivetrain:'RWD', body:'coupe', price:8000, zeroToSixty:6.4 },
+  { id:848, year:1989, make:'Mazda', model:'MX-5 NA 1.6', country:'JP', hp:115, engine:'1.6L NA I4', weight:1020, drivetrain:'RWD', body:'roadster', price:14000, zeroToSixty:8.6 },
+  { id:849, year:2000, make:'Mazda', model:'MX-5 NB Turbo', country:'JP', hp:178, engine:'1.8L Turbo I4', weight:1090, drivetrain:'RWD', body:'roadster', price:12000, zeroToSixty:6.7 },
+  { id:850, year:2005, make:'Mazda', model:'MX-5 NC 2.0', country:'JP', hp:160, engine:'2.0L NA I4', weight:1100, drivetrain:'RWD', body:'roadster', price:10000, zeroToSixty:7.9 },
+  { id:851, year:2018, make:'Mazda', model:'MX-5 ND RF 2.0', country:'JP', hp:184, engine:'2.0L NA I4', weight:1098, drivetrain:'RWD', body:'roadster', price:26000, zeroToSixty:6.5 },
+  { id:852, year:1988, make:'Mazda', model:'323 GTX AWD Turbo', country:'JP', hp:185, engine:'1.6L Turbo I4', weight:1040, drivetrain:'AWD', body:'hatch', price:14000, zeroToSixty:7.5 },
+  { id:853, year:2006, make:'Mazda', model:'3 MPS 2.3 Turbo', country:'JP', hp:260, engine:'2.3L Turbo I4', weight:1440, drivetrain:'FWD', body:'hatch', price:7000, zeroToSixty:5.9 },
+  { id:854, year:2006, make:'Mazda', model:'6 MPS 2.3 Turbo', country:'JP', hp:260, engine:'2.3L Turbo I4', weight:1575, drivetrain:'AWD', body:'estate', price:8000, zeroToSixty:6.4 },
+  { id:855, year:2021, make:'Mazda', model:'CX-5 2.5 AWD', country:'JP', hp:194, engine:'2.5L NA I4', weight:1695, drivetrain:'AWD', body:'4x4', price:28000, zeroToSixty:8.5 },
+  { id:856, year:1991, make:'Mazda', model:'323 1.3 LX', country:'JP', hp:73, engine:'1.3L NA I4', weight:960, drivetrain:'FWD', body:'hatch', price:900, zeroToSixty:13.5 },
+  { id:857, year:2004, make:'Daewoo', model:'Matiz 0.8', country:'KR', hp:52, engine:'0.8L NA I3', weight:770, drivetrain:'FWD', body:'hatch', price:500, zeroToSixty:18.0 },
+  { id:858, year:2002, make:'Rover', model:'25 1.4', country:'UK', hp:84, engine:'1.4L NA I4', weight:1115, drivetrain:'FWD', body:'hatch', price:700, zeroToSixty:12.5 },
+  { id:859, year:2004, make:'Peugeot', model:'107 1.0', country:'FR', hp:68, engine:'1.0L NA I3', weight:800, drivetrain:'FWD', body:'hatch', price:700, zeroToSixty:14.5 },
+  { id:860, year:2008, make:'Toyota', model:'Aygo 1.0', country:'JP', hp:68, engine:'1.0L NA I3', weight:845, drivetrain:'FWD', body:'hatch', price:2500, zeroToSixty:14.2 },
+  { id:861, year:2007, make:'Citroen', model:'C1 1.0', country:'FR', hp:68, engine:'1.0L NA I3', weight:855, drivetrain:'FWD', body:'hatch', price:1800, zeroToSixty:14.5 },
+  { id:862, year:2004, make:'Daihatsu', model:'Charade 1.0', country:'JP', hp:58, engine:'1.0L NA I3', weight:840, drivetrain:'FWD', body:'hatch', price:600, zeroToSixty:16.0 },
+  { id:863, year:1997, make:'Vauxhall', model:'Corsa A 1.2 Merit', country:'UK', hp:45, engine:'1.2L NA I4', weight:895, drivetrain:'FWD', body:'hatch', price:400, zeroToSixty:16.5 },
+  { id:864, year:1996, make:'Ford', model:'Escort 1.3 LX', country:'UK', hp:60, engine:'1.3L NA I4', weight:1030, drivetrain:'FWD', body:'saloon', price:600, zeroToSixty:14.8 },
+  { id:865, year:2001, make:'SEAT', model:'Arosa 1.0', country:'ES', hp:50, engine:'1.0L NA I3', weight:855, drivetrain:'FWD', body:'hatch', price:600, zeroToSixty:15.5 },
+  { id:866, year:2003, make:'Volkswagen', model:'Lupo 1.0', country:'DE', hp:50, engine:'1.0L NA I3', weight:890, drivetrain:'FWD', body:'hatch', price:2000, zeroToSixty:15.5 },
+  { id:867, year:1982, make:'Lada', model:'Niva 1600', country:'RU', hp:78, engine:'1.6L NA I4', weight:1200, drivetrain:'AWD', body:'4x4', price:2500, zeroToSixty:16.0 },
+  { id:868, year:1985, make:'Lada', model:'1200 S', country:'RU', hp:64, engine:'1.2L NA I4', weight:900, drivetrain:'RWD', body:'saloon', price:1200, zeroToSixty:17.0 },
+  { id:869, year:1970, make:'SEAT', model:'600 D', country:'ES', hp:25, engine:'0.6L NA I4', weight:470, drivetrain:'RWD', body:'saloon', price:8000, zeroToSixty:35.0 },
+  { id:870, year:1985, make:'Robin Reliant', model:'Robin 750cc', country:'UK', hp:40, engine:'0.75L NA I4', weight:457, drivetrain:'RWD', body:'hatch', price:5000, zeroToSixty:16.0 },
+  { id:871, year:1969, make:'Austin', model:'Allegro 1.1', country:'UK', hp:48, engine:'1.1L NA I4', weight:890, drivetrain:'FWD', body:'saloon', price:3500, zeroToSixty:20.0 },
+  { id:872, year:1992, make:'Skoda', model:'Estelle 130L', country:'CZ', hp:58, engine:'1.3L NA I4', weight:840, drivetrain:'RWD', body:'saloon', price:2000, zeroToSixty:17.0 },
+  { id:873, year:2001, make:'Mercedes-Benz', model:'Sprinter 311 CDI', country:'DE', hp:109, engine:'2.2L Turbo I4', weight:1860, drivetrain:'RWD', body:'estate', price:4500, zeroToSixty:14.0 },
+  { id:874, year:2008, make:'Ford', model:'Transit Connect 1.8 TDCi', country:'UK', hp:110, engine:'1.8L Turbo I4', weight:1440, drivetrain:'RWD', body:'estate', price:3500, zeroToSixty:14.0 },
+  { id:875, year:1994, make:'Pontiac', model:'Firebird Trans Am', country:'US', hp:275, engine:'5.7L NA V8', weight:1620, drivetrain:'RWD', body:'coupe', price:12000, zeroToSixty:5.9 },
+  { id:876, year:1969, make:'Pontiac', model:'GTO Judge 400', country:'US', hp:370, engine:'6.6L NA V8', weight:1620, drivetrain:'RWD', body:'coupe', price:45000, zeroToSixty:5.5 },
+  { id:877, year:1992, make:'Pontiac', model:'Firebird Formula', country:'US', hp:245, engine:'5.0L NA V8', weight:1480, drivetrain:'RWD', body:'coupe', price:8000, zeroToSixty:6.5 },
+  { id:878, year:1970, make:'AMC', model:'AMX 390', country:'US', hp:325, engine:'6.4L NA V8', weight:1470, drivetrain:'RWD', body:'coupe', price:28000, zeroToSixty:6.2 },
+  { id:879, year:1969, make:'Plymouth', model:'Barracuda 440', country:'US', hp:375, engine:'7.2L NA V8', weight:1540, drivetrain:'RWD', body:'coupe', price:55000, zeroToSixty:5.8 },
+  { id:880, year:1972, make:'De Tomaso', model:'Pantera GTS', country:'IT', hp:330, engine:'5.8L NA V8', weight:1372, drivetrain:'RWD', body:'coupe', price:120000, zeroToSixty:6.0 },
+  { id:881, year:2012, make:'Lotus', model:'Exige S V6', country:'UK', hp:350, engine:'3.5L Supercharged V6', weight:1175, drivetrain:'RWD', body:'coupe', price:45000, zeroToSixty:3.8 },
+  { id:882, year:2015, make:'Lotus', model:'Evora 400', country:'UK', hp:400, engine:'3.5L Supercharged V6', weight:1395, drivetrain:'RWD', body:'coupe', price:65000, zeroToSixty:4.1 },
+  { id:883, year:2019, make:'Lotus', model:'Evora GT430', country:'UK', hp:430, engine:'3.5L Supercharged V6', weight:1298, drivetrain:'RWD', body:'coupe', price:90000, zeroToSixty:3.8 },
+  { id:884, year:2022, make:'Lotus', model:'Emira V6 First Edition', country:'UK', hp:400, engine:'3.5L Supercharged V6', weight:1405, drivetrain:'RWD', body:'coupe', price:70000, zeroToSixty:4.2 },
+  { id:885, year:1995, make:'Citroen', model:'Saxo VTS 1.6', country:'FR', hp:120, engine:'1.6L NA I4', weight:900, drivetrain:'FWD', body:'hatch', price:3500, zeroToSixty:8.6 },
+  { id:886, year:1989, make:'Citroen', model:'AX GT 1.4', country:'FR', hp:85, engine:'1.4L NA I4', weight:720, drivetrain:'FWD', body:'hatch', price:4500, zeroToSixty:10.0 },
+  { id:887, year:2000, make:'Citroen', model:'Xsara VTS 2.0', country:'FR', hp:167, engine:'2.0L NA I4', weight:1090, drivetrain:'FWD', body:'coupe', price:4000, zeroToSixty:7.3 },
+  { id:888, year:1993, make:'Citroen', model:'BX GTi 16v', country:'FR', hp:160, engine:'1.9L NA I4', weight:1015, drivetrain:'FWD', body:'hatch', price:5000, zeroToSixty:8.0 },
+  { id:889, year:2019, make:'Citroen', model:'C3 Aircross 1.2 PureTech', country:'FR', hp:110, engine:'1.2L Turbo I3', weight:1270, drivetrain:'FWD', body:'4x4', price:9000, zeroToSixty:11.2 },
+  { id:890, year:2007, make:'Citroen', model:'C4 1.6 HDi', country:'FR', hp:109, engine:'1.6L Turbo I4', weight:1300, drivetrain:'FWD', body:'saloon', price:2500, zeroToSixty:11.5 },
+  { id:891, year:1973, make:'Alpine', model:'A110 1600S', country:'FR', hp:138, engine:'1.6L NA I4', weight:670, drivetrain:'RWD', body:'coupe', price:120000, zeroToSixty:6.3 },
+  { id:892, year:2017, make:'Alpine', model:'A110 Premiere Edition', country:'FR', hp:252, engine:'1.8L Turbo I4', weight:1080, drivetrain:'RWD', body:'coupe', price:55000, zeroToSixty:4.5 },
+  { id:893, year:2021, make:'Alpine', model:'A110 S', country:'FR', hp:292, engine:'1.8L Turbo I4', weight:1097, drivetrain:'RWD', body:'coupe', price:65000, zeroToSixty:4.2 },
+  { id:894, year:1975, make:'Lancia', model:'Stratos HF', country:'IT', hp:190, engine:'2.4L NA V6', weight:890, drivetrain:'RWD', body:'coupe', price:600000, zeroToSixty:5.5 },
+  { id:895, year:1983, make:'Lancia', model:'037 Stradale', country:'IT', hp:205, engine:'2.0L Supercharged I4', weight:1060, drivetrain:'RWD', body:'coupe', price:500000, zeroToSixty:6.0 },
+  { id:896, year:1988, make:'Lancia', model:'Delta Integrale 8v', country:'IT', hp:185, engine:'2.0L Turbo I4', weight:1250, drivetrain:'AWD', body:'hatch', price:45000, zeroToSixty:5.5 },
+  { id:897, year:1991, make:'Lancia', model:'Delta HF Integrale Evo I', country:'IT', hp:210, engine:'2.0L Turbo I4', weight:1320, drivetrain:'AWD', body:'hatch', price:80000, zeroToSixty:5.1 },
+  { id:898, year:2001, make:'Lancia', model:'Thema 2.0 Turbo', country:'IT', hp:155, engine:'2.0L Turbo I4', weight:1380, drivetrain:'FWD', body:'saloon', price:3000, zeroToSixty:9.5 },
+  { id:899, year:2022, make:'Subaru', model:'BRZ S (ZD8)', country:'JP', hp:234, engine:'2.4L NA F4', weight:1270, drivetrain:'RWD', body:'coupe', price:32000, zeroToSixty:6.3 },
+  { id:900, year:2003, make:'Subaru', model:'Impreza WRX STI GD Spec C', country:'JP', hp:265, engine:'2.0L Turbo F4', weight:1370, drivetrain:'AWD', body:'saloon', price:22000, zeroToSixty:4.8 },
+  { id:901, year:1969, make:'Pontiac', model:'Firebird 400 Ram Air III', country:'US', hp:335, engine:'6.6L NA V8', weight:1590, drivetrain:'RWD', body:'coupe', price:35000, zeroToSixty:6.0 },
+  { id:902, year:1973, make:'Pontiac', model:'Trans Am Super Duty 455', country:'US', hp:310, engine:'7.5L NA V8', weight:1680, drivetrain:'RWD', body:'coupe', price:30000, zeroToSixty:6.5 },
+  { id:903, year:2004, make:'Pontiac', model:'GTO LS1', country:'US', hp:350, engine:'5.7L NA V8', weight:1640, drivetrain:'RWD', body:'coupe', price:12000, zeroToSixty:5.3 },
+  { id:904, year:1970, make:'Chevrolet', model:'Chevelle SS454 LS6', country:'US', hp:450, engine:'7.4L NA V8', weight:1670, drivetrain:'RWD', body:'coupe', price:60000, zeroToSixty:5.4 },
+  { id:905, year:1969, make:'Ford', model:'Mustang Boss 429', country:'US', hp:375, engine:'7.0L NA V8', weight:1590, drivetrain:'RWD', body:'coupe', price:120000, zeroToSixty:5.8 },
+  { id:906, year:1970, make:'Plymouth', model:'Hemi Cuda 426', country:'US', hp:425, engine:'7.0L NA V8', weight:1670, drivetrain:'RWD', body:'coupe', price:200000, zeroToSixty:5.5 },
+  { id:907, year:1969, make:'Dodge', model:'Charger Daytona 440', country:'US', hp:375, engine:'7.2L NA V8', weight:1720, drivetrain:'RWD', body:'saloon', price:70000, zeroToSixty:5.9 },
+  { id:908, year:2004, make:'Cadillac', model:'CTS-V 5.7 V8', country:'US', hp:400, engine:'5.7L NA V8', weight:1774, drivetrain:'RWD', body:'saloon', price:15000, zeroToSixty:4.9 },
+  { id:909, year:2016, make:'Cadillac', model:'CTS-V 6.2 Supercharged', country:'US', hp:640, engine:'6.2L Supercharged V8', weight:1965, drivetrain:'RWD', body:'saloon', price:55000, zeroToSixty:3.6 },
+  { id:910, year:2022, make:'Cadillac', model:'CT5-V Blackwing', country:'US', hp:668, engine:'6.2L Supercharged V8', weight:1989, drivetrain:'RWD', body:'saloon', price:80000, zeroToSixty:3.7 },
+  { id:911, year:2008, make:'Infiniti', model:'G37 S Coupe', country:'JP', hp:330, engine:'3.7L NA V6', weight:1583, drivetrain:'RWD', body:'coupe', price:12000, zeroToSixty:5.3 },
+  { id:912, year:2014, make:'Infiniti', model:'Q50 Red Sport 400', country:'JP', hp:405, engine:'3.0L Twin-Turbo V6', weight:1770, drivetrain:'AWD', body:'saloon', price:22000, zeroToSixty:4.5 },
+  { id:913, year:2006, make:'Lexus', model:'IS-F 5.0 V8', country:'JP', hp:423, engine:'5.0L NA V8', weight:1740, drivetrain:'RWD', body:'saloon', price:18000, zeroToSixty:4.6 },
+  { id:914, year:2012, make:'Lexus', model:'LFA', country:'JP', hp:552, engine:'4.8L NA V10', weight:1480, drivetrain:'RWD', body:'supercar', price:375000, zeroToSixty:3.6 },
+  { id:915, year:2021, make:'Lexus', model:'RC-F Track Edition', country:'JP', hp:472, engine:'5.0L NA V8', weight:1720, drivetrain:'RWD', body:'coupe', price:85000, zeroToSixty:4.2 },
+  { id:916, year:2012, make:'Nissan', model:'GT-R R35 Track Edition', country:'JP', hp:545, engine:'3.8L Twin-Turbo V6', weight:1740, drivetrain:'AWD', body:'coupe', price:75000, zeroToSixty:2.7 },
+  { id:917, year:2017, make:'Nissan', model:'GT-R NISMO', country:'JP', hp:600, engine:'3.8L Twin-Turbo V6', weight:1720, drivetrain:'AWD', body:'coupe', price:185000, zeroToSixty:2.7 },
+  { id:918, year:2016, make:'Tesla', model:'Model S P100D', country:'US', hp:762, engine:'Electric Dual Motor', weight:2241, drivetrain:'AWD', body:'saloon', price:65000, zeroToSixty:2.7 },
+  { id:919, year:2021, make:'Tesla', model:'Model S Plaid', country:'US', hp:1020, engine:'Electric Tri Motor', weight:2162, drivetrain:'AWD', body:'saloon', price:90000, zeroToSixty:2.1 },
+  { id:920, year:2019, make:'Tesla', model:'Model 3 Performance', country:'US', hp:450, engine:'Electric Dual Motor', weight:1847, drivetrain:'AWD', body:'saloon', price:38000, zeroToSixty:3.3 },
+  { id:921, year:2022, make:'Tesla', model:'Model X Plaid', country:'US', hp:1020, engine:'Electric Tri Motor', weight:2459, drivetrain:'AWD', body:'4x4', price:100000, zeroToSixty:2.5 },
+  { id:922, year:2021, make:'Rimac', model:'Nevera', country:'HR', hp:1914, engine:'Electric Quad Motor', weight:2150, drivetrain:'AWD', body:'supercar', price:2000000, zeroToSixty:1.9 },
+  { id:923, year:2022, make:'Polestar', model:'Polestar 1', country:'SE', hp:619, engine:'2.0L Turbo Hybrid I4', weight:2350, drivetrain:'AWD', body:'coupe', price:120000, zeroToSixty:4.2 },
+  { id:924, year:2022, make:'Polestar', model:'Polestar 2 Performance', country:'SE', hp:476, engine:'Electric Dual Motor', weight:2009, drivetrain:'AWD', body:'saloon', price:50000, zeroToSixty:4.5 },
+  { id:925, year:2011, make:'Koenigsegg', model:'Agera R', country:'SE', hp:1115, engine:'5.0L Twin-Turbo V8', weight:1435, drivetrain:'RWD', body:'supercar', price:2000000, zeroToSixty:2.9 },
+  { id:926, year:2014, make:'Koenigsegg', model:'One:1', country:'SE', hp:1341, engine:'5.0L Twin-Turbo V8', weight:1360, drivetrain:'RWD', body:'supercar', price:3000000, zeroToSixty:2.8 },
+  { id:927, year:2019, make:'Koenigsegg', model:'Jesko', country:'SE', hp:1600, engine:'5.0L Twin-Turbo V8', weight:1420, drivetrain:'RWD', body:'supercar', price:3000000, zeroToSixty:2.5 },
+  { id:928, year:2021, make:'Koenigsegg', model:'Gemera', country:'SE', hp:1700, engine:'2.0L Twin-Turbo Hybrid I3', weight:1850, drivetrain:'AWD', body:'saloon', price:1700000, zeroToSixty:1.9 },
+  { id:929, year:2011, make:'Pagani', model:'Huayra', country:'IT', hp:730, engine:'6.0L Twin-Turbo V12', weight:1350, drivetrain:'RWD', body:'supercar', price:2500000, zeroToSixty:3.3 },
+  { id:930, year:2017, make:'Pagani', model:'Huayra BC', country:'IT', hp:789, engine:'6.0L Twin-Turbo V12', weight:1218, drivetrain:'RWD', body:'supercar', price:3000000, zeroToSixty:2.9 },
+  { id:931, year:2022, make:'Pagani', model:'Utopia', country:'IT', hp:852, engine:'6.0L Twin-Turbo V12', weight:1280, drivetrain:'RWD', body:'supercar', price:2200000, zeroToSixty:3.0 },
+  { id:932, year:2020, make:'SSC', model:'Tuatara', country:'US', hp:1750, engine:'5.9L Twin-Turbo V8', weight:1247, drivetrain:'RWD', body:'supercar', price:1900000, zeroToSixty:2.5 },
+  { id:933, year:2013, make:'Hennessey', model:'Venom GT', country:'US', hp:1244, engine:'7.0L Twin-Turbo V8', weight:1244, drivetrain:'RWD', body:'supercar', price:1200000, zeroToSixty:2.7 },
+  { id:934, year:2022, make:'Hennessey', model:'Venom F5', country:'US', hp:1817, engine:'6.6L Twin-Turbo V8', weight:1360, drivetrain:'RWD', body:'supercar', price:2100000, zeroToSixty:2.6 },
+  { id:935, year:2023, make:'Lamborghini', model:'Revuelto LP1015-4', country:'IT', hp:1015, engine:'6.5L Hybrid NA V12', weight:1772, drivetrain:'AWD', body:'supercar', price:380000, zeroToSixty:2.5 },
+  { id:936, year:2013, make:'Ferrari', model:'LaFerrari', country:'IT', hp:963, engine:'6.3L Hybrid NA V12', weight:1255, drivetrain:'RWD', body:'supercar', price:3500000, zeroToSixty:2.9 },
+  { id:937, year:2022, make:'Ferrari', model:'Daytona SP3', country:'IT', hp:829, engine:'6.5L NA V12', weight:1485, drivetrain:'RWD', body:'supercar', price:2200000, zeroToSixty:2.8 },
+  { id:938, year:2007, make:'TVR', model:'Sagaris 4.0', country:'UK', hp:406, engine:'4.0L NA I6', weight:1080, drivetrain:'RWD', body:'coupe', price:28000, zeroToSixty:3.9 },
+  { id:939, year:1998, make:'TVR', model:'Cerbera Speed Six', country:'UK', hp:360, engine:'4.2L NA I6', weight:1050, drivetrain:'RWD', body:'coupe', price:22000, zeroToSixty:4.2 },
+  { id:940, year:1995, make:'TVR', model:'Chimaera 4.0', country:'UK', hp:240, engine:'4.0L NA V8', weight:1060, drivetrain:'RWD', body:'roadster', price:16000, zeroToSixty:5.1 },
+  { id:941, year:2020, make:'Morgan', model:'Super 3', country:'UK', hp:118, engine:'1.5L NA I3', weight:635, drivetrain:'RWD', body:'roadster', price:38000, zeroToSixty:7.0 },
+  { id:942, year:2019, make:'Morgan', model:'Plus Six', country:'UK', hp:335, engine:'3.0L Turbo I6', weight:1075, drivetrain:'RWD', body:'roadster', price:82000, zeroToSixty:4.2 },
+  { id:943, year:2015, make:'Caterham', model:'Seven 420R', country:'UK', hp:210, engine:'2.0L Turbo I4', weight:490, drivetrain:'RWD', body:'roadster', price:40000, zeroToSixty:3.8 },
+  { id:944, year:2020, make:'Caterham', model:'Seven 620R', country:'UK', hp:311, engine:'2.0L Supercharged I4', weight:535, drivetrain:'RWD', body:'roadster', price:55000, zeroToSixty:2.8 },
+  { id:945, year:2012, make:'Caterham', model:'Seven 160', country:'UK', hp:80, engine:'0.66L Turbo I3', weight:440, drivetrain:'RWD', body:'roadster', price:18000, zeroToSixty:6.5 },
+  { id:946, year:2017, make:'Lotus', model:'Exige Sport 410', country:'UK', hp:410, engine:'3.5L Supercharged V6', weight:1054, drivetrain:'RWD', body:'coupe', price:70000, zeroToSixty:3.6 },
+  { id:947, year:2020, make:'Lotus', model:'Evija', country:'UK', hp:2000, engine:'Electric Quad Motor', weight:1680, drivetrain:'AWD', body:'supercar', price:2000000, zeroToSixty:3.0 },
+  { id:948, year:1988, make:'Lotus', model:'Esprit Turbo SE', country:'UK', hp:264, engine:'2.2L Turbo I4', weight:1230, drivetrain:'RWD', body:'coupe', price:40000, zeroToSixty:4.7 },
+  { id:949, year:2016, make:'Ariel', model:'Atom 3.5R', country:'UK', hp:350, engine:'2.0L Turbo I4', weight:550, drivetrain:'RWD', body:'roadster', price:65000, zeroToSixty:2.8 },
+  { id:950, year:2014, make:'BAC', model:'Mono', country:'UK', hp:280, engine:'2.3L Turbo I4', weight:540, drivetrain:'RWD', body:'roadster', price:110000, zeroToSixty:2.8 },
+  { id:951, year:2021, make:'Porsche', model:'Taycan Turbo S', country:'DE', hp:761, engine:'Electric Dual Motor', weight:2295, drivetrain:'AWD', body:'saloon', price:170000, zeroToSixty:2.8 },
+  { id:952, year:2022, make:'Porsche', model:'Taycan GTS Sport Turismo', country:'DE', hp:590, engine:'Electric Dual Motor', weight:2225, drivetrain:'AWD', body:'estate', price:110000, zeroToSixty:3.7 },
+  { id:953, year:2023, make:'BMW', model:'XM Label Red', country:'DE', hp:748, engine:'4.4L Twin-Turbo Hybrid V8', weight:2760, drivetrain:'AWD', body:'4x4', price:185000, zeroToSixty:3.8 },
+  { id:954, year:2021, make:'BMW', model:'M3 Competition Touring G81', country:'DE', hp:510, engine:'3.0L Twin-Turbo I6', weight:1730, drivetrain:'AWD', body:'estate', price:80000, zeroToSixty:3.6 },
+  { id:955, year:1998, make:'Bristol', model:'Fighter T', country:'UK', hp:610, engine:'8.0L NA V10', weight:1250, drivetrain:'RWD', body:'coupe', price:180000, zeroToSixty:4.0 },
+  { id:956, year:2002, make:'Noble', model:'M12 GTO-3R', country:'UK', hp:352, engine:'3.0L Twin-Turbo V6', weight:1050, drivetrain:'RWD', body:'coupe', price:45000, zeroToSixty:3.8 },
+  { id:957, year:2010, make:'Radical', model:'SR3 SL 1500cc', country:'UK', hp:185, engine:'1.5L NA I4', weight:475, drivetrain:'RWD', body:'roadster', price:38000, zeroToSixty:4.8 },
+  { id:958, year:2004, make:'Westfield', model:'Sports SE', country:'UK', hp:150, engine:'2.0L NA I4', weight:520, drivetrain:'RWD', body:'roadster', price:22000, zeroToSixty:4.5 },
+  { id:959, year:2019, make:'Volkswagen', model:'Polo 1.0 TSI Trendline', country:'DE', hp:95, engine:'1.0L Turbo I3', weight:1095, drivetrain:'FWD', body:'hatch', price:12000, zeroToSixty:11.0 },
+  { id:960, year:2020, make:'Ford', model:'Puma ST', country:'UK', hp:200, engine:'1.5L Turbo I3', weight:1390, drivetrain:'FWD', body:'4x4', price:24000, zeroToSixty:6.7 },
+  { id:961, year:2021, make:'Hyundai', model:'Tucson 1.6 CRDI', country:'KR', hp:115, engine:'1.6L Turbo I4', weight:1520, drivetrain:'FWD', body:'4x4', price:22000, zeroToSixty:11.5 },
+  { id:962, year:2019, make:'Toyota', model:'Supra GR A90 2.0', country:'JP', hp:258, engine:'2.0L Turbo I4', weight:1395, drivetrain:'RWD', body:'coupe', price:46000, zeroToSixty:5.2 },
+  { id:963, year:2007, make:'Honda', model:'Accord 2.2 i-DTEC', country:'JP', hp:140, engine:'2.2L Turbo I4', weight:1543, drivetrain:'FWD', body:'estate', price:5000, zeroToSixty:10.5 },
+  { id:964, year:2011, make:'Kia', model:'Rio 1.1 CRDi', country:'KR', hp:75, engine:'1.1L Turbo I4', weight:1080, drivetrain:'FWD', body:'hatch', price:3500, zeroToSixty:14.0 },
+  { id:965, year:2014, make:'Suzuki', model:'Swift 1.2 SZ2', country:'JP', hp:94, engine:'1.2L NA I4', weight:1005, drivetrain:'FWD', body:'hatch', price:4500, zeroToSixty:11.5 },
+  { id:966, year:1996, make:'Honda', model:'Civic 1.4 LS', country:'JP', hp:90, engine:'1.4L NA I4', weight:1020, drivetrain:'FWD', body:'saloon', price:1800, zeroToSixty:12.5 },
+  { id:967, year:2000, make:'Nissan', model:'Primera 1.8 SE', country:'JP', hp:114, engine:'1.8L NA I4', weight:1280, drivetrain:'FWD', body:'saloon', price:1200, zeroToSixty:11.0 },
+  { id:968, year:2006, make:'Toyota', model:'Corolla Verso 1.8', country:'JP', hp:129, engine:'1.8L NA I4', weight:1510, drivetrain:'FWD', body:'estate', price:4000, zeroToSixty:11.5 },
+  { id:969, year:2009, make:'Renault', model:'Laguna 3.0 V6', country:'FR', hp:240, engine:'3.0L Turbo I6', weight:1740, drivetrain:'FWD', body:'saloon', price:5000, zeroToSixty:7.5 },
+  { id:970, year:2013, make:'Seat', model:'Leon 1.8 TSI FR', country:'ES', hp:180, engine:'1.8L Turbo I4', weight:1295, drivetrain:'FWD', body:'hatch', price:8000, zeroToSixty:7.3 },
+  { id:971, year:2022, make:'BMW', model:'2 Series 220i Active Tourer', country:'DE', hp:170, engine:'2.0L Turbo I4', weight:1595, drivetrain:'FWD', body:'estate', price:28000, zeroToSixty:8.5 },
+  { id:972, year:2018, make:'Mercedes-Benz', model:'CLA 200', country:'DE', hp:163, engine:'1.3L Turbo I4', weight:1415, drivetrain:'FWD', body:'saloon', price:24000, zeroToSixty:8.2 },
+  { id:973, year:2020, make:'Audi', model:'Q3 Sportback 35 TFSI', country:'DE', hp:150, engine:'1.5L Turbo I4', weight:1540, drivetrain:'FWD', body:'4x4', price:32000, zeroToSixty:9.2 },
+  { id:974, year:2015, make:'Volkswagen', model:'Passat B8 2.0 BiTDI', country:'DE', hp:240, engine:'2.0L Twin-Turbo I4', weight:1535, drivetrain:'AWD', body:'estate', price:12000, zeroToSixty:6.0 },
+  { id:975, year:2019, make:'Skoda', model:'Superb 2.0 TSI 4x4', country:'CZ', hp:272, engine:'2.0L Turbo I4', weight:1640, drivetrain:'AWD', body:'saloon', price:25000, zeroToSixty:5.9 },
+  { id:976, year:1999, make:'Renault', model:'Megane 1.6 RXT', country:'FR', hp:107, engine:'1.6L NA I4', weight:1135, drivetrain:'FWD', body:'hatch', price:700, zeroToSixty:12.0 },
+  { id:977, year:2016, make:'Hyundai', model:'i40 1.7 CRDi Blue', country:'KR', hp:136, engine:'1.7L Turbo I4', weight:1445, drivetrain:'FWD', body:'estate', price:7000, zeroToSixty:11.5 },
+  { id:978, year:2003, make:'Citroen', model:'Xsara Picasso 1.6', country:'FR', hp:97, engine:'1.6L NA I4', weight:1330, drivetrain:'FWD', body:'estate', price:1800, zeroToSixty:13.5 },
+  { id:979, year:2019, make:'Ford', model:'Galaxy 2.0 EcoBlue AWD', country:'UK', hp:190, engine:'2.0L Turbo I4', weight:1915, drivetrain:'AWD', body:'estate', price:18000, zeroToSixty:9.8 },
+  { id:980, year:2011, make:'Honda', model:'CR-V 2.2 i-DTEC', country:'JP', hp:150, engine:'2.2L Turbo I4', weight:1657, drivetrain:'AWD', body:'4x4', price:8000, zeroToSixty:10.5 },
+  { id:981, year:2015, make:'Mazda', model:'MX-5 ND 1.5', country:'JP', hp:131, engine:'1.5L NA I4', weight:1010, drivetrain:'RWD', body:'roadster', price:18000, zeroToSixty:8.3 },
+  { id:982, year:2018, make:'Toyota', model:'C-HR 1.8 Hybrid', country:'JP', hp:122, engine:'1.8L Hybrid I4', weight:1350, drivetrain:'FWD', body:'4x4', price:16000, zeroToSixty:11.0 },
+  { id:983, year:2021, make:'Peugeot', model:'e-208 EV', country:'FR', hp:136, engine:'Electric Motor', weight:1520, drivetrain:'FWD', body:'hatch', price:28000, zeroToSixty:8.1 },
+  { id:984, year:2020, make:'Renault', model:'Zoe ZE50 R135', country:'FR', hp:135, engine:'Electric Motor', weight:1502, drivetrain:'FWD', body:'hatch', price:22000, zeroToSixty:9.5 },
+  { id:985, year:2022, make:'VinFast', model:'VF 8 Plus', country:'VN', hp:402, engine:'Electric Dual Motor', weight:2018, drivetrain:'AWD', body:'4x4', price:45000, zeroToSixty:5.9 },
+  { id:986, year:2022, make:'BYD', model:'Atto 3', country:'CN', hp:204, engine:'Electric Motor', weight:1750, drivetrain:'FWD', body:'4x4', price:33000, zeroToSixty:7.3 },
+  { id:987, year:2023, make:'Alfa Romeo', model:'Tonale PHEV Q4', country:'IT', hp:280, engine:'1.3L Turbo Hybrid I4', weight:1820, drivetrain:'AWD', body:'4x4', price:45000, zeroToSixty:6.1 },
+  { id:988, year:2021, make:'Maserati', model:'Ghibli Trofeo V8', country:'IT', hp:580, engine:'3.8L Twin-Turbo V8', weight:1980, drivetrain:'AWD', body:'saloon', price:90000, zeroToSixty:4.3 },
+  { id:989, year:2022, make:'Maserati', model:'MC20', country:'IT', hp:630, engine:'3.0L Twin-Turbo V6', weight:1500, drivetrain:'RWD', body:'supercar', price:210000, zeroToSixty:2.9 },
+  { id:990, year:2021, make:'Maserati', model:'GranTurismo Modena', country:'IT', hp:490, engine:'3.0L Twin-Turbo V6', weight:1900, drivetrain:'RWD', body:'coupe', price:150000, zeroToSixty:3.9 },
+  { id:991, year:2019, make:'Lamborghini', model:'Urus 4.0 V8', country:'IT', hp:641, engine:'4.0L Twin-Turbo V8', weight:2197, drivetrain:'AWD', body:'4x4', price:170000, zeroToSixty:3.6 },
+  { id:992, year:2021, make:'Ferrari', model:'Portofino M', country:'IT', hp:620, engine:'3.9L Twin-Turbo V8', weight:1664, drivetrain:'RWD', body:'roadster', price:215000, zeroToSixty:3.4 },
+  { id:993, year:2016, make:'McLaren', model:'GT', country:'UK', hp:620, engine:'4.0L Twin-Turbo V8', weight:1466, drivetrain:'RWD', body:'coupe', price:180000, zeroToSixty:3.1 },
+  { id:994, year:2015, make:'Bentley', model:'Continental GT V8 S', country:'UK', hp:528, engine:'4.0L Twin-Turbo V8', weight:2205, drivetrain:'AWD', body:'coupe', price:80000, zeroToSixty:4.3 },
+  { id:995, year:2019, make:'Aston Martin', model:'Vantage V8', country:'UK', hp:503, engine:'4.0L Twin-Turbo V8', weight:1530, drivetrain:'RWD', body:'coupe', price:100000, zeroToSixty:3.7 },
+  { id:996, year:2021, make:'Rolls-Royce', model:'Ghost Black Badge', country:'UK', hp:592, engine:'6.6L Twin-Turbo V12', weight:2440, drivetrain:'AWD', body:'saloon', price:380000, zeroToSixty:4.5 },
+  { id:997, year:2022, make:'Bentley', model:'Flying Spur Speed', country:'UK', hp:626, engine:'6.0L Twin-Turbo W12', weight:2530, drivetrain:'AWD', body:'saloon', price:230000, zeroToSixty:3.8 },
+  { id:998, year:2021, make:'Porsche', model:'911 Turbo S 992', country:'DE', hp:650, engine:'3.8L Twin-Turbo F6', weight:1640, drivetrain:'AWD', body:'coupe', price:220000, zeroToSixty:2.7 },
+  { id:999, year:2023, make:'Bugatti', model:'Tourbillon', country:'FR', hp:1800, engine:'8.4L Hybrid NA V16', weight:1995, drivetrain:'AWD', body:'supercar', price:4000000, zeroToSixty:2.0 },
+  { id:1000, year:2024, make:'Hennessey', model:'Venom F5 Roadster', country:'US', hp:1817, engine:'6.6L Twin-Turbo V8', weight:1385, drivetrain:'RWD', body:'roadster', price:2500000, zeroToSixty:2.7 },
 ];
 
 
@@ -1751,7 +2407,35 @@ async function submitPick() {
   renderSubmissions();
   renderSelected();
   updateSubBadge();
+  setTimeout(() => showShareCard(c), 600);
 }
+function showShareCard(car) {
+  if (!TODAY) return;
+  const num = String(TODAY.number).padStart(3, '0');
+  const budget = fmt(TODAY.max_price);
+  const constraints = TODAY.drivetrain_blacklist.length > 0
+    ? ' · ' + TODAY.drivetrain_blacklist.map(d => 'NO ' + d).join(' ')
+    : '';
+  const carName = car.year + ' ' + car.make.toUpperCase() + ' ' + car.model.toUpperCase();
+  const text = [
+    '🏎️  PISTONWAVE #' + num,
+    'Budget: ' + budget + constraints,
+    'My pick: ' + carName,
+    'pistonwave.com'
+  ].join('\n');
+  document.getElementById('shareCardText').textContent = text;
+  document.getElementById('shareCardModal').classList.add('show');
+  document.getElementById('shareCopyBtn').onclick = () => {
+    navigator.clipboard.writeText(text).then(() => {
+      document.getElementById('shareCopyBtn').textContent = 'COPIED!';
+      setTimeout(() => { document.getElementById('shareCopyBtn').textContent = 'COPY TO CLIPBOARD'; }, 2000);
+    });
+  };
+  document.getElementById('shareCloseBtn').onclick = () => {
+    document.getElementById('shareCardModal').classList.remove('show');
+  };
+}
+
 
 // ============ SUBMISSIONS RENDER ============
 function renderSubmissions() {
@@ -2127,16 +2811,43 @@ document.getElementById('garageLoadMore')?.addEventListener('click', () => {
 })();
 
 // ============ SUPABASE LOADERS ============
+// ── Infinite challenge generator (seeded from UTC date) ──────────────────
+function _seed(s){return s.split('-').map(Number).reduce((a,b)=>a*400+b,0);}
+function _rng(s){let x=s;return function(){x=Math.imul(x^(x>>>16),0x45d9f3b);x=Math.imul(x^(x>>>16),0x45d9f3b);x^=x>>>16;return(x>>>0)/0xffffffff;};}
+function _pick(arr,r){return arr[Math.floor(r()*arr.length)];}
+function _dayNum(d){return Math.floor((new Date(d)-new Date('2024-01-01'))/86400000)+1;}
+const DAILY_TEMPLATES=[
+  {title:'THE LOTTERY WIN',desc:"Money is no object. Choose the car of your dreams.",budgets:[500000,750000,1000000],bl:[]},
+  {title:'BANGER BUDGET',desc:"You've scraped together everything you have. Make it work.",budgets:[500,1000,2000,3000],bl:[]},
+  {title:'THE PURIST',desc:"Power through the rear wheels only. Old school, always.",budgets:[30000,50000,80000,120000],bl:['FWD','AWD']},
+  {title:'SENSIBLE SHOES',desc:"You need something practical. What actually makes sense?",budgets:[10000,15000,20000,25000],bl:[]},
+  {title:'MIDNIGHT RUN',desc:"Late night, empty roads. Choose something you will remember.",budgets:[35000,55000,80000],bl:['FWD']},
+  {title:'THE TRACK WEAPON',desc:"One car, one mission. Make the lap times talk.",budgets:[80000,120000,200000],bl:['FWD']},
+  {title:'THE SLEEPER',desc:"It has to look completely boring. Nobody can know.",budgets:[15000,25000,40000],bl:[]},
+  {title:'FIRST CAR FEVER',desc:"You have just passed your test. This is your budget.",budgets:[1500,2000,3000],bl:[]},
+  {title:'THE INHERITANCE',desc:"Your uncle left you this in his will. He would want you to enjoy it.",budgets:[25000,40000,65000,100000],bl:[]},
+  {title:'WEEKEND WARRIOR',desc:"Five days of commuting for this one moment. Make it count.",budgets:[40000,60000,90000],bl:[]},
+  {title:'GARAGE QUEEN',desc:"This one never sees rain. It just needs to look magnificent.",budgets:[200000,350000,500000],bl:[]},
+  {title:'THE IMPULSE BUY',desc:"You were just browsing AutoTrader. Whoops.",budgets:[5000,8000,12000],bl:[]},
+  {title:'RETIREMENT REWARD',desc:"Forty years of work. You have earned this.",budgets:[80000,120000,180000],bl:[]},
+  {title:'PROJECT CAR',desc:"It is going in the garage. Wrench time. What are you fixing up?",budgets:[3000,5000,8000],bl:[]},
+  {title:'GRAND TOURER',desc:"You are driving to the south of France. Comfort and pace.",budgets:[60000,90000,150000],bl:[]},
+  {title:'MOTORSPORT MONDAY',desc:"Race-derived, road-legal. The line between track and street.",budgets:[100000,200000,350000],bl:['FWD']},
+  {title:'THE GUMBALL RACER',desc:"No speed limits apply. You know what this is for.",budgets:[250000,400000,600000],bl:[]},
+  {title:'SKINT SUNDAY',desc:"You checked the account. This is genuinely the budget.",budgets:[800,1200,1800],bl:[]},
+  {title:'THE DAILY DRIVER',desc:"You are driving this to work every single day. Choose wisely.",budgets:[8000,12000,18000,25000],bl:[]},
+  {title:'AWD ONLY',desc:"Traction is the priority. Four wheels get the power.",budgets:[30000,50000,80000,150000],bl:['RWD','FWD']},
+];
+function generateDailyChallenge(dateStr){
+  const r=_rng(_seed(dateStr)*7+3);
+  const t=_pick(DAILY_TEMPLATES,r);
+  const budget=_pick(t.budgets,r);
+  return{id:dateStr,number:_dayNum(dateStr),title:t.title,description:t.desc,max_price:budget,drivetrain_blacklist:t.bl,closes_at:dateStr+'T23:59:59.000Z'};
+}
+
 async function loadChallenge() {
-  const now = new Date().toISOString();
-  let { data, error } = await sb.from('challenges')
-    .select('*').gte('closes_at', now)
-    .order('closes_at', { ascending: true }).limit(1).single();
-  if (error || !data) {
-    const fallback = await sb.from('challenges').select('*').order('closes_at', { ascending: false }).limit(1).single();
-    data = fallback.data;
-  }
-  if (!data) return;
+  const dateStr = new Date().toISOString().slice(0,10);
+  const data = generateDailyChallenge(dateStr);
   TODAY = {
     id: data.id, number: data.number, title: data.title, description: data.description,
     closes_at: data.closes_at, max_price: data.max_price,
@@ -2190,16 +2901,28 @@ let gcVotes = new Set();
 let gcVisibleCount = 24;
 
 // ============ GARAGE CHALLENGE LOADERS ============
+const TRIO_TEMPLATES=[
+  {title:'THE ULTIMATE GARAGE',desc:"Three cars that cover everything. Daily, weekend, track day.",budgets:[200000,350000,500000],bl:[]},
+  {title:'THE COLLECTOR',desc:"Three cars that belong in a proper collection. Invest wisely.",budgets:[500000,750000,1000000],bl:[]},
+  {title:'THREE FOR THREE GRAND',desc:"Combined budget of three grand. Three cars. Good luck.",budgets:[3000,5000,8000],bl:[]},
+  {title:'THE JDM SHRINE',desc:"Build the ultimate Japanese icon garage in this budget.",budgets:[80000,120000,180000],bl:[]},
+  {title:'NO COMPROMISE',desc:"No restrictions. Pure perfection in three cars.",budgets:[1000000,1500000,2000000],bl:[]},
+  {title:'SUNDAY DRIVERS',desc:"Three cars built purely for joy. Never for commuting.",budgets:[120000,200000,300000],bl:['FWD']},
+  {title:'TRACK, ROAD, COMFORT',desc:"One for the track, one for the drive, one for the long haul.",budgets:[150000,250000,400000],bl:[]},
+  {title:'THE FAMILY FLEET',desc:"Three cars that serve a whole family. Compromise is key.",budgets:[40000,65000,90000],bl:[]},
+  {title:'ROUND THE WORLD',desc:"Three cars for three different adventures. Choose them well.",budgets:[60000,100000,150000],bl:[]},
+  {title:'THE BANGER FLEET',desc:"Three cars combined under the price of a decent holiday.",budgets:[5000,8000,12000],bl:[]},
+];
+function generateGcChallenge(dateStr){
+  const r=_rng(_seed(dateStr)*13+99991);
+  const t=_pick(TRIO_TEMPLATES,r);
+  const budget=_pick(t.budgets,r);
+  return{id:'gc-'+dateStr,number:_dayNum(dateStr),title:t.title,description:t.desc,max_price:budget,drivetrain_blacklist:t.bl,closes_at:dateStr+'T23:59:59.000Z'};
+}
+
 async function loadGcChallenge() {
-  const now = new Date().toISOString();
-  let { data, error } = await sb.from('garage_challenges')
-    .select('*').gte('closes_at', now)
-    .order('closes_at', { ascending: true }).limit(1).single();
-  if (error || !data) {
-    const fb = await sb.from('garage_challenges').select('*').order('closes_at', { ascending: false }).limit(1).single();
-    data = fb.data;
-  }
-  if (!data) return;
+  const dateStr = new Date().toISOString().slice(0,10);
+  const data = generateGcChallenge(dateStr);
   gcChallenge = data;
   gcChallenge.drivetrain_blacklist = data.drivetrain_blacklist || [];
   document.getElementById('gcTag').textContent = '▶ TRIO CHALLENGE ' + String(data.number).padStart(3,'0');
@@ -2625,5 +3348,17 @@ document.addEventListener('DOMContentLoaded', function() {
       <button class="welcome-go-btn" id="welcomeGoBtn">LET'S GO ▶</button>
     </div>
   </div>
+
+<!-- Share card modal -->
+<div class="share-card-modal" id="shareCardModal">
+  <div class="share-card-inner">
+    <div class="share-card-title">🏎️ SHARE YOUR PICK</div>
+    <div class="share-card-text" id="shareCardText"></div>
+    <div class="share-card-btns">
+      <button class="share-copy-btn" id="shareCopyBtn">COPY TO CLIPBOARD</button>
+      <button class="share-close-btn" id="shareCloseBtn">CLOSE</button>
+    </div>
+  </div>
+</div>
 </body>
 </html>
